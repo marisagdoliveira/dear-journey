@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
+import AddPic from '../../public/assets/AddPic.svg'
+
+
 
 
 const UserPic = ({ user }) => {
   const [userPic, setUserPic] = useState(null);
 
-  useEffect(() => {
-    // Update userPic state when user.img prop changes
-    setUserPic(user.img || null);
-  }, [user.img]);
+
+// Descomentar este useEffect após existir a lógica de file upload: 
+
+   useEffect(() => {
+     // Update userPic state when user.img prop changes
+     setUserPic(user.img || null);
+   }, [user.img]);
 
  
 
@@ -18,8 +24,8 @@ const UserPic = ({ user }) => {
       {userPic ? (
         <img src={`/assets/${userPic}`} alt="User Pic" className="w-[100%] h-[100%] rounded-full object-cover" />
       ) : (
-        <div className='w-full h-full bg-[#5b4a95] flex justify-center items-center'>JOORGE
-            
+        <div className='picholder w-full h-full bg-[#5c43b0] flex justify-center items-center'><AddPic className=""/>
+
         </div>
       )}
     </div>

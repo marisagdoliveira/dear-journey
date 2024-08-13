@@ -136,3 +136,9 @@ body{
     #8472FF 100%
   );
 }
+
+
+.picholder{
+  background-image: radial-gradient(circle,#6B64FF, #c0affdee);
+
+}

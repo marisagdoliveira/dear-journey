@@ -47,7 +47,7 @@ const NavBar = () => {
     };
 
     return (
-        <div className="h-[415px] w-fit px-4 flex items-center py-8 relative border ml-10 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)]">
+        <div className="h-[430px] w-fit px-4 flex items-center py-8 relative border ml-10 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)]">
             <div style={{ 
                 position: 'absolute',
                 top: 0,
