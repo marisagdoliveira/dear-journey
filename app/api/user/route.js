@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import User from "@/models/User"; // Import your User model
+import User from "@/models/User";
 import { connectDB } from "@/lib/mongodb";
 
 // Getting the user:
