@@ -9,10 +9,12 @@ import UserPic from "../components/UserPic";
 
 export default function Homepage() {
   const [username, setUsername] = useState("");
-  const [objectUser, setObjectUser] = useState(""); // isto é à toa - ñ ha nenhum obj ficticio neste projeto
+  const [userPic, setUserPic] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [email, setEmail] = useState("");
   const router = useRouter();
 
-  // Fetch user data to confirm authentication
+  // Fetch user data to confirm authentication - BEFORE USERPIC LOGIC:
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -26,20 +28,31 @@ export default function Homepage() {
 
         const data = await res.json();
         console.log(data)
-        setObjectUser(data.user);
         if (!data.user.username) { // ---------------> this is the way to access userinfo -> "data.user.whatever"
           throw new Error("User not authenticated");
         }
         setUsername(data.user.username);// ---------------> this is the way to access userinfo -> data.user.x
+        setUserPic(data.user.img || null); // -----------> set state userPic
+        setEmail(data.user.email);
       } catch (error) {
         console.error("Error fetching user data:", error);
         router.replace("/"); // Redirect to login if not authenticated
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchUser();
   }, [router]);
 
+
+  const handlePicChange = (newPicUrl) => {
+    setUserPic(newPicUrl);
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
 
   return (
@@ -53,7 +66,7 @@ export default function Homepage() {
           </div>
         </div>
         <div className="fixed top-12 right-16 w-[100px] h-[100px]">
-          <UserPic user={objectUser} />
+        <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
       </div>
       <div className="mt-14">
