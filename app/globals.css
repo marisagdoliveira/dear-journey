@@ -192,3 +192,28 @@ body{
     opacity: 0;
   }
 }
+
+
+/* Hide scrollbar track and buttons */
+::-webkit-scrollbar-track,
+::-webkit-scrollbar-corner,
+::-webkit-scrollbar-button {
+    background: transparent; /* Make it transparent */
+}
+
+/* Hide the scrollbar track for non-webkit browsers (e.g., Firefox) */
+::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5); /* Mac-like dark thumb */
+  border-radius: 10px; /* Rounded corners */
+  width: 8px; /* Set a width similar to macOS */
+}
+
+/* For non-webkit browsers (e.g., Firefox) */
+.scroll-container {
+  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+  scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
+}
+
+textarea {
+  resize: none; /* Disables resizing */
+}

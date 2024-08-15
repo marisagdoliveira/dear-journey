@@ -130,7 +130,7 @@ export default function Calendar() {
   const handleConfirmAddNote = (day) => {
     const entry = getDateEntry(day);
     const newNotes = [...entry.smallNotes, { content: newNoteContent }];
-    handleEntryChange(day, entry.mainContent, newNotes);
+    handleEntryChange(day, entry.mainContent, entry.smallNotes);
     setNewNoteContent('');
     setShowAddNoteInput(false);
   };
