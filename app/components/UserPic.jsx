@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import AddPic from '../../public/assets/AddPic.svg'
-import LoadingSpinner from './LoadingSpinner'; // Import your loading spinner component
+import LoadingSpinner from './LoadingSpinner';
+
 
 
 
@@ -25,7 +26,7 @@ const UserPic = ({ user, onPicChange }) => {
         if (refresh) {
           setTimeout(() => {
             window.location.reload();
-          }, 2000); // Delay the reload to allow the animation to play for 1 second
+          }, 1000); // Delay the reload to allow the animation to play for 1 second
         }
       }, [refresh]);
     

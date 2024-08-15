@@ -55,7 +55,6 @@ const NavBar = () => {
                 width: '100%',
                 height: '100%',
                 marginLeft: '20px',
-                backgroundColor: 'rgba(59, 130, 246, 0.8)',
                 zIndex: -1,
             }}></div>
             <div className='relative flex-1 flex flex-col items-start justify-evenly'>

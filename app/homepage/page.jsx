@@ -65,11 +65,11 @@ export default function Homepage() {
             </div>
           </div>
         </div>
-        <div className="fixed top-12 right-16 w-[100px] h-[100px]">
+        <div className="fixed top-12 right-16 w-[100px] h-[100px] z-50" >
         <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
       </div>
-      <div className="mt-14">
+      <div className="mt-14 z-0">
         <Navbar />
       </div>
         <Calendar />
