@@ -4,6 +4,10 @@ const Schema = mongoose.Schema;
 
 // Small notes schema:
 
+
+
+// Library Entry schema:
+
 const SmallNotesSchema = new Schema({
   content: {
     type: String,
@@ -11,8 +15,6 @@ const SmallNotesSchema = new Schema({
     default: undefined
   },
 });
-
-// Library Entry schema:
 
 const LibraryEntrySchema = new Schema({
   title: {

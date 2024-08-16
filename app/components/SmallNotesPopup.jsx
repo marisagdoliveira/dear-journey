@@ -3,33 +3,38 @@ import { FaCheck } from "react-icons/fa6";
 import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg"
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 
-const SmallNotesPopup = ({ smallNotes, onSave, setSmallNotes }) => {
+const SmallNotesPopup = ({ smallNotes, onSave, setSmallNotes, setUpdatedNotes }) => {
 
 
 
-  const [newNote, setNewNote] = useState('');
+    const [newNote, setNewNote] = React.useState('');
 
-  const handleSaveNote = (index) => {
-    // Update the existing note
-    const updatedNotes = [...smallNotes];
-    if (index < smallNotes.length) {
-      onSave(); // Save the updated notes
-    }
-  };
-
-  const handleAddNewNote = () => {
-    if (newNote.trim() !== '') {
-      const updatedNotes = [...smallNotes, newNote];
-      setSmallNotes(updatedNotes);
-      setNewNote('');
-      onSave(); // Save the updated notes including the new note
-    }
-  };
+    const handleSaveNote = (index) => {
+        const updatedNotes = [...smallNotes];
+        updatedNotes[index] = { content: smallNotes[index].content }; // Ensure it's updated correctly
+        setSmallNotes(updatedNotes);
+        setUpdatedNotes(updatedNotes);
+        console.log("Updated smallNotes (handleSaveNote):", updatedNotes);
+        setTimeout(() => onSave(), 1000); // Delay to ensure state update
+      };
+    
+      const handleAddNewNote = () => {
+        if (newNote.trim() !== '') {
+          const updatedNotes = [...smallNotes, { content: newNote }];
+          setSmallNotes(updatedNotes);
+          setUpdatedNotes(updatedNotes);
+          console.log("Updated smallNotes (handleAddNewNote):", updatedNotes);
+          setNewNote('');
+          setTimeout(() => onSave(), 1000); // Delay to ensure state update
+        }
+      };
+  
 
 
   return (
     <div>
-        <div className='mt-10 max-w-{80%} w-full max-h-{800px} h-fit flex items-center overflow-y-auto overflow-x-hidden'>
+       <div className='mt-10 w-[650px] max-h-[500px] h-fit flex flex-wrap gap-6 items-center overflow-auto scroll-container'>
+
         
         {smallNotes.map((note, index) => (
           <div key={index}>
@@ -39,12 +44,13 @@ const SmallNotesPopup = ({ smallNotes, onSave, setSmallNotes }) => {
             <p className="absolute left-5 top-5">{index+1}</p>
             <div className='absolute left-5 top-16'>
                 <textarea
-              value={note}
+              value={note.content}
               onChange={(e) => {
                 const updatedNotes = [...smallNotes];
                 updatedNotes[index] = e.target.value;
-                setSmallNotes(updatedNotes);
-              }}
+                setSmallNotes(updatedNotes)
+                setUpdatedNotes(updatedNotes);
+            }}
               placeholder='Write your retrospective here...'
               className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
             />
