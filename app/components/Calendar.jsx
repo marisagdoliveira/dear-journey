@@ -23,10 +23,11 @@ export default function Calendar() {
 
   useEffect(() => {
     fetchUserAndJournalEntries();
-  }, [currentMonth]);
-  useEffect(() => {
-    fetchUserAndJournalEntries();
-  }, [title]);
+  }, [currentMonth, title]);
+  
+  //useEffect(() => {
+  //  fetchUserAndJournalEntries();
+  //}, [title]);
 
   const fetchUserAndJournalEntries = async () => {
     try {
@@ -36,6 +37,7 @@ export default function Calendar() {
         setEmail(data.user.email);
         setJournalEntries(data.user.library);
         console.log('Journal entries:', journalEntries);
+
 
       } else {
         throw new Error("Failed to fetch user data.");
