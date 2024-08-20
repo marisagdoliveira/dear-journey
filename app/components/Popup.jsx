@@ -15,6 +15,10 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [smallPopupOpen, setSmallPopupOpen] = useState(false);
   const [updatedNotes, setUpdatedNotes] = useState([]);
 
+
+
+
+  
   useEffect(() => {
     // Fetch user data and journal entries when the component mounts
     const fetchUserAndJournalEntries = async () => {
@@ -33,6 +37,11 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
             setMainContent(entry.mainContent || '');
             setSmallNotes(entry.smallNotes || []);
             setTitle1(entry.title || "");
+          } else {
+            setTitle('');
+            setMainContent('');
+            setSmallNotes([]);
+            setTitle1("");
           }
         } else {
           throw new Error("Failed to fetch user data.");
@@ -45,9 +54,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
     fetchUserAndJournalEntries();
   }, [noteDate, setTitle1]);
 
-  useEffect(() => {
-    console.log("Updated smallNotes in Popup:", smallNotes);
-  }, [smallNotes]);
+  
 
   const saveEntry = async () => {
     console.log('Before saving:', { title, email, mainContent, smallNotes });
@@ -104,8 +111,8 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   return (
     <div className='popup-content bg-[#2c2251b2] w-[100vh] h-[90vh] p-10 relative'>
       {smallPopupOpen && (
-        <div className='absolute cursor-pointer' style={{ left: "-115px", top: "15px" }}>
-          <BackIcon onClick={() => setSmallPopupOpen(false)} />
+        <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%",  top: "15px", zIndex: 100000 }}>
+          <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
         </div>
       )}
 
@@ -156,6 +163,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
           noteDate={noteDate}
           setSmallNotes={setSmallNotes}
           setUpdatedNotes={setUpdatedNotes}
+          saveEntry={saveEntry}
         />
       )}
     </div>

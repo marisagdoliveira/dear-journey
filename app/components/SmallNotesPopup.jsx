@@ -3,10 +3,12 @@ import { FaCheck } from "react-icons/fa6";
 import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg"
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 
-const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdatedNotes }) => {
+const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdatedNotes, saveEntry }) => {
 
     const [newNote, setNewNote] = React.useState('');
-
+    
+    
+      
     const saveSmallNotes = async (updatedNotes) => {
       try {
           const response = await fetch('/api/smallnotes', {
@@ -26,7 +28,10 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
           }
   
           setSmallNotes(updatedNotes); // Update the local state
-          setUpdatedNotes(updatedNotes); // Update parent state
+          setUpdatedNotes(updatedNotes);
+          
+          
+           // Update parent state
           //setSmallPopupOpen(false); // Optionally close the popup after saving
       } catch (error) {
           console.error('Error saving small notes:', error);
@@ -42,6 +47,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
         setUpdatedNotes(updatedNotes);
         saveSmallNotes(updatedNotes); // Save only small notes
         console.log("Updated smallNotes (handleSaveNote):", updatedNotes);
+        
     };
 
     const handleAddNewNote = () => {
@@ -52,13 +58,27 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
             saveSmallNotes(updatedNotes); // Save only small notes
             console.log("Updated smallNotes (handleAddNewNote):", updatedNotes);
             setNewNote('');
+            
+            
         }
     };
 
     return (
         <div>
             <div className='mt-10 w-[650px] max-h-[500px] h-fit flex flex-wrap gap-6 items-center overflow-auto scroll-container'>
-
+                <div className='relative'>
+                    <SmallPopupIcon className="size-72"/>
+                    <AddIconSmall className="absolute left-5 top-5" />
+                    <div className='absolute left-5 top-16'>
+                        <textarea
+                            value={newNote}
+                            onChange={(e) => setNewNote(e.target.value)}
+                            placeholder='Write your retrospective here...'
+                            className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+                        />
+                    </div>
+                    <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
+                </div>
                 {smallNotes.map((note, index) => (
                     <div key={index}>
                         <div className='relative'>
@@ -82,19 +102,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
                     </div>
                 ))}
 
-                <div className='relative'>
-                    <SmallPopupIcon className="size-72"/>
-                    <AddIconSmall className="absolute left-5 top-5" />
-                    <div className='absolute left-5 top-16'>
-                        <textarea
-                            value={newNote}
-                            onChange={(e) => setNewNote(e.target.value)}
-                            placeholder='Write your retrospective here...'
-                            className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-                        />
-                    </div>
-                    <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
-                </div>
+                
             </div>
         </div>
     );
