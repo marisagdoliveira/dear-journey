@@ -4,27 +4,49 @@ import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
 import SmallNotesPopup from './SmallNotesPopup';
 
-const Popup = ({ email, noteDate, onSave, getDateEntry, setTitle1 }) => {
+const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
-  const [smallNotes, setSmallNotes] = useState(getDateEntry(new Date(noteDate)).smallNotes);
+  const [smallNotes, setSmallNotes] = useState([]);
+  const [journalEntries, setJournalEntries] = useState([]);
+  const [email, setEmail] = useState('');
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
   const [smallPopupOpen, setSmallPopupOpen] = useState(false);
-  const [updatedNotes, setUpdatedNotes] = useState([])
+  const [updatedNotes, setUpdatedNotes] = useState([]);
 
   useEffect(() => {
-    const entry = getDateEntry(new Date(noteDate));
-    setTitle(entry.title || '');
-    setMainContent(entry.mainContent || '');
-    setSmallNotes(entry.smallNotes || []);
-    setTitle1(entry.title || "");
-  }, [noteDate, getDateEntry]);
+    // Fetch user data and journal entries when the component mounts
+    const fetchUserAndJournalEntries = async () => {
+      try {
+        const response = await fetch(`/api/user`);
+        if (response.ok) {
+          const data = await response.json();
+          setEmail(data.user.email);
+          setJournalEntries(data.user.library);
+          console.log('Journal entries:', data.user.library);
+          
+          // Automatically update the small notes for the current date
+          const entry = data.user.library.find(entry => new Date(entry.date).toISOString() === noteDate.toISOString());
+          if (entry) {
+            setTitle(entry.title || '');
+            setMainContent(entry.mainContent || '');
+            setSmallNotes(entry.smallNotes || []);
+            setTitle1(entry.title || "");
+          }
+        } else {
+          throw new Error("Failed to fetch user data.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    };
+
+    fetchUserAndJournalEntries();
+  }, [noteDate, setTitle1]);
 
   useEffect(() => {
     console.log("Updated smallNotes in Popup:", smallNotes);
-    console.log("Updated smallNotes in Popup:", updatedNotes);
-    
   }, [smallNotes]);
 
   const saveEntry = async () => {
@@ -32,31 +54,51 @@ const Popup = ({ email, noteDate, onSave, getDateEntry, setTitle1 }) => {
 
     const date = noteDate.toISOString();
     try {
-      setIsSaving(true);
-      const formattedSmallNotes = updatedNotes.map(note => typeof note === 'string' ? { content: note } : note);
-      console.log('Saving entry:', { title, email, date, mainContent, smallNotes });
-      const response = await fetch('/api/register', {
-        method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ title, email, date, mainContent, smallNotes: formattedSmallNotes }),
-      });
-      if (!response.ok) {
-        throw new Error('Failed to save entry.');
-      }
-      const result = await response.json();
-      console.log('Saved entry:', result);
-      setSmallNotes(updatedNotes)
-      onSave( noteDate, title, mainContent, updatedNotes)
-      setSaveMessage('Entry saved successfully.');
-      
+        setIsSaving(true);
+
+        // Ensure smallNotes are always passed as the correct current state
+        const notesToSave = updatedNotes.length > 0 ? updatedNotes : smallNotes;
+
+        const formattedSmallNotes = notesToSave.map(note => typeof note === 'string' ? { content: note } : note);
+        console.log('Saving entry:', { title, email, date, mainContent, smallNotes: formattedSmallNotes });
+
+        const response = await fetch('/api/register', {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                title,
+                email,
+                date,
+                mainContent,
+                smallNotes: formattedSmallNotes
+            }),
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to save entry.');
+        }
+
+        const result = await response.json();
+        console.log('Saved entry:', result);
+
+        // Update state with the current saved data
+        setSmallNotes(formattedSmallNotes);
+        onSave(noteDate, title, mainContent, formattedSmallNotes);
+
+        setSaveMessage('Entry saved successfully.');
     } catch (error) {
-      console.error('Error saving journal entry:', error);
-      setSaveMessage('Failed to save entry. Please try again.');
+        console.error('Error saving journal entry:', error);
+        setSaveMessage('Failed to save entry. Please try again.');
     } finally {
-      setIsSaving(false);
+        setIsSaving(false);
     }
+};
+
+
+  const handleOpenPopup = () => {
+    setSmallPopupOpen(true);
   };
 
   return (
@@ -95,23 +137,31 @@ const Popup = ({ email, noteDate, onSave, getDateEntry, setTitle1 }) => {
           </button>
           {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
           <div className='flex items-center'>
-          <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
-            {smallNotes.map((note, index) => (
-              <div key={index} className='relative cursor-pointer'>
-                <p className="absolute left-5 top-5">{index+1}</p>
-                <SmallPopupIcon className="size-24" onClick={() => setSmallPopupOpen(true)} />
-              </div>
-            ))}
-          </div>
-            <AddIconSmall className="cursor-pointer" onClick={() => setSmallPopupOpen(true)} />
+            <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
+              {smallNotes.map((note, index) => (
+                <div key={index} className='relative cursor-pointer'>
+                  <p className="absolute left-5 top-5">{index + 1}</p>
+                  <SmallPopupIcon className="size-24" onClick={handleOpenPopup} />
+                </div>
+              ))}
+            </div>
+            <AddIconSmall className="cursor-pointer" onClick={handleOpenPopup} />
           </div>
         </div>
       )}
       {smallPopupOpen && (
-        <SmallNotesPopup setUpdatedNotes={setUpdatedNotes} smallNotes={smallNotes} onSave={saveEntry} setSmallNotes={setSmallNotes} />
+        <SmallNotesPopup
+          smallNotes={smallNotes}
+          email={email}
+          noteDate={noteDate}
+          setSmallNotes={setSmallNotes}
+          setUpdatedNotes={setUpdatedNotes}
+        />
       )}
     </div>
   );
 };
 
 export default Popup;
+
+
