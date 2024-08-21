@@ -3,6 +3,9 @@ import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg";
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
 import SmallNotesPopup from './SmallNotesPopup';
+import { GoTrash } from "react-icons/go";
+
+
 
 const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [title, setTitle] = useState('');
@@ -133,15 +136,17 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
             onChange={(e) => setMainContent(e.target.value)}
             placeholder='Write your journal entry here...'
             className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-          />
+          /><div className='flex flex-row items-center space-x-4 '>
           <button
             onClick={saveEntry}
-            className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 rounded-2xl hover:box-shadow-white justify-center items-center darker-grotesque-main'
+            className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
             style={{ fontWeight: 500 }}
             disabled={isSaving}
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
+          <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300" />
+          </div>
           {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
           <div className='flex items-center'>
             <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>

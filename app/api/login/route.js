@@ -26,7 +26,10 @@ export async function POST(req) {
       return NextResponse.json({ message: "Invalid email or password" }, { status: 401 });
     }
 
-    const passwordMatch = await bcrypt.compare(password, user.password);
+
+    const passwordMatch = user.password.length < 20 // plain text check (not secure - must hash passwords)
+    ? user.password === password // Plain text check (not secure)
+    : await bcrypt.compare(password, user.password);
     console.log("Password match:", passwordMatch);
 
     if (!passwordMatch) {

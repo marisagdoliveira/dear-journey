@@ -58,7 +58,7 @@ const NavBar = () => {
                 zIndex: -1,
             }}></div>
             <div className='relative flex-1 flex flex-col items-start justify-evenly'>
-                <div className='py-[10px]' onClick={toggleSideBar}>
+                <div className='py-[10px] cursor-pointer' onClick={toggleSideBar}>
                     <Resize />
                 </div>
                 <Link href="/homepage" className={`flex items-center py-[10px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>

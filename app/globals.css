@@ -119,6 +119,7 @@ body{
 }
 
 
+  
 .popup-content {
   border-radius: 50px 50px 0 0;
 
@@ -217,4 +218,12 @@ body{
 
 textarea {
   resize: none; /* Disables resizing */
+}
+
+.shadow-save {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2), 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.shadow-save-hover {
+  box-shadow: 0 4px 12px rgba(130, 116, 208, 0.5); /* Custom color with more blur */
 }
