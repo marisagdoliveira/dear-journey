@@ -79,3 +79,46 @@ export async function PATCH(req) {
 }
 
 
+// Delete a whole entry + smallNotes:
+export async function DELETE(req) {
+  try {
+    // Parse request body to extract the data
+    const { email, date } = await req.json();
+    console.log('Received DELETE request:', { email, date });
+
+    // Connect to the database
+    await connectDB();
+
+    // Validate required fields
+    if (!email || !date) {
+      return NextResponse.json({ message: "User email and date are required." }, { status: 400 });
+    }
+
+    // Find user by email
+    const user = await User.findOne({ email });
+    if (!user) {
+      return NextResponse.json({ message: "User not found." }, { status: 404 });
+    }
+
+    // Convert date string to Date object
+    const entryDate = new Date(date);
+
+    // Find the index of the entry to delete
+    const entryIndex = user.library.findIndex(entry => entry.date.getTime() === entryDate.getTime());
+
+    if (entryIndex === -1) {
+      return NextResponse.json({ message: "Library entry not found." }, { status: 404 });
+    }
+
+    // Remove the entry from the user's library
+    user.library.splice(entryIndex, 1);
+
+    // Save the updated user document
+    await user.save();
+
+    return NextResponse.json({ message: "Library entry deleted successfully." }, { status: 200 });
+  } catch (error) {
+    console.log("Error: ", error);
+    return NextResponse.json({ message: "An error occurred while deleting the library entry." }, { status: 500 });
+  }
+}

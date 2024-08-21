@@ -111,6 +111,43 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
     setSmallPopupOpen(true);
   };
 
+
+  const deleteEntry = async () => {
+    try {
+      const response = await fetch('/api/register', {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email,
+          date: noteDate.toISOString(),
+        }),
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to delete entry.');
+      }
+  
+      const result = await response.json();
+      console.log('Deleted entry:', result);
+  
+      // Notify parent component about the deletion
+      if (onSave) {
+        onSave(noteDate, '', '', []);
+      }
+  
+      // Clear the current state
+      setTitle('');
+      setMainContent('');
+      setSmallNotes([]);
+      setTitle1("");
+    } catch (error) {
+      console.error('Error deleting journal entry:', error);
+    }
+  };
+  
+
   return (
     <div className='popup-content bg-[#2c2251b2] w-[100vh] h-[90vh] p-10 relative'>
       {smallPopupOpen && (
@@ -145,7 +182,8 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
           >
             {isSaving ? 'Saving...' : 'Save'}
           </button>
-          <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300" />
+          <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
+          onClick={deleteEntry} />
           </div>
           {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
           <div className='flex items-center'>
