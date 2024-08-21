@@ -155,6 +155,8 @@ export default function Calendar() {
         })}
       </div>
       {showPopup && (
+        <div>
+          <div className="overlay_blur"></div>
         <div className="popup border border-white/45">
           <div className="popup-content flex flex-col justify-center items-center relative">
             <div className="flex w-full justify-end items-end">
@@ -168,6 +170,7 @@ export default function Calendar() {
               <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
             </div>
           </div>
+        </div>
         </div>
         )}
     </div>

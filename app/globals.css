@@ -111,6 +111,7 @@ body{
   box-shadow: 0 0 10px rgba(28, 14, 63, 0.2);
   overflow: hidden;
   animation: scaleUp 0.5s ease-in-out;
+  z-index: 10000;
 }
 
 @keyframes scaleUp {
@@ -122,6 +123,7 @@ body{
   
 .popup-content {
   border-radius: 50px 50px 0 0;
+  z-index: 100;
 
 }
 
@@ -226,4 +228,18 @@ textarea {
 
 .shadow-save-hover {
   box-shadow: 0 4px 12px rgba(130, 116, 208, 0.5); /* Custom color with more blur */
+}
+
+.overlay_blur{
+  backdrop-filter: blur(4px);
+  width: 100vw;
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.3);
 }

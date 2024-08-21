@@ -58,9 +58,9 @@ export default function Homepage() {
   return (
     <div className="flex items-center justify-center wrapper pb-10">
       <div>
-        <div className="fixed top-5 w-[100px] h-[100px]">
-        <div className="flex w-72 mb-10 h-fit mt-5 mb-2 justify-center items-center font-semibold text-[#5c62da]">
-            <div className="w-full flex justify-center items-center -ml-20">
+        <div className="fixed top-5 w-[100px] h-[100px]" style={{ zIndex: "1000"}}>
+        <div className="flex w-72 mb-10 h-fit mt-5 mb-2 justify-center items-center font-semibold text-[#5c62da]" >
+            <div className="w-full flex justify-center items-center -ml-20" >
               <img src="../../assets/Logo.svg" className="w-28 h-28" />
             </div>
           </div>
@@ -69,7 +69,7 @@ export default function Homepage() {
         <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
       </div>
-      <div className="mt-14 z-0">
+      <div className="mt-14 " style={{ zIndex: "1000"}}>
         <Navbar />
       </div>
         <Calendar />

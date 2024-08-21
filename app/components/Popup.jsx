@@ -191,8 +191,8 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
         /><div className='flex flex-row items-center space-x-4 '>
         <button
           onClick={saveEntry}
-          className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
-          style={{ fontWeight: 500 }}
+          className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 pt-1 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
+          style={{ fontSize: 25 }}
           disabled={isSaving}
         >
           {isSaving ? 'Saving...' : 'Save'}
