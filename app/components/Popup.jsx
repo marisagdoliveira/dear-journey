@@ -2,8 +2,12 @@ import React, { useState, useEffect } from 'react';
 import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg";
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
+import CancelX from "../../public/assets/CancelX.svg";
 import SmallNotesPopup from './SmallNotesPopup';
+import { FaCheck } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
+import { Darker_Grotesque } from 'next/font/google';
+
 
 
 
@@ -17,6 +21,8 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [saveMessage, setSaveMessage] = useState('');
   const [smallPopupOpen, setSmallPopupOpen] = useState(false);
   const [updatedNotes, setUpdatedNotes] = useState([]);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+
 
 
 
@@ -98,18 +104,16 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
         onSave(noteDate, title, mainContent, formattedSmallNotes);
 
         setSaveMessage('Entry saved successfully.');
-    } catch (error) {
-        console.error('Error saving journal entry:', error);
-        setSaveMessage('Failed to save entry. Please try again.');
-    } finally {
-        setIsSaving(false);
-    }
-};
+        } catch (error) {
+            console.error('Error saving journal entry:', error);
+            setSaveMessage('Failed to save entry. Please try again.');
+        } finally {
+            setIsSaving(false);
+        }
+    };
 
 
-  const handleOpenPopup = () => {
-    setSmallPopupOpen(true);
-  };
+
 
 
   const deleteEntry = async () => {
@@ -146,71 +150,109 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
       console.error('Error deleting journal entry:', error);
     }
   };
+
+  const handleDeleteConfirmation = async (confirm) => {
+    if (confirm) {
+      await deleteEntry(); // Proceed with deletion
+    }
+    setShowConfirmDelete(false); // Hide confirmation dialog
+  };
   
+
+    const handleOpenPopup = () => {
+    setSmallPopupOpen(true);
+  };
 
   return (
     <div className='popup-content bg-[#2c2251b2] w-[100vh] h-[90vh] p-10 relative'>
-      {smallPopupOpen && (
-        <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%",  top: "15px", zIndex: 100000 }}>
-          <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
-        </div>
-      )}
-
-      <div className='flex justify-between mb-4'>
-        <div className='pl-2 text-xl'>{new Date(noteDate).toLocaleDateString('pt-PT')}</div>
-        <input
-          type='text'
-          placeholder='Title'
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className='bg-transparent focus:outline-none text-xl'
-        />
+    {smallPopupOpen && (
+      <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%",  top: "15px", zIndex: 100000 }}>
+        <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
       </div>
-      {!smallPopupOpen && (
-        <div>
-          <textarea
-            value={mainContent}
-            onChange={(e) => setMainContent(e.target.value)}
-            placeholder='Write your journal entry here...'
-            className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-          /><div className='flex flex-row items-center space-x-4 '>
-          <button
-            onClick={saveEntry}
-            className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
-            style={{ fontWeight: 500 }}
-            disabled={isSaving}
-          >
-            {isSaving ? 'Saving...' : 'Save'}
-          </button>
-          <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
-          onClick={deleteEntry} />
-          </div>
-          {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
-          <div className='flex items-center'>
-            <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
-              {smallNotes.map((note, index) => (
-                <div key={index} className='relative cursor-pointer'>
-                  <p className="absolute left-5 top-5">{index + 1}</p>
-                  <SmallPopupIcon className="size-24" onClick={handleOpenPopup} />
-                </div>
-              ))}
-            </div>
-            <AddIconSmall className="cursor-pointer" onClick={handleOpenPopup} />
-          </div>
-        </div>
-      )}
-      {smallPopupOpen && (
-        <SmallNotesPopup
-          smallNotes={smallNotes}
-          email={email}
-          noteDate={noteDate}
-          setSmallNotes={setSmallNotes}
-          setUpdatedNotes={setUpdatedNotes}
-          saveEntry={saveEntry}
-        />
-      )}
+    )}
+
+    <div className='flex justify-between mb-4'>
+      <div className='pl-2 text-xl'>{new Date(noteDate).toLocaleDateString('pt-PT')}</div>
+      <input
+        type='text'
+        placeholder='Title'
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
+        className='bg-transparent focus:outline-none text-xl'
+      />
     </div>
-  );
+    {!smallPopupOpen && (
+      <div>
+        <textarea
+          value={mainContent}
+          onChange={(e) => setMainContent(e.target.value)}
+          placeholder='Write your journal entry here...'
+          className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+        /><div className='flex flex-row items-center space-x-4 '>
+        <button
+          onClick={saveEntry}
+          className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
+          style={{ fontWeight: 500 }}
+          disabled={isSaving}
+        >
+          {isSaving ? 'Saving...' : 'Save'}
+        </button>
+        <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
+        onClick={() => setShowConfirmDelete(true)} />
+        </div>
+        {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
+        <div className='flex items-center'>
+          <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
+            {smallNotes.map((note, index) => (
+              <div key={index} className='relative cursor-pointer'>
+                <p className="absolute left-5 top-5">{index + 1}</p>
+                <SmallPopupIcon className="size-24" onClick={handleOpenPopup} />
+              </div>
+            ))}
+          </div>
+          <AddIconSmall className="cursor-pointer" onClick={handleOpenPopup} />
+        </div>
+      </div>
+    )}
+    {smallPopupOpen && (
+      <SmallNotesPopup
+        smallNotes={smallNotes}
+        email={email}
+        noteDate={noteDate}
+        setSmallNotes={setSmallNotes}
+        setUpdatedNotes={setUpdatedNotes}
+        saveEntry={saveEntry}
+      />
+    )}
+    {showConfirmDelete && (
+      <div className='fixed inset-0 flex items-center justify-center z-50'>
+        {/* Overlay */}
+        <div className='absolute inset-0 bg-[#2a224dba] opacity-80'></div>
+    
+        {/* Confirmation Dialog */}
+        <div className='relative bg-[#7e74ff]/60 p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
+            <p className='mb-4 text-md darker-grotesque-main' style={{ fontWeight: 450 }}>
+              Are you sure you want to delete the whole entry?<br />
+              This action cannot be reversed.
+            </p>
+            <div className='flex justify-end space-x-4'>
+              <FaCheck
+                className='text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
+                size={35}  // Adjust the size as needed
+                onClick={() => handleDeleteConfirmation(true)}  // Confirm deletion 
+              />
+              <CancelX
+                onClick={() => handleDeleteConfirmation(false)} // Cancel deletion
+                className='text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
+                width={35} // Adjust the size as needed
+                height={35} // Adjust the size as needed
+              />
+            </div>
+          </div>
+      </div>
+    )}
+  </div>
+);
 };
 
 export default Popup;
