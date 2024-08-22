@@ -214,8 +214,9 @@ body{
 
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
-  scrollbar-color: rgba(255, 255, 255, 0.5) transparent;
+  scrollbar-color: #6d6db9b8 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
+ 
 }
 
 textarea {
@@ -253,7 +254,7 @@ textarea {
   text-shadow: 
     0 0 10px rgba(141, 141, 242, 1),  /* Intense core glow */
     0 0 20px rgb(163, 163, 252), /* Expanding soft glow */
-    0 0 30px rgba(215, 215, 255, 0.886), /* Larger, softer halo */
+    0 0 30px rgba(255, 255, 255, 0.886), /* Larger, softer halo */
     0 0 40px rgba(215, 215, 255, 0.715), /* Even larger glow */
     0 0 50px rgba(215, 215, 255, 0.572); /* Extensive radial glow */
 }
@@ -286,4 +287,6 @@ textarea {
       transform: rotate(0deg) scale(1); /* Return to normal size */
   }
 }
+
+
 

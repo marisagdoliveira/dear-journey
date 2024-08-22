@@ -70,6 +70,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   useEffect(() => {
     // Function to start and stop the shake animation
     const startShaking = () => {
+      if (showPopup){
       const bell = document.querySelector('.notification-bell');
       
       // Start the shake animation
@@ -79,7 +80,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
       setTimeout(() => {
         bell.style.animationPlayState = 'paused';
       }, 3000); // 3000 ms = 3 seconds
-    };
+    };}
 
     // Start the first shake after 20 seconds
     const shakeTimeout = setTimeout(() => {
@@ -204,7 +205,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   };
 
   return (
-    <div className='popup-content bg-[#2c2251b2] w-[100vh] h-[90vh] p-10 relative'>
+    <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative'>
       {smallPopupOpen && (
         <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%", top: "15px", zIndex: 100000 }}>
           <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
@@ -246,6 +247,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
             </button>
             <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
               onClick={() => setShowConfirmDelete(true)} />
+              <p className='darker-grotesque-main flex ' style={{fontSize: 17}} size={1}>Your insights:</p>
         </div>
         {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
         <div className='flex items-center'>
