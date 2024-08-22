@@ -236,17 +236,18 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
               This action cannot be reversed.
             </p>
             <div className='flex justify-end space-x-4'>
+                <CancelX
+                onClick={() => handleDeleteConfirmation(false)} // Cancel deletion
+                className='bg-[#302c5056] /10 text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
+                width={35} // Adjust the size as needed
+                height={35} // Adjust the size as needed
+              />
               <FaCheck
                 className='text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
                 size={35}  // Adjust the size as needed
                 onClick={() => handleDeleteConfirmation(true)}  // Confirm deletion 
               />
-              <CancelX
-                onClick={() => handleDeleteConfirmation(false)} // Cancel deletion
-                className='text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
-                width={35} // Adjust the size as needed
-                height={35} // Adjust the size as needed
-              />
+
             </div>
           </div>
       </div>

@@ -5,6 +5,8 @@ import { useEffect, useState } from "react";
 import Calendar from "../components/Calendar";
 import Navbar from "../components/Navbar";
 import UserPic from "../components/UserPic";
+import Link from 'next/link';
+
 
 
 export default function Homepage() {
@@ -61,7 +63,9 @@ export default function Homepage() {
         <div className="fixed top-5 w-[100px] h-[100px]" style={{ zIndex: "1000"}}>
         <div className="flex w-72 mb-10 h-fit mt-5 mb-2 justify-center items-center font-semibold text-[#5c62da]" >
             <div className="w-full flex justify-center items-center -ml-20" >
-              <img src="../../assets/Logo.svg" className="w-28 h-28" />
+              <Link href="/welcome" > 
+                <img src="../../assets/Logo.svg" className="w-28 h-28" /> 
+              </Link>
             </div>
           </div>
         </div>
