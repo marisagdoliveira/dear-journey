@@ -243,3 +243,19 @@ textarea {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.3);
 }
+
+/* styles/globals.css or any global CSS file */
+.text-sparkle {
+  transition: all 0.3s ease-in-out;
+}
+
+.text-sparkle:hover {
+  text-shadow: 
+    0 0 10px rgba(141, 141, 242, 1),  /* Intense core glow */
+    0 0 20px rgb(163, 163, 252), /* Expanding soft glow */
+    0 0 30px rgba(215, 215, 255, 0.886), /* Larger, softer halo */
+    0 0 40px rgba(215, 215, 255, 0.715), /* Even larger glow */
+    0 0 50px rgba(215, 215, 255, 0.572); /* Extensive radial glow */
+}
+
+

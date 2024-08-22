@@ -47,7 +47,7 @@ const NavBar = () => {
     };
 
     return (
-        <div className="h-[430px] w-fit px-4 flex items-center py-8 relative border ml-10 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)]">
+        <div className={`h-[430px] ${isOpen ? 'w-[200px]' : 'w-[75px]'} px-4 flex items-center py-8 relative border ml-12 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] transition-all duration-300 ease-in-out`}>
             <div style={{ 
                 position: 'absolute',
                 top: 0,
@@ -58,34 +58,54 @@ const NavBar = () => {
                 zIndex: -1,
             }}></div>
             <div className='relative flex-1 flex flex-col items-start justify-evenly'>
-                <div className='py-[10px] cursor-pointer' onClick={toggleSideBar}>
+                <div className='ml-2 py-[10px]  cursor-pointer' onClick={toggleSideBar}>
                     <Resize />
                 </div>
-                <Link href="/homepage" className={`flex items-center py-[10px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Home className="w-8 h-8" /> {isOpen && <div className={`font-medium`} style={{ marginLeft: '10px' }}>Home</div>}
+                <Link href="/homepage" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Home className="ml-2 w-8 h-8" /> 
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Home
+                    </div>
                 </Link>
-                <Link href="/welcome" className={`flex items-center py-[10px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Welcome className="w-6 h-6" /> {isOpen && <div className={`font-medium`} style={{ marginLeft: '16px' }}>Welcome!</div>}
+                <Link href="/welcome" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Welcome className="ml-2 w-6 h-6" /> 
+                    <div className={`font-medium ml-4 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Welcome!
+                    </div>
                 </Link>
-                <Link href="/profile" className={`flex items-center py-[13px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Profile className="w-8 h-8"/> {isOpen && <div className={`font-medium`} style={{ marginLeft: '10px' }}>Profile</div>}
+                <Link href="/profile" className={`flex items-center py-[13px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Profile className="ml-2 w-8 h-8"/> 
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Profile
+                    </div>
                 </Link>
-                <Link href="/support" className={`flex items-center py-[10px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Support className="w-8 h-8 "/> {isOpen && <div className={`font-medium`} style={{ marginLeft: '10px' }}>Support</div>}
+                <Link href="/support" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Support className="ml-2 w-8 h-8 "/> 
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Support
+                    </div>
                 </Link>
-                <Link href="/profile" className={`flex items-center py-[10px] text-2xl`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Notifications className="w-8 h-8"/> {isOpen && <div className={`font-medium`} style={{ marginLeft: '10px' }}>Notifications</div>}
+                <Link href="/profile" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Notifications className="ml-2 w-8 h-8"/> 
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Notifications
+                    </div>
                 </Link>
                 <button 
-                    className={`flex items-center py-[10px] text-2xl`} 
+                    className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} 
                     style={{ fontFamily: 'Darker Grotesque' }}
                     onClick={handleLogout}
                 >
-                    <Logout className="w-8 h-8 pt-1.5" /> {isOpen && <div className={`font-medium`} style={{ marginLeft: '10px' }} >Log Out</div>}
+                    <Logout className="ml-2 w-8 h-8 pt-1.5" /> 
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                        Log Out
+                    </div>
                 </button>
             </div>
         </div>
     );
+    
+
 };
 
 export default NavBar;
