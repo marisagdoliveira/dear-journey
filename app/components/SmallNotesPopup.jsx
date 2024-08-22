@@ -79,7 +79,6 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
                         />
                     </div>
                     {/* Position TrashSmall to the left of FaCheck */}
-                    <TbTrashX className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" size={30}/>
                     <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
                 </div>
                 {smallNotes.map((note, index) => (
@@ -100,6 +99,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
                                     className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
                                 />
                             </div>
+                            <TbTrashX className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" size={30}/>
                             <FaCheck onClick={() => handleSaveNote(index)} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
                         </div>
                     </div>

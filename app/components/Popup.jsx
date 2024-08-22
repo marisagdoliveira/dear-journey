@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg";
+import SmallPopupIconSmall from "../../public/assets/SmallPopupIconSmall.svg";
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
 import CancelX from "../../public/assets/CancelX.svg";
@@ -24,6 +24,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [smallPopupOpen, setSmallPopupOpen] = useState(false);
   const [updatedNotes, setUpdatedNotes] = useState([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+  const [isClicked, setIsClicked] = useState(false);
 
 
 
@@ -93,11 +94,15 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   
 
   const saveEntry = async () => {
+    
+
+
     console.log('Before saving:', { title, email, mainContent, smallNotes });
 
     const date = noteDate.toISOString();
     try {
         setIsSaving(true);
+        setIsClicked(true);
 
         // Ensure smallNotes are always passed as the correct current state
         const notesToSave = updatedNotes.length > 0 ? updatedNotes : smallNotes;
@@ -136,6 +141,14 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
             setSaveMessage('Failed to save entry. Please try again.');
         } finally {
             setIsSaving(false);
+            // Reset the button state after a short delay
+            setTimeout(() => {
+              setIsClicked(false);
+          }, 100);
+            // Clear the save message after 2 seconds
+            setTimeout(() => {
+              setSaveMessage('');
+          }, 1000);
         }
     };
 
@@ -192,11 +205,11 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
 
   return (
     <div className='popup-content bg-[#2c2251b2] w-[100vh] h-[90vh] p-10 relative'>
-    {smallPopupOpen && (
-      <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%",  top: "15px", zIndex: 100000 }}>
-        <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
-      </div>
-    )}
+      {smallPopupOpen && (
+        <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%", top: "15px", zIndex: 100000 }}>
+          <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
+        </div>
+      )}
       <div className='flex items-center justify-between mb-4'>
         <div className='pl-2 text-xl'>
           {new Date(noteDate).toLocaleDateString('pt-PT')}
@@ -209,41 +222,43 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
           className='bg-transparent focus:outline-none text-xl pl-64'
         />
         <div className='flex items-center justify-center'>
-          <div className=' w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
+          <div className='w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
             <TbBell className='notification-bell text-white' size={26} />
           </div>
         </div>
       </div>
-    {!smallPopupOpen && (
-      <div>
-        <textarea
-          value={mainContent}
-          onChange={(e) => setMainContent(e.target.value)}
-          placeholder='Write your journal entry here...'
-          className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-        /><div className='flex flex-row items-center space-x-4 '>
-        <button
-          onClick={saveEntry}
-          className='flex mt-4 text-3xl bg-[#8585f26f] w-[80px] h-[41px] border border-white/55 p-2 pt-1 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-shadow duration-300'
-          style={{ fontSize: 25 }}
-          disabled={isSaving}
-        >
-          {isSaving ? 'Saving...' : 'Save'}
-        </button>
-        <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
-        onClick={() => setShowConfirmDelete(true)} />
+      {!smallPopupOpen && (
+        <div>
+          <textarea
+            value={mainContent}
+            onChange={(e) => setMainContent(e.target.value)}
+            placeholder='Write your journal entry here...'
+            className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+          />
+          <div className='flex flex-row items-center space-x-4 '>
+            <button
+              onClick={saveEntry}
+              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-transform duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
+              style={{ fontSize: 25 }}
+              disabled={isSaving}
+            >
+              {isSaving ? 'Save' : 'Save'}
+            </button>
+            <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
+              onClick={() => setShowConfirmDelete(true)} />
         </div>
         {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
         <div className='flex items-center'>
           <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
             {smallNotes.map((note, index) => (
               <div key={index} className='relative cursor-pointer'>
-                <p className="absolute left-5 top-5">{index + 1}</p>
-                <SmallPopupIcon className="size-24" onClick={handleOpenPopup} />
+                <p className="absolute left-9 top-8">{index + 1}</p>
+                <SmallPopupIconSmall className="size-24" onClick={handleOpenPopup} />
               </div>
             ))}
           </div>
-          <AddIconSmall className="cursor-pointer" onClick={handleOpenPopup} />
+          {/* Make sure the size matches and is properly aligned */}
+          <AddIconSmall className="size-24 pt-10 cursor-pointer" onClick={handleOpenPopup} />
         </div>
       </div>
     )}
@@ -263,13 +278,13 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
         <div className='absolute inset-0 bg-[#2a224dba] opacity-80'></div>
     
         {/* Confirmation Dialog */}
-        <div className='relative bg-[#7e74ff]/60 p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
+          <div className='relative bg-[#7e74ff]/60 p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
             <p className='mb-4 text-md darker-grotesque-main' style={{ fontWeight: 450 }}>
               Are you sure you want to delete the whole entry?<br />
               This action cannot be reversed.
             </p>
             <div className='flex justify-end space-x-4'>
-                <CancelX
+              <CancelX
                 onClick={() => handleDeleteConfirmation(false)} // Cancel deletion
                 className='bg-[#302c5056] /10 text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
                 width={35} // Adjust the size as needed
@@ -280,13 +295,13 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
                 size={35}  // Adjust the size as needed
                 onClick={() => handleDeleteConfirmation(true)}  // Confirm deletion 
               />
-
             </div>
           </div>
-      </div>
-    )}
-  </div>
-);
+        </div>
+      )}
+    </div>
+  );
+
 };
 
 export default Popup;
