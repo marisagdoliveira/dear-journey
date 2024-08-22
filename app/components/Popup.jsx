@@ -7,6 +7,8 @@ import SmallNotesPopup from './SmallNotesPopup';
 import { FaCheck } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
+import { TbBell } from "react-icons/tb";
+
 
 
 
@@ -63,6 +65,31 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
     fetchUserAndJournalEntries();
   }, [noteDate, setTitle1]);
 
+
+  useEffect(() => {
+    // Function to start and stop the shake animation
+    const startShaking = () => {
+      const bell = document.querySelector('.notification-bell');
+      
+      // Start the shake animation
+      bell.style.animationPlayState = 'running';
+
+      // Stop the shake animation after 3 seconds
+      setTimeout(() => {
+        bell.style.animationPlayState = 'paused';
+      }, 3000); // 3000 ms = 3 seconds
+    };
+
+    // Start the first shake after 20 seconds
+    const shakeTimeout = setTimeout(() => {
+      startShaking();
+      // Repeat the shaking every 32 seconds (30 seconds pause + 3 seconds shaking)
+      const shakeInterval = setInterval(startShaking, 32000);
+      return () => clearInterval(shakeInterval); // Clear interval on cleanup
+    }, 20000); // 20000 ms = 20 seconds
+
+    return () => clearTimeout(shakeTimeout); // Clear timeout on cleanup
+  }, []); // Empty dependency array to run once on mount
   
 
   const saveEntry = async () => {
@@ -170,17 +197,23 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
         <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
       </div>
     )}
-
-    <div className='flex justify-between mb-4'>
-      <div className='pl-2 text-xl'>{new Date(noteDate).toLocaleDateString('pt-PT')}</div>
-      <input
-        type='text'
-        placeholder='Title'
-        value={title}
-        onChange={(e) => setTitle(e.target.value)}
-        className='bg-transparent focus:outline-none text-xl'
-      />
-    </div>
+      <div className='flex items-center justify-between mb-4'>
+        <div className='pl-2 text-xl'>
+          {new Date(noteDate).toLocaleDateString('pt-PT')}
+        </div>
+        <input
+          type='text'
+          placeholder='Title'
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          className='bg-transparent focus:outline-none text-xl pl-64'
+        />
+        <div className='flex items-center justify-center'>
+          <div className=' w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
+            <TbBell className='notification-bell text-white' size={26} />
+          </div>
+        </div>
+      </div>
     {!smallPopupOpen && (
       <div>
         <textarea

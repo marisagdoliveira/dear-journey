@@ -258,4 +258,32 @@ textarea {
     0 0 50px rgba(215, 215, 255, 0.572); /* Extensive radial glow */
 }
 
+/* Bell icon container */
+.notification-bell {
+  display: flex; /* Changed from inline-block to flex */
+  align-items: center; /* Center vertically */
+  justify-content: center; /* Center horizontally */
+  cursor: pointer;
+  animation: ring 3s ease-in-out infinite;
+  animation-play-state: paused; /* Start paused */
+  transform-origin: top center; /* Set the pivot point to the top center */
+
+}
+
+
+/* Bell swinging and scaling animation keyframes */
+@keyframes ring {
+  0% {
+      transform: rotate(0deg) scale(1); /* Start at normal size */
+  }
+  10%, 90% {
+      transform: rotate(10deg) scale(1.1); /* Rotate to the right, slightly enlarged */
+  }
+  50% {
+      transform: rotate(-10deg) scale(1.1); /* Rotate to the left, slightly enlarged */
+  }
+  100% {
+      transform: rotate(0deg) scale(1); /* Return to normal size */
+  }
+}
 
