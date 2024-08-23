@@ -97,8 +97,8 @@ body{
 
 .popup {
   position:absolute;
-  top: 50%;
-  left: 50%;
+  top: 50%; /* position of popup in the screen */
+  left: 53%; /* position of popup in the screen */
   
   transform: translate(-50%, -50%);
   transform-origin: center;
@@ -218,6 +218,7 @@ body{
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
  
 }
+
 
 textarea {
   resize: none; /* Disables resizing */

@@ -13,7 +13,7 @@ import { TbBell } from "react-icons/tb";
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1 }) => {
+const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -25,6 +25,7 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
   const [updatedNotes, setUpdatedNotes] = useState([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+
 
 
 
@@ -80,7 +81,8 @@ const Popup = ({ noteDate, onSave, setTitle1 }) => {
       setTimeout(() => {
         bell.style.animationPlayState = 'paused';
       }, 3000); // 3000 ms = 3 seconds
-    };}
+    };
+  }
 
     // Start the first shake after 20 seconds
     const shakeTimeout = setTimeout(() => {
