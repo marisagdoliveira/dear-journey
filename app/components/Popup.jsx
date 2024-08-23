@@ -9,6 +9,9 @@ import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
 import { TbBell } from "react-icons/tb";
 
+import DateTimePicker from '../components/DateTimePicker'; // Import the new component
+
+
 
 
 
@@ -25,6 +28,9 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
   const [updatedNotes, setUpdatedNotes] = useState([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
   const [isClicked, setIsClicked] = useState(false);
+
+  const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
+  const [reminderDate, setReminderDate] = useState('');
 
 
 
@@ -69,31 +75,41 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
 
 
   useEffect(() => {
+    let shakeInterval; // Declare shakeInterval in the scope of useEffect
+  
     // Function to start and stop the shake animation
     const startShaking = () => {
-      if (showPopup){
-      const bell = document.querySelector('.notification-bell');
-      
-      // Start the shake animation
-      bell.style.animationPlayState = 'running';
-
-      // Stop the shake animation after 3 seconds
-      setTimeout(() => {
-        bell.style.animationPlayState = 'paused';
-      }, 3000); // 3000 ms = 3 seconds
+      if (showPopup) {
+        const bell = document.querySelector('.notification-bell');
+        
+        // Check if bell is not null before accessing its style
+        if (bell) {
+          // Start the shake animation
+          bell.style.animationPlayState = 'running';
+  
+          // Stop the shake animation after 3 seconds
+          setTimeout(() => {
+            if (bell) { // Check again before applying style
+              bell.style.animationPlayState = 'paused';
+            }
+          }, 3000); // 3000 ms = 3 seconds
+        }
+      }
     };
-  }
-
+  
     // Start the first shake after 20 seconds
     const shakeTimeout = setTimeout(() => {
       startShaking();
-      // Repeat the shaking every 32 seconds (30 seconds pause + 3 seconds shaking)
-      const shakeInterval = setInterval(startShaking, 32000);
-      return () => clearInterval(shakeInterval); // Clear interval on cleanup
-    }, 20000); // 20000 ms = 20 seconds
-
-    return () => clearTimeout(shakeTimeout); // Clear timeout on cleanup
-  }, []); // Empty dependency array to run once on mount
+      // Repeat the shaking every 18 seconds (15 seconds pause + 3 seconds shaking)
+      shakeInterval = setInterval(startShaking, 18000);
+    }, 1000); // 20000 ms = 20 seconds
+  
+    return () => {
+      clearTimeout(shakeTimeout); // Clear timeout on cleanup
+      clearInterval(shakeInterval); // Clear interval on cleanup
+    };
+  }, [showPopup]); // Depend on showPopup to re-run if it changes
+  
   
 
   const saveEntry = async () => {
@@ -206,6 +222,21 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
     setSmallPopupOpen(true);
   };
 
+  // Date and Time Picker:
+
+  const handleOpenDateTimePicker = () => {
+    setIsDateTimePickerOpen(true);
+  };
+
+  const handleSaveReminder = (date) => {
+    setReminderDate(date);
+    // You may want to handle saving this date to your backend or state here:
+
+    
+  };
+
+
+
   return (
     <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative'>
       {smallPopupOpen && (
@@ -226,7 +257,7 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
         />
         <div className='flex items-center justify-center'>
           <div className='w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
-            <TbBell className='notification-bell text-white' size={26} />
+            <TbBell className='notification-bell text-white' size={26} onClick={handleOpenDateTimePicker} />
           </div>
         </div>
       </div>
@@ -238,7 +269,7 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
             placeholder='Write your journal entry here...'
             className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
           />
-          <div className='flex flex-row items-center space-x-4 '>
+          <div className='flex flex-row items-center space-x-4 mb-5 '>
             <button
               onClick={saveEntry}
               className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-transform duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
@@ -247,13 +278,13 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
             >
               {isSaving ? 'Save' : 'Save'}
             </button>
-            <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white transition-colors duration-300"
+            <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white/85 transition-colors duration-300 "
               onClick={() => setShowConfirmDelete(true)} />
-              <p className='darker-grotesque-main flex ' style={{fontSize: 17}} size={1}>Your insights:</p>
+              {smallNotes.length > 0 && (<p className='darker-grotesque-main flex h-10 pl-8 pt-10 pb-0' style={{fontSize: 20}} size={1}>Your latest insights:</p>)}
         </div>
-        {saveMessage && <div className='mt-4 text-white'>{saveMessage}</div>}
+        {saveMessage && <div className='mt-4 text-white '>{saveMessage}</div>}
         <div className='flex items-center'>
-          <div className='mt-5 max-w-[60%] max-h-[120px] gap-6 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
+          <div className='mt-5 max-w-[50%] max-h-[120px] pb-2 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
             {smallNotes.map((note, index) => (
               <div key={index} className='relative cursor-pointer'>
                 <p className="absolute left-9 top-8">{index + 1}</p>
@@ -262,7 +293,7 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
             ))}
           </div>
           {/* Make sure the size matches and is properly aligned */}
-          <AddIconSmall className="size-24 pt-10 cursor-pointer" onClick={handleOpenPopup} />
+          <AddIconSmall className="size-24 pt-5 cursor-pointer" onClick={handleOpenPopup} />
         </div>
       </div>
     )}
@@ -303,6 +334,13 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
           </div>
         </div>
       )}
+      {isDateTimePickerOpen && (
+        <DateTimePicker
+          isOpen={isDateTimePickerOpen}
+          onClose={() => setIsDateTimePickerOpen(false)}
+          onSave={handleSaveReminder}
+        />
+      )}   
     </div>
   );
 

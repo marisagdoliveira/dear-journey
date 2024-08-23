@@ -62,50 +62,87 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
             
             
         }
+        
     };
+
+
+    const handleDeleteSmallNote = async (noteIndex) => {
+        try {
+          const response = await fetch('/api/smallnotes', {
+            method: 'DELETE',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              email,               // Assuming you have the user's email in your state
+              date: noteDate.toISOString(),  // The date for the entry
+              noteIndex,           // The index of the note to delete
+            }),
+          });
+      
+          if (!response.ok) {
+            throw new Error('Failed to delete the small note.');
+          }
+      
+          const result = await response.json();
+          console.log('Deleted small note:', result);
+      
+          // Update the state to remove the note from the local smallNotes array
+          const updatedNotes = smallNotes.filter((_, index) => index !== noteIndex);
+          setSmallNotes(updatedNotes);
+          setUpdatedNotes(updatedNotes); // Optional, if needed
+      
+        } catch (error) {
+          console.error('Error deleting small note:', error);
+        }
+      };
 
     return (
         <div>
-            <div className='mt-10 w-[650px] max-h-[500px] h-fit flex flex-wrap gap-6 items-center overflow-auto scroll-container'>
-                <div className='relative'>
-                    <SmallPopupIcon className="size-72"/>
-                    <AddIconSmall className="absolute left-5 top-5" />
-                    <div className='absolute left-5 top-16'>
-                        <textarea
-                            value={newNote}
-                            onChange={(e) => setNewNote(e.target.value)}
-                            placeholder='Write your retrospective here...'
-                            className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-                        />
-                    </div>
-                    {/* Position TrashSmall to the left of FaCheck */}
-                    <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
+        <div className='mt-10 w-[650px] max-h-[500px] h-fit flex flex-wrap gap-6 items-center overflow-auto scroll-container'>
+            <div className='relative'>
+                <SmallPopupIcon className="size-72"/>
+                <AddIconSmall className="absolute left-5 top-5" />
+                <div className='absolute left-5 top-16'>
+                    <textarea
+                        value={newNote}
+                        onChange={(e) => setNewNote(e.target.value)}
+                        placeholder='Write your retrospective here...'
+                        className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+                    />
                 </div>
-                {smallNotes.map((note, index) => (
-                    <div key={index}>
-                        <div className='relative'>
-                            <SmallPopupIcon className="size-72"/>
-                            <p className="absolute left-5 top-5">{index+1}</p>
-                            <div className='absolute left-5 top-16'>
-                                <textarea
-                                    value={note.content}
-                                    onChange={(e) => {
-                                        const updatedNotes = [...smallNotes];
-                                        updatedNotes[index].content = e.target.value;
-                                        setSmallNotes(updatedNotes);
-                                        setUpdatedNotes(updatedNotes);
-                                    }}
-                                    placeholder='Write your retrospective here...'
-                                    className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
-                                />
-                            </div>
-                            <TbTrashX className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" size={30}/>
-                            <FaCheck onClick={() => handleSaveNote(index)} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
-                        </div>
-                    </div>
-                ))}
+                <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
             </div>
+            {smallNotes.map((note, index) => (
+                <div key={index}>
+                    <div className='relative'>
+                        <SmallPopupIcon className="size-72"/>
+                        <p className="absolute left-5 top-5">{index+1}</p>
+                        <div className='absolute left-5 top-16'>
+                            <textarea
+                                value={note.content}
+                                onChange={(e) => {
+                                    const updatedNotes = [...smallNotes];
+                                    updatedNotes[index].content = e.target.value;
+                                    setSmallNotes(updatedNotes);
+                                    setUpdatedNotes(updatedNotes);
+                                }}
+                                placeholder='Write your retrospective here...'
+                                className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+                            />
+                        </div>
+                        {/* Added the onClick handler for deleting a specific note */}
+                        <TbTrashX
+                            className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all"
+                            size={30}
+                            onClick={() => handleDeleteSmallNote(index)} // Attach handler for deletion
+                        />
+                        <FaCheck onClick={() => handleSaveNote(index)} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
+                    </div>
+                </div>
+            ))}
         </div>
+    </div>
     );
 }
 
