@@ -5,8 +5,7 @@ import Popup from "./Popup";
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
-import { IoCloseCircleOutline } from "react-icons/io5";
-
+import PlusIcon from "../../public/assets/PlusIcon.svg"
 
 export default function Calendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -126,29 +125,30 @@ export default function Calendar() {
   
 
   return (
-    <div className="flex flex-col items-center w-full p-4">
+    <div className="flex flex-col items-center w-full p-4 pt-28">
       <div className="flex justify-between w-full max-w-xl mb-7">
         <button className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </button>
         <h2 className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
         <button className="text-white darker-grotesque-main" onClick={nextMonth}> <Calenright /> </button>
       </div>
       
-      <div className="flex flex-wrap max-w-[900px]  max-h-[40%]  justify-center gap-4">
+      <div className="flex flex-wrap max-w-[1100px] max-h-[40%] justify-center items-center gap-4 " style={{fontFamily: 'Darker Grotesque', }}>
         {daysInMonth.map((day, index) => {
           const entry = getDateEntry(day);
           return (
             
-            <div key={index} className="flex flex-col w-24 h-24 p-2 rounded-3xl bg-transparent border border-white/33">
+            <div key={index} className="relative flex flex-col w-28 h-28 p-2 rounded-[35px] bg-[#dacdff24] border border-white/33" >
               <div>
-                <span className="flex p-0.5 text-md text-white justify-end">{format(day, 'd')}</span>
+                <span className="flex p-0.5 text-md text-white justify-end pr-1" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>{format(day, 'd')}</span>
               </div>
-              <div className="max-w-[20ch] overflow-hidden text-ellipsis whitespace-nowrap">{getDateEntry(day).title}</div>
+              <div className="max-w-[20ch] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>{getDateEntry(day).title}</div>
+              <div className="absolute border-[1.5px] w-5 h-5 bottom-3 right-4  border-[#ffffffdf] bg-[#ccc4ff90] rounded-full"></div>
               <button
                 className="text-white mt-auto"
                 // onClick={() => setShowAddNoteInput(true)}
                 onClick={() => { setShowPopup(true); setNoteDate(day); }}
               >
-                <IoIosAddCircle className="text-white text-2xl text-[#dcd6ff]" />
+                <PlusIcon className="absolute top-3 left-4 text-white text-2xl text-[#dcd6ff]" />
               </button>
             </div>
           );

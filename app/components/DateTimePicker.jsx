@@ -1,4 +1,8 @@
 import React, { useState } from 'react';
+import CancelX from "../../public/assets/CancelX.svg";
+import { FaCheck } from "react-icons/fa6";
+
+
 
 const DateTimePicker = ({ isOpen, onClose, onSave }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -25,7 +29,7 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-transparent backdrop-blur-[2px]" onClick={onClose}></div>
 
-      <div className="relative bg-gradient-to-br from-[#9a82f2a6] to-[#5d41c0ca] border border-white/60 p-6 rounded-3xl shadow-lg z-50 w-[320px] max-w-[90%]">
+      <div className="relative bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 p-6 rounded-3xl shadow-lg z-50 w-[320px] max-w-[90%]">
         <p className='flex w-[300px] darker-grotesque-main pb-5' style={{  }}>Notify your future self:</p>
         <div className="flex justify-start gap-2 mb-4 pl-10">
             
@@ -98,13 +102,13 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
               onSave(selectedDate);
               onClose();
             }}
-            className="darker-grotesque-main px-4 py-2 bg-[#766cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all" 
+            className="darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all" 
           >
             Save
           </button>
           <button
             onClick={onClose}
-            className="darker-grotesque-main px-4 py-2 bg-[#5b527194] hover:bg-[#48415a94] border border-white/60 text-white rounded-2xl ml-2 transition-all"
+            className="darker-grotesque-main px-4 py-1 bg-[#5b527194] hover:bg-[#48415a94] border border-white/60 text-white rounded-2xl ml-2 transition-all"
           >
             Cancel
           </button>
