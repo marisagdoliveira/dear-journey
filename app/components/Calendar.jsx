@@ -141,8 +141,8 @@ export default function Calendar() {
               <div>
                 <span className="flex p-0.5 text-md text-white justify-end pr-1" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>{format(day, 'd')}</span>
               </div>
-              <div className="max-w-[20ch] overflow-hidden text-ellipsis whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>{getDateEntry(day).title}</div>
-              <div className="absolute border-[1.5px] w-5 h-5 bottom-3 right-3.5  border-[#ffffffdf] bg-[#ccc4ff90] rounded-full"></div>
+              <div className="max-w-[20ch] overflow-hidden text-ellipsis text-[#6464D3] text-[#fefefe] whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>{getDateEntry(day).title}</div>
+              <div className="absolute border-[1.5px] w-5 h-5 bottom-3 right-3.5 text-[#6464D3] border-[#ffffffdf] bg-[#ccc4ff90] rounded-full flex justify-center align-center text-xs " style={{ fontWeight: 700 }}>{ getDateEntry(day).smallNotes.length }</div>
               <button
                 className="text-white mt-auto"
                 // onClick={() => setShowAddNoteInput(true)}
