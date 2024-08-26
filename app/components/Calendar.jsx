@@ -13,12 +13,22 @@ export default function Calendar() {
   const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
   const [showPopup, setShowPopup] = useState(false);
+  const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
   const [noteDate, setNoteDate] = useState("");
+  
 
+
+  const closePopup = () => {
+    setShowPopup(false)
+    setShowSmallNotesCalendar(false)
+  }
+  const openPopupWithSmallNotes = (date) => {
+    setShowPopup(true); setNoteDate(date);
+    setShowSmallNotesCalendar(true)
+  }
 
 
   
-
 
   useEffect(() => {
     fetchUserAndJournalEntries();
@@ -142,7 +152,7 @@ export default function Calendar() {
                 <span className="flex p-0.5 text-md text-white justify-end pr-1" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>{format(day, 'd')}</span>
               </div>
               <div className="max-w-[20ch] overflow-hidden text-ellipsis text-[#6464D3] text-[#fefefe] whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>{getDateEntry(day).title}</div>
-              <div className="absolute border-[1.5px] w-5 h-5 bottom-3 right-3.5 text-[#6464D3] border-[#ffffffdf] bg-[#ccc4ff90] rounded-full flex justify-center align-center text-xs " style={{ fontWeight: 700 }}>{ getDateEntry(day).smallNotes.length }</div>
+              <div onClick={() => openPopupWithSmallNotes(day)} className="absolute border-[1.5px] w-5 h-5 bottom-3 right-3.5 text-[#6464D3] border-[#ffffffdf] bg-[#ccc4ff90] rounded-full flex justify-center align-center text-xs cursor-pointer" style={{ fontWeight: 700 }}>{ getDateEntry(day).smallNotes.length }</div>
               <button
                 className="text-white mt-auto"
                 // onClick={() => setShowAddNoteInput(true)}
@@ -160,13 +170,13 @@ export default function Calendar() {
         <div className="popup border border-white/45">
           <div className="popup-content flex flex-col justify-center items-center relative">
             <div className="flex w-full justify-end items-end">
-              <button className="close-button self-end pr-2 top-5 absolute" onClick={() => setShowPopup(false)}>
+              <button className="close-button self-end pr-2 top-5 absolute" onClick={() => closePopup()}>
                 <Close />
               </button>
             </div>
             <div className="flex items-center">
               <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-              <Popup showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} />
+              <Popup showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} />
               <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
             </div>
           </div>

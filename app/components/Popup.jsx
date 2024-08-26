@@ -16,7 +16,7 @@ import DateTimePicker from '../components/DateTimePicker'; // Import the new com
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
+const Popup = ({ noteDate, onSave, setTitle1, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -34,7 +34,17 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
 
 
 
+  const closeSmallNotes = () => {
+    setSmallPopupOpen(false)
+    setShowSmallNotesCalendar(false)
+  }
 
+  useEffect(() => {
+    if (showSmallNotesCalendar) {
+      setSmallPopupOpen(true);
+    }
+  }, [showSmallNotesCalendar]);
+  
 
 
   
@@ -241,7 +251,7 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup }) => {
     <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative'>
       {smallPopupOpen && (
         <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%", top: "15px", zIndex: 100000 }}>
-          <BackIcon onClick={() => setSmallPopupOpen(false)} className="size-10"/>
+          <BackIcon onClick={() => closeSmallNotes()} className="size-10"/>
         </div>
       )}
       <div className='flex items-center justify-between mb-4'>
