@@ -1,13 +1,22 @@
+
+// ISTO FOI MUDADO - PEDIR BACK E FRONTEND NOVAMENTE AO CHAT:
+
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+// Notification schema without content
+const NotificationSchema = new Schema({
+  noteDate: {
+    type: Date,
+    required: true
+  },
+  noticeDate: {
+    type: Date,
+    required: true
+  },
+});
 
-// Small notes schema:
-
-
-
-// Library Entry schema:
-
+// Small notes schema
 const SmallNotesSchema = new Schema({
   content: {
     type: String,
@@ -16,6 +25,7 @@ const SmallNotesSchema = new Schema({
   },
 });
 
+// Library Entry schema
 const LibraryEntrySchema = new Schema({
   title: {
     type: String,
@@ -32,11 +42,10 @@ const LibraryEntrySchema = new Schema({
     default: undefined
   },
   smallNotes: [SmallNotesSchema],
+
 });
 
-
-// User schema:
-
+// User schema
 const UserSchema = new Schema({
   username: {
     type: String,
@@ -55,9 +64,9 @@ const UserSchema = new Schema({
   img: {
     type: String,
     required: false
-},
-  library: [LibraryEntrySchema],
-
+  },
+  library: [LibraryEntrySchema], // Library entries with notifications
+  notifications: [NotificationSchema], // Array of notifications
 }, { timestamps: true });
 
 module.exports = mongoose.models.User || mongoose.model('User', UserSchema);

@@ -16,7 +16,7 @@ import DateTimePicker from '../components/DateTimePicker'; // Import the new com
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar }) => {
+const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -315,6 +315,7 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup, showSmallNotesCalendar,
         setSmallNotes={setSmallNotes}
         setUpdatedNotes={setUpdatedNotes}
         saveEntry={saveEntry}
+        fetchUser={fetchUser}
       />
     )}
     {showConfirmDelete && (
@@ -349,6 +350,8 @@ const Popup = ({ noteDate, onSave, setTitle1, showPopup, showSmallNotesCalendar,
           isOpen={isDateTimePickerOpen}
           onClose={() => setIsDateTimePickerOpen(false)}
           onSave={handleSaveReminder}
+          entryDate={noteDate.toISOString()} // Assuming noteDate is the entryDate you want to pass
+          email={email} // Pass the email for the notification
         />
       )}   
     </div>

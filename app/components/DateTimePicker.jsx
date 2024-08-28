@@ -1,16 +1,19 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import CancelX from "../../public/assets/CancelX.svg";
 import { FaCheck } from "react-icons/fa6";
 
 
 
-const DateTimePicker = ({ isOpen, onClose, onSave }) => {
+const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (entryDate) {
+      setSelectedDate(new Date(entryDate));
+    }
+  }, [entryDate]);
 
-  // Helper function to pad numbers with leading zeros
-  const padNumber = (num) => String(num).padStart(2, '0');
+  if (!isOpen) return null;
 
   const handleDateChange = (e) => {
     const { name, value } = e.target;
@@ -25,14 +28,43 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
     });
   };
 
+  const handleSaveClick = async () => {
+    const noticeDate = selectedDate.toISOString();
+    const notificationData = {
+      email,
+      noteDate: entryDate,
+      noticeDate
+    };
+
+    try {
+      const response = await fetch('/api/notifications', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(notificationData),
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Failed to create notification: ${errorText}`);
+      }
+
+      await response.json();
+      onSave(noticeDate); // Call the onSave callback with the new date
+    } catch (error) {
+      console.error('Error saving notification:', error);
+    }
+
+    onClose();
+  };
+
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-transparent backdrop-blur-[2px]" onClick={onClose}></div>
-
       <div className="relative bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 p-6 rounded-3xl shadow-lg z-50 w-[320px] max-w-[90%]">
-        <p className='flex w-[300px] darker-grotesque-main pb-5' style={{  }}>Notify your future self:</p>
+        <p className='flex w-[300px] darker-grotesque-main pb-5'>Notify your future self:</p>
         <div className="flex justify-start gap-2 mb-4 pl-10">
-            
           <select
             name="day"
             value={selectedDate.getDate()}
@@ -40,9 +72,7 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
             className="bg-transparent text-white darker-grotesque-main"
           >
             {Array.from({ length: 31 }, (_, i) => (
-              <option  key={i + 1} value={i + 1}>
-                {padNumber(i + 1)}
-              </option>
+              <option key={i + 1} value={i + 1}>{String(i + 1).padStart(2, '0')}</option>
             ))}
           </select>
           <select
@@ -52,9 +82,7 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
             className="bg-transparent text-white darker-grotesque-main"
           >
             {Array.from({ length: 12 }, (_, i) => (
-              <option className="" key={i + 1} value={i + 1}>
-                {padNumber(i + 1)}
-              </option>
+              <option key={i + 1} value={i + 1}>{String(i + 1).padStart(2, '0')}</option>
             ))}
           </select>
           <select
@@ -78,9 +106,7 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
             className="bg-transparent text-white darker-grotesque-main"
           >
             {Array.from({ length: 24 }, (_, i) => (
-              <option key={i} value={i}>
-                {padNumber(i)}
-              </option>
+              <option key={i} value={i}>{String(i).padStart(2, '0')}</option>
             ))}
           </select>
           <select
@@ -90,19 +116,14 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
             className="bg-transparent text-white darker-grotesque-main"
           >
             {Array.from({ length: 60 }, (_, i) => (
-              <option className='' key={i} value={i}>
-                {padNumber(i)}
-              </option>
+              <option key={i} value={i}>{String(i).padStart(2, '0')}</option>
             ))}
           </select>
         </div>
         <div className="flex justify-center gap-3 pt-2">
           <button
-            onClick={() => {
-              onSave(selectedDate);
-              onClose();
-            }}
-            className="darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all" 
+            onClick={handleSaveClick}
+            className="darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all"
           >
             Save
           </button>
@@ -119,4 +140,3 @@ const DateTimePicker = ({ isOpen, onClose, onSave }) => {
 };
 
 export default DateTimePicker;
-

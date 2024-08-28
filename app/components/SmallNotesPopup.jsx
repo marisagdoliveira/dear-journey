@@ -4,7 +4,7 @@ import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg"
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import { TbTrashX } from "react-icons/tb";
 
-const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdatedNotes, saveEntry }) => {
+const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes, setUpdatedNotes, saveEntry }) => {
 
     const [newNote, setNewNote] = React.useState('');
     
@@ -46,7 +46,9 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, setSmallNotes, setUpdate
         updatedNotes[index] = { content: smallNotes[index].content }; // Ensure it's updated correctly
         setSmallNotes(updatedNotes);
         setUpdatedNotes(updatedNotes);
-        saveSmallNotes(updatedNotes); // Save only small notes
+        saveSmallNotes(updatedNotes);
+         // Save only small notes
+         fetchUser();
         console.log("Updated smallNotes (handleSaveNote):", updatedNotes);
         
     };
