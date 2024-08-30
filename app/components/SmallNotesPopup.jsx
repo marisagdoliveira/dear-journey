@@ -117,8 +117,8 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
             </div>
             {smallNotes.map((note, index) => (
                 <div key={index}>
-                    <div className='relative'>
-                        <SmallPopupIcon className="size-72"/>
+                    <div className='relative '>
+                        <SmallPopupIcon className="size-72 shadow-transparent hover:shadow-white-lg"/>
                         <p className="absolute left-5 top-5">{index+1}</p>
                         <div className='absolute left-5 top-16'>
                             <textarea

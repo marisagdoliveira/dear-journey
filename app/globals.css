@@ -292,7 +292,27 @@ textarea {
 }
 
 
+
+input:focus{
+  outline: none;
+}
+
+select:focus{
+  outline: none;
+}
+
+
+.custom-svg path {
+  transition: fill 0.3s ease; /* Smooth transition effect */
+}
+
+.custom-svg:hover path {
+  fill: #7472D3; /* Color on hover */
+}
+
 /* Time and date picker: */
+
+
 
 
 

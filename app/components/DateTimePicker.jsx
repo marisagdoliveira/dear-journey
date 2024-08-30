@@ -1,6 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import CancelX from "../../public/assets/CancelX.svg";
 import { FaCheck } from "react-icons/fa6";
+import { BsCalendarDate } from "react-icons/bs";
+import { TbClockFilled, TbMailHeart } from "react-icons/tb";
+import MailHeart from "../../public/assets/MailHeart.svg"
+
+
+
 
 
 
@@ -62,14 +68,15 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
   return (
     <div className="fixed inset-0 flex items-center justify-center z-50">
       <div className="absolute inset-0 bg-transparent backdrop-blur-[2px]" onClick={onClose}></div>
-      <div className="relative bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 p-6 rounded-3xl shadow-lg z-50 w-[320px] max-w-[90%]">
-        <p className='flex w-[300px] darker-grotesque-main pb-5'>Notify your future self:</p>
-        <div className="flex justify-start gap-2 mb-4 pl-10">
+      <div className="relative bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 p-6 rounded-3xl shadow-lg z-50 w-[320px] h-[280px] max-w-[90%]">
+        <div className='flex w-200px h-[50px] justify-center rounded-xl border-[1px] border-white/60 bg-[#6c73f171]'><p className='flex w-[300px] justify-start pl-[17px] darker-grotesque-main relative top-1' style={{ fontSize: 24 }}>Notify your future self<MailHeart className='absolute size-5 flex top-3 w-30 right-5 text-[#bbb0ff]'/></p></div>
+        <div className="relative flex justify-center gap-2 mb-4 pl-10 pt-6">
+        <BsCalendarDate className='absolute left-5 size-9 text-[rgb(173,172,255)]' />
           <select
             name="day"
             value={selectedDate.getDate()}
             onChange={handleDateChange}
-            className="bg-transparent text-white darker-grotesque-main"
+            className=" option bg-transparent text-white darker-grotesque-main"
           >
             {Array.from({ length: 31 }, (_, i) => (
               <option key={i + 1} value={i + 1}>{String(i + 1).padStart(2, '0')}</option>
@@ -98,12 +105,13 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
             ))}
           </select>
         </div>
-        <div className="flex justify-start gap-2 mb-4 pl-10">
+        <div className="relative flex justify-start gap-2 mb-4 pl-16 ">
+        <TbClockFilled className=' absolute  left-5 size-9  text-[rgb(173,172,255)] ' />
           <select
             name="hour"
             value={selectedDate.getHours()}
             onChange={handleDateChange}
-            className="bg-transparent text-white darker-grotesque-main"
+            className="bg-transparent text-white darker-grotesque-main pl-2"
           >
             {Array.from({ length: 24 }, (_, i) => (
               <option key={i} value={i}>{String(i).padStart(2, '0')}</option>
@@ -120,10 +128,10 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
             ))}
           </select>
         </div>
-        <div className="flex justify-center gap-3 pt-2">
+        <div className="flex justify-center gap-3 pt-4">
           <button
             onClick={handleSaveClick}
-            className="darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all"
+            className="flex darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all"
           >
             Save
           </button>

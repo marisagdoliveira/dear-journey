@@ -282,7 +282,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           <div className='flex flex-row items-center space-x-4 mb-5 '>
             <button
               onClick={saveEntry}
-              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 rounded-2xl hover:shadow-[#8274d0] shadow-md justify-center items-center darker-grotesque-main transition-transform duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
+              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 shadow-hidden rounded-2xl hover:bg-[#7676d66f] shadow-md justify-center items-center darker-grotesque-main transition-transform duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
               style={{ fontSize: 25 }}
               disabled={isSaving}
             >
@@ -292,7 +292,8 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
               onClick={() => setShowConfirmDelete(true)} />
               {smallNotes.length > 0 && (<p className='darker-grotesque-main flex h-10 pl-8 pt-10 pb-0' style={{fontSize: 20}} size={1}>Your latest insights:</p>)}
         </div>
-        {saveMessage && <div className='mt-4 text-white '>{saveMessage}</div>}
+        <div className='relative'>
+        {saveMessage && <div className='mt-4 text-white absolute -top-[32px] darker-grotesque-main' style={{ fontWeight: 350, fontSize: 19 }}>{saveMessage}</div>}</div>
         <div className='flex items-center'>
           <div className='mt-5 max-w-[50%] max-h-[120px] pb-2 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
             {smallNotes.map((note, index) => (
