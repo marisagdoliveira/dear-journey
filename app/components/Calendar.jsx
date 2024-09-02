@@ -176,7 +176,7 @@ export default function Calendar() {
               </button>
             </div>
             <div className="flex items-center">
-              <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
+              <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer" ><Calenleft /></p>
               <Popup showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries}/>
               <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
             </div>
