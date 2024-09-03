@@ -11,7 +11,8 @@ export async function GET(req) {
     const getUser = await User.findOne({ _id: "6679d45c98cafb1fbc68a1e1" });
 
     if (!getUser) {
-      return NextResponse.json({ message: "User not found." }, { status: 404 });
+      return NextRespons
+      e.json({ message: "User not found." }, { status: 404 });
     }
 
     return NextResponse.json({ user: getUser }, { status: 200 });

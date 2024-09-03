@@ -10,7 +10,7 @@ import MailHeart from "../../public/assets/MailHeart.svg"
 
 
 
-const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
+const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry, fetchTheReminder }) => {
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
@@ -40,8 +40,7 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
       email,
       noteDate: entryDate,
       noticeDate
-    };
-
+    }
     try {
       const response = await fetch('/api/notifications', {
         method: 'POST',
@@ -62,7 +61,10 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email }) => {
       console.error('Error saving notification:', error);
     }
 
+    saveEntry();
+    fetchTheReminder();
     onClose();
+    
   };
 
   return (

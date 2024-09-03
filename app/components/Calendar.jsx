@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useCapitalizeFirstLetter } from '../hooks/useCapitalizeFirstLetter';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays } from "date-fns";
 import { IoIosAddCircle } from "react-icons/io";
 import Popup from "./Popup";
@@ -7,7 +8,7 @@ import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
 import PlusIcon from "../../public/assets/PlusIcon.svg"
 
-export default function Calendar() {
+export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [journalEntries, setJournalEntries] = useState([]);
   const [email, setEmail] = useState('');
@@ -16,6 +17,8 @@ export default function Calendar() {
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
   const [noteDate, setNoteDate] = useState("");
   
+  
+  useCapitalizeFirstLetter(); 
 
 
   const closePopup = () => {
@@ -116,11 +119,9 @@ export default function Calendar() {
       setJournalEntries([...journalEntries, newEntry]);
       saveEntry(title, date, mainContent, smallNotes);
     }
+    // setReminderTitle(title);
   };
   
-  
-
-
 
  
 
@@ -177,7 +178,7 @@ export default function Calendar() {
             </div>
             <div className="flex items-center">
               <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer" ><Calenleft /></p>
-              <Popup showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries}/>
+              <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave}/>
               <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
             </div>
           </div>

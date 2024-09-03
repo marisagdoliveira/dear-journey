@@ -5,9 +5,12 @@ import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import { TbTrashX } from "react-icons/tb";
 
 const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes, setUpdatedNotes, saveEntry }) => {
-
     const [newNote, setNewNote] = React.useState('');
     
+    const capitalizeFirstLetter = (text) => {
+        return text.charAt(0).toUpperCase() + text.slice(1);
+      };
+      
     
       
     const saveSmallNotes = async (updatedNotes) => {
@@ -108,7 +111,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                 <div className='absolute left-5 top-16'>
                     <textarea
                         value={newNote}
-                        onChange={(e) => setNewNote(e.target.value)}
+                        onChange={(e) => setNewNote(capitalizeFirstLetter(e.target.value))}
                         placeholder='Write your retrospective here...'
                         className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
                     />
@@ -125,7 +128,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                                 value={note.content}
                                 onChange={(e) => {
                                     const updatedNotes = [...smallNotes];
-                                    updatedNotes[index].content = e.target.value;
+                                    updatedNotes[index].content = capitalizeFirstLetter(e.target.value);
                                     setSmallNotes(updatedNotes);
                                     setUpdatedNotes(updatedNotes);
                                 }}

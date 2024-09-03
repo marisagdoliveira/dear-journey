@@ -11,12 +11,15 @@ import { TbBell } from "react-icons/tb";
 
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
 
+const capitalizeFirstLetter = (text) => {
+  return text.charAt(0).toUpperCase() + text.slice(1);
+};
 
 
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar }) => {
+const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, fetchTheReminder }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -31,7 +34,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [reminderDate, setReminderDate] = useState('');
-
+ 
 
 
   const closeSmallNotes = () => {
@@ -262,7 +265,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           type='text'
           placeholder='Title'
           value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          onChange={(e) => setTitle(capitalizeFirstLetter(e.target.value))}
           className='bg-transparent focus:outline-none text-xl pl-64'
         />
         <div className='flex items-center justify-center'>
@@ -275,7 +278,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         <div>
           <textarea
             value={mainContent}
-            onChange={(e) => setMainContent(e.target.value)}
+            onChange={(e) => setMainContent(capitalizeFirstLetter(e.target.value))}
             placeholder='Write your journal entry here...'
             className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
           />
@@ -348,11 +351,13 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
       )}
       {isDateTimePickerOpen && (
         <DateTimePicker
+          fetchTheReminder={fetchTheReminder}
           isOpen={isDateTimePickerOpen}
           onClose={() => setIsDateTimePickerOpen(false)}
           onSave={handleSaveReminder}
           entryDate={noteDate.toISOString()} // Assuming noteDate is the entryDate you want to pass
           email={email} // Pass the email for the notification
+          saveEntry={saveEntry}
         />
       )}   
     </div>
