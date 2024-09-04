@@ -1,5 +1,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Vibur&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Darker+Grotesque:wght@300..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Snippet&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=BioRhyme:wght@200..800&family=Linden+Hill:ital@0;1&display=swap');
 
 
 
@@ -215,9 +218,9 @@ body{
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
  
-  scrollbar-color: #6d6db9b8 transparent;
+  scrollbar-color: #5e5ea364 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
- 
+
 }
 
 
@@ -264,30 +267,28 @@ textarea {
 
 /* Bell icon container */
 .notification-bell {
-  display: flex; /* Changed from inline-block to flex */
-  align-items: center; /* Center vertically */
-  justify-content: center; /* Center horizontally */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   animation: ring 3s ease-in-out infinite;
-  animation-play-state: paused; /* Start paused */
-  transform-origin: top center; /* Set the pivot point to the top center */
-
+  animation-play-state: paused; /* Start paused, controlled via inline style */
+  transform-origin: top center; /* Pivot point */
 }
-
 
 /* Bell swinging and scaling animation keyframes */
 @keyframes ring {
   0% {
-      transform: rotate(0deg) scale(1); /* Start at normal size */
+    transform: rotate(0deg) scale(1);
   }
   10%, 90% {
-      transform: rotate(10deg) scale(1.1); /* Rotate to the right, slightly enlarged */
+    transform: rotate(10deg) scale(1.1);
   }
   50% {
-      transform: rotate(-10deg) scale(1.1); /* Rotate to the left, slightly enlarged */
+    transform: rotate(-10deg) scale(1.1);
   }
   100% {
-      transform: rotate(0deg) scale(1); /* Return to normal size */
+    transform: rotate(0deg) scale(1);
   }
 }
 
@@ -301,13 +302,25 @@ select:focus{
   outline: none;
 }
 
+.roboto-mono-popup {
+  font-family: "Roboto Mono", monospace;
+  font-optical-sizing: auto;
+  font-weight: 300;
+  font-style: normal;
+}
 
-/* Time and date picker: */
+.snippet-regular {
+  font-family: "Snippet", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+}
 
 
 
-
-
-
-
-
+.biorhyme-popup {
+  font-family: "BioRhyme", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  font-variation-settings:
+    "wdth" 100;
+}

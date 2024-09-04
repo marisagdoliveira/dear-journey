@@ -9,7 +9,9 @@ import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
 import { TbBell } from "react-icons/tb";
 
+
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
+
 
 const capitalizeFirstLetter = (text) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
@@ -34,7 +36,9 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
   const [isDateTimePickerOpen, setIsDateTimePickerOpen] = useState(false);
   const [reminderDate, setReminderDate] = useState('');
- 
+
+  const [animationState, setAnimationState] = useState('paused');
+
 
 
   const closeSmallNotes = () => {
@@ -87,42 +91,46 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
   }, [noteDate, setTitle1]);
 
 
+
   useEffect(() => {
-    let shakeInterval; // Declare shakeInterval in the scope of useEffect
-  
-    // Function to start and stop the shake animation
-    const startShaking = () => {
-      if (showPopup) {
-        const bell = document.querySelector('.notification-bell');
-        
-        // Check if bell is not null before accessing its style
-        if (bell) {
-          // Start the shake animation
-          bell.style.animationPlayState = 'running';
-  
-          // Stop the shake animation after 3 seconds
-          setTimeout(() => {
-            if (bell) { // Check again before applying style
-              bell.style.animationPlayState = 'paused';
-            }
-          }, 3000); // 3000 ms = 3 seconds
-        }
-      }
+    let timeoutId;
+    let intervalId;
+
+    const startAnimationCycle = () => {
+      // Set animation to running
+      setAnimationState('running');
+
+      // Pause animation after 3 seconds
+      timeoutId = setTimeout(() => {
+        setAnimationState('paused');
+      }, 3000); // 3 seconds animation duration
+
+      // Continue the cycle every 18 seconds (15s pause + 3s animation)
+      intervalId = setInterval(() => {
+        setAnimationState('running');
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => {
+          setAnimationState('paused');
+        }, 3000); // 3 seconds animation duration
+      }, 18000); // 18 seconds interval (15s pause + 3s animation)
     };
-  
-    // Start the first shake after 20 seconds
-    const shakeTimeout = setTimeout(() => {
-      startShaking();
-      // Repeat the shaking every 18 seconds (15 seconds pause + 3 seconds shaking)
-      shakeInterval = setInterval(startShaking, 18000);
-    }, 1000); // 20000 ms = 20 seconds
-  
+
+    if (showPopup) {
+      startAnimationCycle();
+
+      // Cleanup on unmount or when showPopup changes
+      return () => {
+        clearTimeout(timeoutId);
+        clearInterval(intervalId);
+      };
+    }
+
+    // Cleanup when showPopup changes to false
     return () => {
-      clearTimeout(shakeTimeout); // Clear timeout on cleanup
-      clearInterval(shakeInterval); // Clear interval on cleanup
+      clearTimeout(timeoutId);
+      clearInterval(intervalId);
     };
-  }, [showPopup]); // Depend on showPopup to re-run if it changes
-  
+  }, [showPopup]);
   
 
   const saveEntry = async () => {
@@ -258,7 +266,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         </div>
       )}
       <div className='flex items-center justify-between mb-4'>
-        <div className='pl-2 text-xl'>
+        <div className='roboto-mono-popup pl-2 text-xl' style={{ fontWeight:400 }}>
           {new Date(noteDate).toLocaleDateString('pt-PT')}
         </div>
         <input
@@ -266,11 +274,11 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           placeholder='Title'
           value={title}
           onChange={(e) => setTitle(capitalizeFirstLetter(e.target.value))}
-          className='bg-transparent focus:outline-none text-xl pl-64'
+          className='roboto-mono-popup bg-transparent focus:outline-none text-xl pl-64' style={{ fontWeight:400 }}
         />
         <div className='flex items-center justify-center'>
           <div className='w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
-            <TbBell className='notification-bell text-white' size={26} onClick={handleOpenDateTimePicker} />
+            <TbBell className={`notification-bell ${animationState === 'running' ? 'animation-active' : ''} text-white`} style={{ animationPlayState: animationState }} size={26} onClick={handleOpenDateTimePicker} />
           </div>
         </div>
       </div>
@@ -280,12 +288,12 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
             value={mainContent}
             onChange={(e) => setMainContent(capitalizeFirstLetter(e.target.value))}
             placeholder='Write your journal entry here...'
-            className='w-full h-[40vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+            className='biorhyme-popup tracking-wide text-justify w-full h-[40vh] mt-5 pr-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container text-[#ccc6f5]' style={{ fontWeight:350, fontSize: 13 }}
           />
           <div className='flex flex-row items-center space-x-4 mb-5 '>
             <button
               onClick={saveEntry}
-              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 shadow-hidden rounded-2xl hover:bg-[#7676d66f] shadow-md justify-center items-center darker-grotesque-main transition-transform duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
+              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 shadow-hidden rounded-2xl hover:bg-[#7676d66f] shadow-md justify-center items-center darker-grotesque-main transition-all duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
               style={{ fontSize: 25 }}
               disabled={isSaving}
             >
@@ -293,10 +301,10 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
             </button>
             <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white/85 transition-colors duration-300 "
               onClick={() => setShowConfirmDelete(true)} />
-              {smallNotes.length > 0 && (<p className='darker-grotesque-main flex h-10 pl-8 pt-10 pb-0' style={{fontSize: 20}} size={1}>Your latest insights:</p>)}
+              {smallNotes.length > 0 && (<p className='darker-grotesque-main flex h-10 pl-4 pt-10 pb-0' style={{fontSize: 20}} size={1}>My latest insights:</p>)}
         </div>
         <div className='relative'>
-        {saveMessage && <div className='mt-4 text-white absolute -top-[32px] darker-grotesque-main' style={{ fontWeight: 350, fontSize: 19 }}>{saveMessage}</div>}</div>
+        {saveMessage && <div className='mt-4 text-white absolute -top-[32px] darker-grotesque-main' style={{ fontWeight: 350, fontSize: 18 }}>{saveMessage}</div>}</div>
         <div className='flex items-center'>
           <div className='mt-5 max-w-[50%] max-h-[120px] pb-2 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
             {smallNotes.map((note, index) => (
@@ -325,23 +333,27 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
     {showConfirmDelete && (
       <div className='fixed inset-0 flex items-center justify-center z-50'>
         {/* Overlay */}
-        <div className='absolute inset-0 bg-[#2a224dba] opacity-80'></div>
+        <div className='absolute inset-0 bg-transparent backdrop-blur-[2px]'></div>
     
         {/* Confirmation Dialog */}
-          <div className='relative bg-[#7e74ff]/60 p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
-            <p className='mb-4 text-md darker-grotesque-main' style={{ fontWeight: 450 }}>
-              Are you sure you want to delete the whole entry?<br />
-              This action cannot be reversed.
-            </p>
+          <div className='relative bg-[#7e74ff]/60 backdrop-blur-[2px] p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-br from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
+            <div className='flex justify-end gap-3'>
+              <p className='mb-0 text-lg' style={{ fontFamily: "Darker Grotesque", fontWeight: 600, fontSize: 20 }}>
+              Are you sure you want to delete the whole entry? </p>
+              <div className='w-10 h-10 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
+                <GoTrash className='text-white' size={26} />
+              </div>
+            </div>
+              <p className='' style={{ fontFamily: 'Darker Grotesque', fontSize: 20 }}>This action <b className='text-[#433c68]'>can't</b> be reversed.</p>
             <div className='flex justify-end space-x-4'>
               <CancelX
                 onClick={() => handleDeleteConfirmation(false)} // Cancel deletion
-                className='bg-[#302c5056] /10 text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
+                className='bg-[#675E99] /10 text-white p-2 border border-white/70 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-all duration-200'
                 width={35} // Adjust the size as needed
                 height={35} // Adjust the size as needed
               />
               <FaCheck
-                className='text-white p-2 border border-white rounded-full shadow-lg cursor-pointer hover:scale-110 transition-300'
+                className='text-white p-2 bg-[#6c68b8d8] /30 border border-white/70 rounded-full shadow-lg cursor-pointer hover:scale-110 transition-all duration-200'
                 size={35}  // Adjust the size as needed
                 onClick={() => handleDeleteConfirmation(true)}  // Confirm deletion 
               />

@@ -123,7 +123,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                     <div className='relative '>
                         <SmallPopupIcon className="size-72 shadow-transparent hover:shadow-white-lg"/>
                         <p className="absolute left-5 top-5">{index+1}</p>
-                        <div className='absolute left-5 top-16'>
+                        <div className='roboto-mono-popup absolute top-16' style={{ fontSize: 14 }}>
                             <textarea
                                 value={note.content}
                                 onChange={(e) => {
@@ -133,7 +133,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                                     setUpdatedNotes(updatedNotes);
                                 }}
                                 placeholder='Write your retrospective here...'
-                                className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+                                className='w-[130%] h-[20vh] mt-5 bg-transparent p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]'
                             />
                         </div>
                         {/* Added the onClick handler for deleting a specific note */}

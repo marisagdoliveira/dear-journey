@@ -130,19 +130,20 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry, 
             ))}
           </select>
         </div>
-        <div className="flex justify-center gap-3 pt-4">
-          <button
-            onClick={handleSaveClick}
-            className="flex darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all"
-          >
-            Save
-          </button>
+        <div className="flex justify-center gap-3 pt-4"> 
           <button
             onClick={onClose}
             className="darker-grotesque-main px-4 py-1 bg-[#5b527194] hover:bg-[#48415a94] border border-white/60 text-white rounded-2xl ml-2 transition-all"
           >
             Cancel
           </button>
+          <button
+            onClick={handleSaveClick}
+            className="flex darker-grotesque-main px-4 py-1 bg-[#736cd5] hover:bg-[#6259b1] border border-white/60 text-white rounded-2xl transition-all"
+          >
+            Save
+          </button>
+
         </div>
       </div>
     </div>
