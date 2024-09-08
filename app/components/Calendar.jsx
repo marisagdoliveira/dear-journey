@@ -1,12 +1,14 @@
 import { useState, useEffect } from "react";
 import { useCapitalizeFirstLetter } from '../hooks/useCapitalizeFirstLetter';
-import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays } from "date-fns";
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
 import { IoIosAddCircle } from "react-icons/io";
 import Popup from "./Popup";
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
 import PlusIcon from "../../public/assets/PlusIcon.svg"
+import CalendarContainerOriginal from "../../public/assets/CalendarContainerOriginal.svg"
+import TodayCalendarContainerPurp from "../../public/assets/TodayCalendarContainerPurp.svg"
 
 export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
@@ -134,57 +136,80 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
     end: endOfMonth(currentMonth),
   });
 
-  
+
+  // function to highlight todays's day on calendar vs the other days:
+  const today = startOfToday(); // Get today's date 
+
+
 
   return (
-    <div className="flex flex-col items-center w-full p-4 pt-28">
-      <div className="flex justify-between w-full max-w-xl mb-7">
-        <button className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </button>
-        <h2 className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
-        <button className="text-white darker-grotesque-main" onClick={nextMonth}> <Calenright /> </button>
-      </div>
-      
-      <div className="flex flex-wrap max-w-[1100px] max-h-[40%] justify-center items-center gap-4 " style={{fontFamily: 'Darker Grotesque', }}>
-        {daysInMonth.map((day, index) => {
-          const entry = getDateEntry(day);
-          return (
-            
-            <div key={index} className="relative flex flex-col w-28 h-28 p-2 rounded-[35px] bg-[#dacdff24] border border-white/33" >
-              <div>
-                <span className="flex p-0.5 text-md text-white justify-end pr-1" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>{format(day, 'd')}</span>
-              </div>
-              <div className="max-w-[20ch] overflow-hidden text-ellipsis text-[#6464D3] text-[#fefefe] whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>{getDateEntry(day).title}</div>
-              <div onClick={() => openPopupWithSmallNotes(day)} className="absolute border-[1.5px] w-5 h-5 bottom-3 right-3.5 text-[#6464D3] border-[#ffffffdf] bg-[#ccc4ff90] rounded-full flex justify-center align-center text-xs cursor-pointer" style={{ fontWeight: 700 }}>{ getDateEntry(day).smallNotes.length }</div>
-              <button
-                className="text-white mt-auto"
-                // onClick={() => setShowAddNoteInput(true)}
-                onClick={() => { setShowPopup(true); setNoteDate(day); }}
-              >
-                <PlusIcon className="absolute top-3 left-4 text-white text-2xl text-[#dcd6ff]" />
-              </button>
-            </div>
-          );
-        })}
-      </div>
+     <div className="flex flex-col items-center w-full p-4 pt-28">
+       <div className="flex justify-between w-full max-w-xl mb-7">
+         <button className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </button>
+         <h2 className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
+         <button className="text-white darker-grotesque-main" onClick={nextMonth}> <Calenright /> </button>
+       </div>
+   
+       {/* Container for calendar and overlay */}
+       <div className={`relative flex flex-wrap max-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
+   {daysInMonth.map((day, index) => {
+     const entry = getDateEntry(day);
+     const isToday = isSameDay(day, today); // Check if the day is today
+    
+     return (
+       <div key={index} className="relative w-32 h-32 flex items-center justify-center"> {/* Increased size of the container */}
+         {/* Conditional rendering of CalendarContainer or TodayCalendarContainer */}
+         {isToday ? (
+           <TodayCalendarContainerPurp className="pulsingToday absolute  w-full h-full z-10 pointer-events-none" style={{ transform: 'scale(1.05)'
+
+          }} />
+         ) : (
+           <CalendarContainerOriginal className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
+         )}
+  
+         {/* Date (top-right) */}
+         <span className="absolute top-5 right-5 text-md text-white z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>
+           {format(day, 'd')}
+         </span>
+          
+         {/* Title (centered, truncates if too long) */}
+         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+           {entry.title}
+         </div>
+          
+         {/* Small notes indicator (bottom-right) */}
+         <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" style={{ fontWeight: 700 }}>
+           {entry.smallNotes.length}
+         </div>
+          
+         {/* Plus icon (top-left) */}
+         <button className="absolute top-6 left-4 text-white text-2xl z-20" onClick={() => { setShowPopup(true); setNoteDate(day); }}>
+           <PlusIcon className="text-white text-2xl text-[#dcd6ff]" />
+         </button>
+       </div>
+     );
+   })}
+   </div>
+  
       {showPopup && (
-        <div>
+        <div className="fixed inset-0" style={{ zIndex: 1000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
           <div className="overlay_blur"></div>
-        <div className="popup border border-white/45">
-          <div className="popup-content flex flex-col justify-center items-center relative">
-            <div className="flex w-full justify-end items-end">
-              <button className="close-button self-end pr-2 top-5 absolute" onClick={() => closePopup()}>
-                <Close />
-              </button>
-            </div>
-            <div className="flex items-center">
-              <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer" ><Calenleft /></p>
-              <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setTitle1={setTitle}  getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave}/>
-              <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
+          <div className="popup border border-white/45 z-40 ">
+            <div className="popup-content flex flex-col justify-center items-center relative">
+              <div className="flex w-full justify-end items-end">
+                <button className="close-button self-end pr-2 top-5 absolute" onClick={() => closePopup()}>
+                  <Close />
+                </button>
+              </div>
+              <div className="flex items-center">
+                <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
+                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setTitle1={setTitle} getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} />
+                <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
+              </div>
             </div>
           </div>
         </div>
-        </div>
-        )}
+      )}
     </div>
   );
 }

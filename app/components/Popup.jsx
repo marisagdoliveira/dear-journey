@@ -8,6 +8,10 @@ import { FaCheck } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
 import { TbBell } from "react-icons/tb";
+import { FaRegCircleCheck } from "react-icons/fa6";
+import ThoughtIcon from "../../public/assets/ThoughtIcon.svg";
+
+
 
 
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
@@ -175,7 +179,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         setSmallNotes(formattedSmallNotes);
         onSave(noteDate, title, mainContent, formattedSmallNotes);
 
-        setSaveMessage('Entry saved successfully.');
+        setSaveMessage('Entry updated successfully');
         } catch (error) {
             console.error('Error saving journal entry:', error);
             setSaveMessage('Failed to save entry. Please try again.');
@@ -259,10 +263,10 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
 
   return (
-    <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative'>
+    <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative z-100001' >
       {smallPopupOpen && (
         <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%", top: "15px", zIndex: 100000 }}>
-          <BackIcon onClick={() => closeSmallNotes()} className="size-10"/>
+          <BackIcon onClick={() => closeSmallNotes()} className="size-10 cursor-pointer"/>
         </div>
       )}
       <div className='flex items-center justify-between mb-4'>
@@ -274,7 +278,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           placeholder='Title'
           value={title}
           onChange={(e) => setTitle(capitalizeFirstLetter(e.target.value))}
-          className='roboto-mono-popup bg-transparent focus:outline-none text-xl pl-64' style={{ fontWeight:400 }}
+          className='roboto-mono-popup bg-transparent focus:outline-none text-xl pl-64' style={{ fontWeight: 1000000 }}
         />
         <div className='flex items-center justify-center'>
           <div className='w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>
@@ -290,23 +294,45 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
             placeholder='Write your journal entry here...'
             className='biorhyme-popup tracking-wide text-justify w-full h-[40vh] mt-5 pr-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container text-[#ccc6f5]' style={{ fontWeight:350, fontSize: 13 }}
           />
-          <div className='flex flex-row items-center space-x-4 mb-5 '>
+        <div className='flex flex-col items-start'>
+          <div className='flex items-center space-x-4'>
             <button
               onClick={saveEntry}
-              className={`flex mt-4 text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 shadow-hidden rounded-2xl hover:bg-[#7676d66f] shadow-md justify-center items-center darker-grotesque-main transition-all duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
+              className={`flex text-3xl bg-[#8585f26f] w-[95px] h-[41px] border border-white/55 p-2 pt-1 shadow-hidden rounded-2xl hover:bg-[#7676d66f] shadow-md justify-center items-center darker-grotesque-main transition-all duration-150 ${isClicked ? 'scale-95' : 'scale-100'}`}
               style={{ fontSize: 25 }}
               disabled={isSaving}
             >
               {isSaving ? 'Save' : 'Save'}
             </button>
-            <GoTrash className="h-14 pt-5 size-9 text-white/30 hover:text-white/85 transition-colors duration-300 "
+            <GoTrash className="h-14 size-9 text-white/30 hover:text-white/85 transition-colors duration-300"
               onClick={() => setShowConfirmDelete(true)} />
-              {smallNotes.length > 0 && (<p className='darker-grotesque-main flex h-10 pl-4 pt-10 pb-0' style={{fontSize: 20}} size={1}>My latest insights:</p>)}
+          </div>
+          {smallNotes.length > 0 && (
+            <div className='flex items-center pt-4 pl-1'>
+              <ThoughtIcon className='mr-2' /> {/* Adjust the margin as needed */}
+              <p className='darker-grotesque-main' style={{ fontSize: 20 }}>
+                My latest insights:
+              </p>
+            </div>
+          )}
         </div>
         <div className='relative'>
-        {saveMessage && <div className='mt-4 text-white absolute -top-[32px] darker-grotesque-main' style={{ fontWeight: 350, fontSize: 18 }}>{saveMessage}</div>}</div>
-        <div className='flex items-center'>
-          <div className='mt-5 max-w-[50%] max-h-[120px] pb-2 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
+        {saveMessage && (
+        <div className='fixed inset-0 flex justify-center items-center z-50'>
+          {/* Save message container */}
+          <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}>
+            {/* Message */}
+            <div className='mb-4'>
+              {saveMessage}
+            </div>
+            {/* Check icon */}
+            <FaRegCircleCheck className='text-[rgb(173,172,255)]' size={34} />
+          </div>
+        </div>
+      )}
+        </div>
+        <div className='flex items-center z-100000'>
+          <div className='mt-5 max-w-[50%] max-h-[120px] pb-5 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
             {smallNotes.map((note, index) => (
               <div key={index} className='relative cursor-pointer'>
                 <p className="absolute left-9 top-8">{index + 1}</p>

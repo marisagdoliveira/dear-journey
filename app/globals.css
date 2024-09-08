@@ -6,6 +6,7 @@
 
 
 
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -323,4 +324,23 @@ select:focus{
   font-style: normal;
   font-variation-settings:
     "wdth" 100;
+}
+
+.pulsingToday {
+  animation: pulse 3s ease-in-out infinite;
+  border-radius: 35px;
+  height: fit-content;
+
+}
+
+@keyframes pulse {
+  0% {
+   box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.60)
+  }
+  50% {
+    box-shadow: 0px 0px 50px rgba(255, 255, 255, 0.50)
+  }
+  100% {
+    box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.60)
+  }
 }

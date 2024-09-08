@@ -23,7 +23,7 @@ export default function Homepage() {
   const [notifications, setNotifications] = useState([]);
   const [isOpen, setIsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
-
+  const [reminderTitleToday, setReminderTitleToday] = useState(false);
 
   const router = useRouter();
 
@@ -84,11 +84,13 @@ const fetchTheReminder = () => {
             if (correspondingEntry) {
               reminderTitle = correspondingEntry.title || "No Title Available";
               // depois de existir notifiação no frontend:
-              setIsOpen(true) // comentar esta linha p toggle manual
+              setIsOpen(true); // comentar esta linha p toggle manual
+              setReminderTitleToday(true);
               console.log("Reminder title set to: ", reminderTitle);
               break; // Exit the loop once we find a match for today
             } else {
               console.log("No corresponding entry found for notification:", notification);
+              setReminderTitleToday(false)
             }
           }
         }
@@ -166,57 +168,59 @@ const fetchTheReminder = () => {
 
   return (
     <div className="flex items-center justify-center wrapper pb-10">
-      <div>
-        {/* Outer Container with Fixed Position */}
-        <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: "1000" }}>
-          <div className="flex items-center font-semibold text-[#5c62da] ml-10">
-            {/* Logo and Binder Container */}
-            <Link href="./welcome">
-              <img
-                src="../../assets/Logo.svg"
-                className="w-28 h-28 cursor-pointer"
-              />
-            </Link>
-            <div className="relative overflow-hidden -ml-[10.1px] mt-4 w-[calc(100%-7rem)] h-[100px]" style={{ zIndex: 900 }}>
-              <div
-                className={`absolute top-0 h-full transition-transform duration-300 ease-in-out ${
-                  isOpen ? "translate-x-0" : "translate-x-[calc(-100%+15px)]"
-                }`} style={{ zIndex: 900 }} // Lower z-index to avoid overlapping the button
-              >
-                <OriginalBinder2 className="h-full cursor-pointer"
-                 onClick={toggleBinder} />
-                  <div className='absolute top-4 left-2 flex items-center justify-center'>
-                   <div className='w-12 h-12 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
-                     <TbBell className='notification-bell text-white cursor-none' size={34}  />
-                   </div>
+    <div>
+      {/* Outer Container with Fixed Position */}
+      <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: "1000" }}>
+        <div className="flex items-center font-semibold text-[#5c62da] ml-10">
+          {/* Logo and Binder Container */}
+          <Link href="./welcome">
+            <img
+              src="../../assets/Logo.svg"
+              className="w-28 h-28 cursor-pointer"
+            />
+          </Link>
+          {reminderTitleToday && (
+          <div className="relative overflow-hidden -ml-[10.1px] mt-4 w-[calc(100%-7rem)] h-[100px]" style={{ zIndex: 900 }}>
+            <div
+              className={`absolute top-0 h-full transition-transform duration-300 ease-in-out ${
+                isOpen ? "translate-x-0" : "translate-x-[calc(-100%+15px)]"
+              }`} style={{ zIndex: 900 }} // Lower z-index to avoid overlapping the button
+            >
+              <OriginalBinder2 className="h-full cursor-pointer"
+               onClick={toggleBinder} />
+                <div className='absolute top-4 left-2 flex items-center justify-center'>
+                 <div className='w-12 h-12 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
+                   <TbBell className='notification-bell text-white cursor-none' size={34}  />
                  </div>
-                <div className="absolute top-2 left-16 text-white" style={{ fontSize: 26, fontFamily: "Darker Grotesque",
-                 fontWeight: 500 }}>Reminder:</div>
-                <span className="absolute top-[13px] left-[166px] underline  decoration-1 underline-offset-2"style={{ fontSize: 21, fontFamily: "Darker Grotesque",
-                 fontWeight: 500 }}>{reminderTitle}</span>
-                <div className="absolute top-10 left-16" style={{ fontSize: 18, fontFamily: "Darker Grotesque",
-                 fontWeight: 500 }}>Check out this entry today!</div>
-              </div>
+               </div>
+              <div className="absolute top-2 left-16 text-white" style={{ fontSize: 26, fontFamily: "Darker Grotesque",
+               fontWeight: 500 }}>Reminder:</div>
+              <span className="absolute top-[13px] left-[166px] underline  decoration-1 underline-offset-2"style={{ fontSize: 21, fontFamily: "Darker Grotesque",
+               fontWeight: 500 }}>{reminderTitle}</span>
+              <div className="absolute top-10 left-16" style={{ fontSize: 18, fontFamily: "Darker Grotesque",
+               fontWeight: 500 }}>Check out this entry today!</div>
             </div>
           </div>
-        </div>
-
-        {/* User Picture */}
-        <div className="fixed top-12 right-16 w-[100px] h-[100px] z-50">
-          <UserPic
-            user={{ img: userPic, email: email, username: username }}
-            onPicChange={handlePicChange}
-          />
+          )}
         </div>
       </div>
 
-      {/* Navbar */}
-      <div className="mt-14" style={{ zIndex: "1000" }}>
-        <Navbar />
+      {/* User Picture */}
+      <div className="fixed top-12 right-16 w-[100px] h-[100px] z-50">
+        <UserPic
+          user={{ img: userPic, email: email, username: username }}
+          onPicChange={handlePicChange}
+        />
       </div>
-
-      {/* Calendar */}
-      <Calendar setReminderTitle={setReminderTitle}  fetchTheReminder={fetchTheReminder} />
     </div>
+
+    {/* Navbar */}
+    <div className="mt-14" style={{ zIndex: "1000" }}>
+      <Navbar />
+    </div>
+
+    {/* Calendar */}
+    <Calendar setReminderTitle={setReminderTitle}  fetchTheReminder={fetchTheReminder} />
+  </div>
   );
 }
