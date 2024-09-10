@@ -35,7 +35,11 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry, 
   };
 
   const handleSaveClick = async () => {
-    const noticeDate = selectedDate.toISOString();
+    //const noticeDate = selectedDate.toISOString();
+    const noticeDate = new Date(selectedDate.getTime() - selectedDate.getTimezoneOffset() * 60000).toISOString(); // Convert to UTC
+
+    console.log('Saving date:', noticeDate); // Log here
+
     const notificationData = {
       email,
       noteDate: entryDate,

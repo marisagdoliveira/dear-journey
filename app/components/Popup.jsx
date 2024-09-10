@@ -254,6 +254,8 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
   };
 
   const handleSaveReminder = (date) => {
+    console.log('Reminder date:', date); // Log here
+
     setReminderDate(date);
     // You may want to handle saving this date to your backend or state here:
 
@@ -278,7 +280,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           placeholder='Title'
           value={title}
           onChange={(e) => setTitle(capitalizeFirstLetter(e.target.value))}
-          className='roboto-mono-popup bg-transparent focus:outline-none text-xl pl-64' style={{ fontWeight: 1000000 }}
+          className='roboto-mono-popup bg-transparent focus:outline-none text-xl ' style={{ fontWeight: 1000000, width: "480px", paddingLeft: "215px" }} // atualizar esta linha no original!!!!
         />
         <div className='flex items-center justify-center'>
           <div className='w-10 h-10 bg-[#675E99]/90 rounded-xl flex items-center justify-center'>

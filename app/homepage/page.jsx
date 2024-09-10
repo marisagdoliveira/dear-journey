@@ -82,7 +82,7 @@ const fetchTheReminder = () => {
             );
 
             if (correspondingEntry) {
-              reminderTitle = correspondingEntry.title || "No Title Available";
+              reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString(); // atualizado
               // depois de existir notifiação no frontend:
               setIsOpen(true); // comentar esta linha p toggle manual
               setReminderTitleToday(true);
