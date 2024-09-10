@@ -82,7 +82,7 @@ const fetchTheReminder = () => {
             );
 
             if (correspondingEntry) {
-              reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString(); // atualizado
+              reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString(); // atualizar no proj original;
               // depois de existir notifiação no frontend:
               setIsOpen(true); // comentar esta linha p toggle manual
               setReminderTitleToday(true);
@@ -99,7 +99,14 @@ const fetchTheReminder = () => {
           console.log("No notification for today.");
         }
 
-        setReminderTitle(reminderTitle);
+        const MAX_TITLE_LENGTH = 10; // Define the maximum length
+
+        const truncatedTitle = reminderTitle.length > MAX_TITLE_LENGTH
+        ? reminderTitle.substring(0, MAX_TITLE_LENGTH) + '...' // Append ellipsis if truncated
+        : reminderTitle;
+
+        setReminderTitle(truncatedTitle);
+        
         console.log("Final reminder title: ", reminderTitle);
       } else {
         console.log("No notifications available.");
