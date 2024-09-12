@@ -6,7 +6,6 @@
 
 
 
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -219,11 +218,28 @@ body{
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
  
-  scrollbar-color: #5e5ea364 transparent;
+  scrollbar-color: #5e5ea300 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 
 }
+.scroll-container2 {
+  scrollbar-color: #5e5ea300 transparent; /* For Firefox */
+  scrollbar-width: thin; /* For Firefox */
+}
 
+/* For WebKit browsers (Chrome, Safari, Edge) */
+.scroll-container2::-webkit-scrollbar {
+  width: px; /* Adjust this value to make the scrollbar thinner */
+}
+
+.scroll-container2::-webkit-scrollbar-thumb {
+  background-color: #5e5ea345; /* Color of the scrollbar thumb */
+  border-radius: 10px; /* Rounded corners for the thumb */
+}
+
+.scroll-container2::-webkit-scrollbar-track {
+  background: transparent; /* Background of the scrollbar track */
+}
 
 
 textarea {
@@ -342,5 +358,63 @@ select:focus{
   }
   100% {
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.60)
+  }
+}
+
+
+/* Define the cubic-bezier easing
+function */
+.arrow-container {
+  position: relative;
+  width: 10px; /* Adjust this for the smallest size */
+  height: 19px; /* Adjust this for the smallest size */
+}
+
+.moving-arrow-wrapper, .moving-arrow-fixed-wrapper {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.moving-arrow-wrapper svg, .moving-arrow-fixed-wrapper svg {
+  width: 100%; /* Make sure the SVG scales with the container */
+  height: auto;
+}
+
+/* Animation for the moving arrow */
+.moving-arrow-wrapper {
+  animation: moving-arrow-anim 1.25s cubic-bezier(.2, 1, .3, 1) infinite;
+}
+
+/* Animation for the fixed arrow */
+.moving-arrow-fixed-wrapper {
+  animation: moving-arrow-fixed-anim 1.25s cubic-bezier(.2, 1, .3, 1) infinite;
+}
+
+/* Keyframes for moving arrow */
+@keyframes moving-arrow-anim {
+  0% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  5% {
+    transform: translateX(-0.1rem);
+  }
+  100% {
+    transform: translateX(1rem);
+    opacity: 0;
+  }
+}
+
+/* Keyframes for fixed arrow */
+@keyframes moving-arrow-fixed-anim {
+  5% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 0.4;
+  }
+  100% {
+    opacity: 1;
   }
 }

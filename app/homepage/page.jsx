@@ -10,6 +10,8 @@ import OriginalBinder2 from "../../public/assets/OriginalBinder2.svg"
 import ScrollRight from "../../public/assets/ScrollRight.svg"
 import { TbBell } from "react-icons/tb";
 import TbBell2 from "../../public/assets/TbBell2.svg"
+import FirstArrow from "../../public/assets/FirstArrow.svg"
+import SecondArrow from "../../public/assets/SecondArrow.svg"
 
 
 
@@ -242,7 +244,7 @@ useEffect(() => {
           )}
           {/* Mini popup for additional titles -----------------------------------------------------------------------------  */}
           {showAdditionalTitles && (
-            <div className="flex flex-row absolute top-[98px] left-[189px] pt-1.5 gap-1 max-w-[200px] pb-3 overflow-auto scroll-container" style={{ zIndex: 100000, fontFamily: "Darker Grotesque", whiteSpace: "nowrap" }}>
+            <div className="flex flex-row absolute top-[98px] left-[189px] pt-1.5 gap-1 min-w-[190px]  max-w-[200px] pb-1 overflow-auto scroll-container2" style={{ zIndex: 100000, fontFamily: "Darker Grotesque", whiteSpace: "nowrap" }}>
               {additionalReminderTitlesToday.map((title, index) => (
                 <div key={index} className="flex-shrink-0 text-sm justify-center items-center bg-[#938ef8] shadow-md shadow-[#4c496345] text-white p-1.5 mb-1 rounded-xl">
                   {title}
@@ -252,7 +254,19 @@ useEffect(() => {
             </div>
           )}
          {additionalReminderTitlesToday.length > 3 && showAdditionalTitles && (
-          <ScrollRight className="absolute top-[108px] left-[398px]"/>
+          <div className="arrow-container absolute top-[63px] right-[33px]">
+          <div className="moving-arrow-wrapper">
+            <svg width="8" height="19" viewBox="0 0 31 59" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.93257 59C1.44232 59 0.940603 58.802 0.564362 58.4175C-0.188121 57.6486 -0.188121 56.3905 0.564362 55.6216L26.3198 29.3049L0.9406 3.37259C0.188118 2.60371 0.188118 1.34554 0.9406 0.57666C1.69308 -0.192222 2.92442 -0.192222 3.6769 0.57666L30.4356 27.9069C31.1881 28.6758 31.1881 29.934 30.4356 30.7028L3.31207 58.4175C2.92442 58.8136 2.43422 59 1.93257 59Z" fill="white"/>
+            </svg>
+          </div>
+
+          <div className="moving-arrow-fixed-wrapper">
+            <svg width="8" height="19" viewBox="0 0 31 59" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M1.93257 59C1.44232 59 0.940603 58.802 0.564362 58.4175C-0.188121 57.6486 -0.188121 56.3905 0.564362 55.6216L26.3198 29.3049L0.9406 3.37259C0.188118 2.60371 0.188118 1.34554 0.9406 0.57666C1.69308 -0.192222 2.92442 -0.192222 3.6769 0.57666L30.4356 27.9069C31.1881 28.6758 31.1881 29.934 30.4356 30.7028L3.31207 58.4175C2.92442 58.8136 2.43422 59 1.93257 59Z" fill="white"/>
+            </svg>
+          </div>
+        </div>
          )}
         </div>
       </div>
