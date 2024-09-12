@@ -7,6 +7,7 @@ import Navbar from "../components/Navbar";
 import UserPic from "../components/UserPic";
 import Link from 'next/link';
 import OriginalBinder2 from "../../public/assets/OriginalBinder2.svg"
+import ScrollRight from "../../public/assets/ScrollRight.svg"
 import { TbBell } from "react-icons/tb";
 import TbBell2 from "../../public/assets/TbBell2.svg"
 
@@ -15,6 +16,7 @@ import TbBell2 from "../../public/assets/TbBell2.svg"
 
 export default function Homepage() {
   const [reminderTitle, setReminderTitle] = useState("");  // New state for the reminder title
+  const [additionalReminderTitlesToday, setAdditionalReminderTitlesToday] = useState([]); // State for additional reminder titles
 
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
@@ -24,6 +26,8 @@ export default function Homepage() {
   const [isOpen, setIsOpen] = useState(false);
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [reminderTitleToday, setReminderTitleToday] = useState(false);
+  const [showAdditionalTitles, setShowAdditionalTitles] = useState(false); // New state for showing additional titles
+
 
   const router = useRouter();
 
@@ -32,96 +36,110 @@ useEffect(() => {
   fetchTheReminder()
 }, [router]);
 
-const fetchTheReminder = () => {
-  const fetchUser = async () => {
-    try {
-      const res = await fetch("/api/user", {
-        method: "GET",
-      });
+  const fetchTheReminder = () => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user", {
+          method: "GET",
+        });
 
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
-      }
+        if (!res.ok) {
+          throw new Error("Network response was not ok");
+        }
 
-      const data = await res.json();
-      console.log(data);
+        const data = await res.json();
+        console.log(data);
 
-      if (!data.user.username) {
-        throw new Error("User not authenticated");
-      }
+        if (!data.user.username) {
+          throw new Error("User not authenticated");
+        }
 
-      setUsername(data.user.username);
-      setUserPic(data.user.img || null);
-      setEmail(data.user.email);
-      setNotifications(data.user.notifications);
+        setUsername(data.user.username);
+        setUserPic(data.user.img || null);
+        setEmail(data.user.email);
+        setNotifications(data.user.notifications);
 
-      console.log("Notifications received: ", data.user.notifications);
+        console.log("Notifications received: ", data.user.notifications);
 
-      if (data.user.notifications.length > 0) {
-        const today = new Date();
+        if (data.user.notifications.length > 0) {
+          const today = new Date();
 
-        // Helper function to check if two dates are the same day
-        const isSameDay = (date1, date2) => {
-          return (
-            date1.getFullYear() === date2.getFullYear() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getDate() === date2.getDate()
-          );
-        };
-
-        let reminderTitle = "";
-
-        // Loop through all notifications
-        for (const notification of data.user.notifications) {
-          const noticeDate = new Date(notification.noticeDate);
-          console.log("Checking Notification: ", notification);
-
-          if (isSameDay(today, noticeDate)) {
-            const correspondingEntry = data.user.library.find(entry =>
-              isSameDay(new Date(entry.date), new Date(notification.noteDate))
+          // Helper function to check if two dates are the same day
+          const isSameDay = (date1, date2) => {
+            return (
+              date1.getFullYear() === date2.getFullYear() &&
+              date1.getMonth() === date2.getMonth() &&
+              date1.getDate() === date2.getDate()
             );
+          };
 
-            if (correspondingEntry) {
-              reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString(); // atualizar no proj original;
-              // depois de existir notifiação no frontend:
-              setIsOpen(true); // comentar esta linha p toggle manual
-              setReminderTitleToday(true);
-              console.log("Reminder title set to: ", reminderTitle);
-              break; // Exit the loop once we find a match for today
-            } else {
-              console.log("No corresponding entry found for notification:", notification);
-              setReminderTitleToday(false)
+          let reminderTitle = "";
+          let additionalTitles = [];
+
+          // Loop through all notifications
+          for (const notification of data.user.notifications) {
+            const noticeDate = new Date(notification.noticeDate);
+            console.log("Checking Notification: ", notification);
+
+            if (isSameDay(today, noticeDate)) {
+              const correspondingEntry = data.user.library.find(entry =>
+                isSameDay(new Date(entry.date), new Date(notification.noteDate))
+              );
+
+              if (correspondingEntry) {
+                if (reminderTitle === "") {
+                  reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString();
+                  setReminderTitleToday(true);
+                } else {
+                  additionalTitles.push(correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString());
+                }
+                setIsOpen(true); // Toggle the binder open state
+                console.log("Reminder title set to: ", reminderTitle);
+              } else {
+                console.log("No corresponding entry found for notification:", notification);
+                setReminderTitleToday(false);
+              }
             }
           }
+
+          if (!reminderTitle) {
+            console.log("No notification for today.");
+          }
+
+          const MAX_TITLE_LENGTH = 10; // Define the maximum length
+
+          const truncatedTitle = reminderTitle.length > MAX_TITLE_LENGTH
+            ? reminderTitle.substring(0, MAX_TITLE_LENGTH) + '...' // Append ellipsis if truncated
+            : reminderTitle;
+
+          setReminderTitle(truncatedTitle);
+
+          const truncatedAdditionalTitles = additionalTitles.map(title => 
+            title.length > MAX_TITLE_LENGTH ? title.substring(0, MAX_TITLE_LENGTH) + '...' : title
+          );
+
+          setAdditionalReminderTitlesToday(truncatedAdditionalTitles);
+
+          console.log("Final reminder title: ", reminderTitle);
+        } else {
+          console.log("No notifications available.");
         }
-
-        if (!reminderTitle) {
-          console.log("No notification for today.");
-        }
-
-        const MAX_TITLE_LENGTH = 10; // Define the maximum length
-
-        const truncatedTitle = reminderTitle.length > MAX_TITLE_LENGTH
-        ? reminderTitle.substring(0, MAX_TITLE_LENGTH) + '...' // Append ellipsis if truncated
-        : reminderTitle;
-
-        setReminderTitle(truncatedTitle);
-        
-        console.log("Final reminder title: ", reminderTitle);
-      } else {
-        console.log("No notifications available.");
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+        router.replace("/"); // Redirect to login if not authenticated
+      } finally {
+        setLoading(false);
       }
-    } catch (error) {
-      console.error("Error fetching user data:", error);
-      router.replace("/"); // Redirect to login if not authenticated
-    } finally {
-      setLoading(false);
-    }
+    };
+    fetchUser();
   };
-  fetchUser();
-};
 
-
+  useEffect(() => { // --------------- NEW!!!! -----------------------------------------------------------
+    if (!isOpen) {
+      setShowAdditionalTitles(false); // Automatically close additional titles when binder is closed
+    }
+  }, [isOpen]);
+  
 
   useEffect(() => {
     let shakeInterval; // Declare shakeInterval in the scope of useEffect
@@ -187,33 +205,60 @@ const fetchTheReminder = () => {
             />
           </Link>
           {reminderTitleToday && (
-          <div className="relative overflow-hidden -ml-[10.1px] mt-4 w-[calc(100%-7rem)] h-[100px]" style={{ zIndex: 900 }}>
-            <div
-              className={`absolute top-0 h-full transition-transform duration-300 ease-in-out ${
-                isOpen ? "translate-x-0" : "translate-x-[calc(-100%+15px)]"
-              }`} style={{ zIndex: 900 }} // Lower z-index to avoid overlapping the button
-            >
-              <OriginalBinder2 className="h-full cursor-pointer"
-               onClick={toggleBinder} />
+            <div className="relative overflow-hidden -ml-[10.1px] mt-4 w-[calc(100%-7rem)] h-[100px]" style={{ zIndex: 900 }}>
+              <div
+                className={`absolute top-0 h-full transition-transform duration-300 ease-in-out ${
+                  isOpen ? "translate-x-0" : "translate-x-[calc(-100%+15px)]"
+                }`} style={{ zIndex: 900 }} // Lower z-index to avoid overlapping the button
+              >
+                <OriginalBinder2 className="h-full cursor-pointer"
+                  onClick={toggleBinder} />
                 <div className='absolute top-4 left-2 flex items-center justify-center'>
-                 <div className='w-12 h-12 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
-                   <TbBell className='notification-bell text-white cursor-none' size={34}  />
-                 </div>
-               </div>
-              <div className="absolute top-2 left-16 text-white" style={{ fontSize: 26, fontFamily: "Darker Grotesque",
-               fontWeight: 500 }}>Reminder:</div>
-              <span className="absolute top-[13px] left-[166px] underline  decoration-1 underline-offset-2"style={{ fontSize: 21, fontFamily: "Darker Grotesque",
-               fontWeight: 500 }}>{reminderTitle}</span>
-              <div className="absolute top-10 left-16" style={{ fontSize: 18, fontFamily: "Darker Grotesque",
-               fontWeight: 500 }}>Check out this entry today!</div>
+                  <div className='w-12 h-12 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
+                    <TbBell className='notification-bell text-white cursor-none' size={34} />
+                  </div>
+                </div>
+                <div className="absolute top-3 left-16 text-white" style={{ fontSize: 22, fontFamily: "Darker Grotesque",
+                  fontWeight: 500 }}>Reminder:</div>
+                <div className="absolute top-[12px] left-[150px] flex items-center">
+                  <span className="underline decoration-1 underline-offset-2" style={{ fontSize: 22, fontFamily: "Darker Grotesque",
+                    fontWeight: 500 }}>{reminderTitle}</span>
+                  {/* Counter for additional notifications */}
+                  {additionalReminderTitlesToday.length > 0 && (
+                    <p
+                      className="absolute top-12 left-[99px] bg-[#938ef8] w-6 h-6 pr-0.5 pb-1 rounded-full shadow-sm shadow-[#4c4963] flex justify-center items-center text-xs text-[#fff] cursor-pointer"
+                      onClick={() => setShowAdditionalTitles(!showAdditionalTitles)}
+                      style={{ fontSize: 16, fontFamily: "Darker Grotesque", fontWeight: 700 }}
+                    >
+                      +{additionalReminderTitlesToday.length }
+                    </p>
+                  )}
+                </div>
+                <div className="absolute top-10 left-16" style={{ fontSize: 18, fontFamily: "Darker Grotesque",
+                  fontWeight: 500 }}>Check out this entry today!</div>
+
+              </div>
             </div>
-          </div>
           )}
+          {/* Mini popup for additional titles -----------------------------------------------------------------------------  */}
+          {showAdditionalTitles && (
+            <div className="flex flex-row absolute top-[98px] left-[189px] pt-1.5 gap-1 max-w-[200px] pb-3 overflow-auto scroll-container" style={{ zIndex: 100000, fontFamily: "Darker Grotesque", whiteSpace: "nowrap" }}>
+              {additionalReminderTitlesToday.map((title, index) => (
+                <div key={index} className="flex-shrink-0 text-sm justify-center items-center bg-[#938ef8] shadow-md shadow-[#4c496345] text-white p-1.5 mb-1 rounded-xl">
+                  {title}
+                </div>
+              ))}
+              
+            </div>
+          )}
+         {additionalReminderTitlesToday.length > 3 && showAdditionalTitles && (
+          <ScrollRight className="absolute top-[108px] left-[398px]"/>
+         )}
         </div>
       </div>
 
-      {/* User Picture */}
-      <div className="fixed top-12 right-16 w-[100px] h-[100px] z-50">
+      {/* User Picture ----------------------------------------------------------------------------------------------------  */} 
+      <div className="fixed top-12 right-16 w-[100px] h-[100px] z-1000" style={{ zIndex: 10000000 }}>
         <UserPic
           user={{ img: userPic, email: email, username: username }}
           onPicChange={handlePicChange}
@@ -222,12 +267,12 @@ const fetchTheReminder = () => {
     </div>
 
     {/* Navbar */}
-    <div className="mt-14" style={{ zIndex: "1000" }}>
+    <div className="mt-24" style={{ zIndex: "100000000000" }}>
       <Navbar />
     </div>
 
     {/* Calendar */}
-    <Calendar setReminderTitle={setReminderTitle}  fetchTheReminder={fetchTheReminder} />
+    <Calendar className="pt-10" setReminderTitle={setReminderTitle} fetchTheReminder={fetchTheReminder} />
   </div>
   );
 }

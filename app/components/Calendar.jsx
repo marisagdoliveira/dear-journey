@@ -143,7 +143,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
 
 
   return (
-     <div className="flex flex-col items-center w-full p-4 pt-28">
+     <div className="flex flex-col items-center w-full p-4 pt-36"> {/* <------------------ LINHA ALTERADA, ATUALIZAR NO ORIGINAL!!!!--------*/ }
        <div className="flex justify-between w-full max-w-xl mb-7">
          <button className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </button>
          <h2 className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
