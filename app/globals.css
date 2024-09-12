@@ -218,7 +218,7 @@ body{
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
  
-  scrollbar-color: #5e5ea300 transparent;
+  scrollbar-color: #5e5ea396 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 
 }
