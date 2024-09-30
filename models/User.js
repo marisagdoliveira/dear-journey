@@ -45,6 +45,27 @@ const LibraryEntrySchema = new Schema({
 
 });
 
+// Support schema
+
+const SupportSchema = new Schema({
+  username: {
+    type: String,
+    required: true
+  },
+  email: {
+    type: String,
+    required: true
+  },
+  description: {
+    type: String,
+    required: true
+  },
+  explanation: {
+    type: String,
+    required: true
+  },
+});
+
 // User schema
 const UserSchema = new Schema({
   username: {
@@ -67,6 +88,7 @@ const UserSchema = new Schema({
   },
   library: [LibraryEntrySchema], // Library entries with notifications
   notifications: [NotificationSchema], // Array of notifications
+  support: [SupportSchema], // Array of support tickets
 }, { timestamps: true });
 
 module.exports = mongoose.models.User || mongoose.model('User', UserSchema);
