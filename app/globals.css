@@ -217,19 +217,26 @@ body{
 
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
- 
-  scrollbar-color: #5e5ea396 transparent;
+  scrollbar-color: #5e5ea3cf transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
-
 }
+
+
 .scroll-container2 {
   scrollbar-color: #5e5ea300 transparent; /* For Firefox */
   scrollbar-width: thin; /* For Firefox */
 }
 
+
+.scroll-container-faq {
+  scrollbar-color: #a79af7 transparent;
+  scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
+}
+
+
 /* For WebKit browsers (Chrome, Safari, Edge) */
 .scroll-container2::-webkit-scrollbar {
-  width: px; /* Adjust this value to make the scrollbar thinner */
+  width: 2px; /* Adjust this value to make the scrollbar thinner */
 }
 
 .scroll-container2::-webkit-scrollbar-thumb {
@@ -240,6 +247,11 @@ body{
 .scroll-container2::-webkit-scrollbar-track {
   background: transparent; /* Background of the scrollbar track */
 }
+
+
+
+
+
 
 
 textarea {
@@ -319,6 +331,30 @@ select:focus{
   outline: none;
 }
 
+textarea:focus{
+  outline: none;
+}
+
+
+/* Placeholder text color */
+::placeholder {
+  color: white;
+  opacity: 1; /* Ensure it doesn't fade */
+}
+
+/* Autofill background fix */
+input:-webkit-autofill,
+textarea:-webkit-autofill {
+  background-color: transparent !important;
+  -webkit-box-shadow: 0 0 0 30px transparent inset !important;
+  -webkit-text-fill-color: rgba(255, 255, 255, 0) !important;
+}
+
+/* Ensure the width consistency for input and textarea */
+.input-field {
+  width: 500px; /* Match the size of email and description fields */
+}
+
 .roboto-mono-popup {
   font-family: "Roboto Mono", monospace;
   font-optical-sizing: auto;
@@ -360,6 +396,8 @@ select:focus{
     box-shadow: 0px 0px 10px rgba(255, 255, 255, 0.60)
   }
 }
+
+/*----------------------------------------------------------------*/
 
 
 /* Define the cubic-bezier easing
@@ -418,3 +456,162 @@ function */
     opacity: 1;
   }
 }
+
+/*----------------------------------------------------------------*/
+
+
+/* Container for the animation */
+.animation-container {
+  position: relative;
+  width: 155px;
+  height: 150px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* SVG Circle path */
+.circle-svg {
+  width: 150px;
+  height: 150px;
+  position: absolute;
+}
+
+.circle-path {
+  fill: #8b85ff30;
+  stroke: #8b80ed91;
+  stroke-width: 4; /* Adjust stroke width here */
+  stroke-dasharray: 440; /* Adjusted to fit the circle path length */
+  stroke-dashoffset: 440; /* Starts hidden */
+  animation: drawCircle 2s forwards ease-in-out;
+  
+  animation: drawCircle 2s forwards ease-in-out;
+}
+
+/* Check icon */
+.check-icon {
+  font-size: 50px;
+  color: #a7a4ef;
+  opacity: 0;
+  position: absolute;
+  animation: checkFadeIn 0.5s 2s forwards ease-in-out, checkFadeOut 0.5s 2.5s forwards ease-in-out;
+}
+
+/* Email icon flips and stays visible */
+.email-icon {
+  font-size: 50px;
+  opacity: 0;
+  position: absolute;
+  transform: rotateY(90deg);
+  margin-left: 4px;
+  margin-top: 10px;
+  animation: flipToEmail 2s 2.5s forwards ease-in-out;
+}
+
+/* SVG Circle draw animation */
+@keyframes drawCircle {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Faster fade in and out for check icon */
+@keyframes checkFadeIn {
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+@keyframes checkFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+/* More flips for email icon */
+/* Email icon flip animation (stays visible) */
+@keyframes flipToEmail {
+  0% {
+    opacity: 0;
+    transform: rotateY(90deg);
+  }
+  50% {
+    opacity: 0;
+    transform: rotateY(180deg);
+  }
+  75% {
+    opacity: 1;
+    transform: rotateY(360deg);
+  }
+  100% {
+    transform: rotateY(710deg); /* Extra flip */
+    opacity: 1; /* Ensures it stays visible */
+  }
+}
+
+/*----------------------------------------------------------------*/
+
+
+.waviy {
+  font-size: 55px;
+  display: flex;
+  justify-content: center;
+}
+
+.waviy span {
+  font-family: 'Darker Grotesque', sans-serif;
+  font-weight: 600;
+  display: inline-block;
+  color: #fff;
+  text-transform: none;
+  animation: waviy 1s ease-out;
+  animation-delay: calc(0.1s * var(--i));
+  text-shadow: 5px 5px 8px rgba(107, 85, 251, 0.418); /* Add shadow here */
+}
+
+@keyframes waviy {
+  0%, 40%, 100% {
+    transform: translateY(0);
+  }
+  20% {
+    transform: translateY(-20px);
+  }
+}
+
+/*----------------------------------------------------------------*/
+
+.button-pop {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-pop:hover {
+  transform: translateY(-5px) scale(1.05);
+  box-shadow: 0px 5px 8px rgba(107, 85, 251, 0.38);
+}
+
+.button-pop:active {
+  transform: scale(0.95); /* Scale down on click */
+}
+
+/*----------------------------------------------------------------*/
+
+.button-pop2 {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.button-pop2:hover {
+  transform: translateY(-0.4px) scale(1.05);
+  box-shadow: 0px 2px 8px rgba(107, 85, 251, 0.38);
+}
+
+.button-pop2:active {
+  transform: scale(0.95); /* Scale down on click */
+}
+
+/*----------------------------------------------------------------*/
