@@ -188,9 +188,9 @@ useEffect(() => {
     setNotificationsOpen(!notificationsOpen);
   };
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+ //if (loading) {
+ //  return <div>Loading...</div>; <----------------- This was making the black loading screen!! DO NOT INCLUDE -------------
+ //}
 
 
   return (
@@ -244,7 +244,7 @@ useEffect(() => {
           )}
           {/* Mini popup for additional titles -----------------------------------------------------------------------------  */}
           {showAdditionalTitles && (
-            <div className="flex flex-row absolute top-[98px] left-[189px] pt-1.5 gap-1 min-w-[190px]  max-w-[200px] justify-end pb-1 overflow-auto scroll-container2" style={{ zIndex: 100000, fontFamily: "Darker Grotesque", whiteSpace: "nowrap" }}>
+            <div className="flex flex-row absolute top-[98px] left-[189px] pt-1.5 gap-1 min-w-[190px] justify-end  max-w-[200px] pb-1 overflow-auto scroll-container" style={{ zIndex: 100000, fontFamily: "Darker Grotesque", whiteSpace: "nowrap" }}>
               {additionalReminderTitlesToday.map((title, index) => (
                 <div key={index} className="flex-shrink-0 text-sm justify-center items-center bg-[#938ef8] shadow-md shadow-[#4c496345] text-white p-1.5 mb-1 rounded-xl">
                   {title}
