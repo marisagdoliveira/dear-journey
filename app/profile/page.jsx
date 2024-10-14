@@ -20,10 +20,14 @@ export default function Profile() {
     password: '',
     confirmPassword: ''
   });
+  
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [passwordVisible2, setPasswordVisible2] = useState(true);
+  const [isChangingPassword, setIsChangingPassword] = useState(false); // Track password change
+  
+
 
   const router = useRouter();
 
@@ -47,6 +51,7 @@ export default function Profile() {
           password: '',
           confirmPassword: ''
         });
+        
       } catch (error) {
         console.error("Error fetching user data:", error);
         router.replace("/"); // Redirect to login if not authenticated
@@ -59,20 +64,38 @@ export default function Profile() {
   const handlePicChange = (newPicUrl) => setUserPic(newPicUrl);
 
   const handleChange = (e) => {
+    const { name, value } = e.target; // <-- Add this line to destructure `name` and `value`.
+
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
+     // Set isChangingPassword if password field is filled or cleared ---> new - 14/10!!! -----------
+     if (name === 'password') {
+      setIsChangingPassword(!!value);  // true if password has value, false if it's cleared
+    } // ---------------------------------------------------------------------------------------------
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match!');
+    console.log("Form submitted", formData); // <-- Add this line to check if the form submits.
+
+    
+    // Add validation for password confirmation only if password is being changed
+    if (isChangingPassword) {
+      if (formData.password !== formData.confirmPassword) {
+        setError('Passwords do not match!');
+        return;
+    }
+
+    if (!formData.confirmPassword) {  // If the user is changing the password, confirmPassword is required
+      setError('Password confirmation is required!');
       return;
     }
 
     try {
+      console.log("Sending update request"); // <-- Add this line to see if the fetch is attempted.
+
       const res = await fetch('/api/user', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
@@ -82,12 +105,20 @@ export default function Profile() {
           password: formData.password
         })
       });
+        console.log("Response received:", res); // <-- Log the response to check its status.
+
 
       const data = await res.json();
 
       if (res.ok) {
         setSuccess('Profile updated successfully!');
         setError('');
+
+        // Refresh the page after 3 seconds of displaying the above success message
+        setTimeout(() => {
+          window.location.reload();
+      }, 3000);
+
       } else {
         setError(data.message || 'Failed to update profile.');
       }
@@ -95,7 +126,7 @@ export default function Profile() {
       setError('An error occurred.');
       console.error(err);
     }
-  };
+  }};
 
   return (
     <div className="flex justify-center wrapper pb-10">
@@ -158,13 +189,13 @@ export default function Profile() {
 
           <div className="flex items-center mb-4">
             <input
-              type="password"
+              type={passwordVisible ? "password" : "text"} // Toggle between "password" and "text"
               id="password"
               name="password"
               value={formData.password}
               onChange={handleChange}
               placeholder="new password"
-              required
+              required={isChangingPassword} // Dynamically required
               className="relative bg-transparent border border-white/60 p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
             />
@@ -182,13 +213,13 @@ export default function Profile() {
 
           <div className="flex items-center mb-4">
             <input
-              type="password"
+              type={passwordVisible ? "password" : "text"} // Toggle between "password" and "text"
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
               onChange={handleChange}
               placeholder="confirm password"
-              required
+              required={isChangingPassword} // Dynamically required
               className="bg-transparent border border-white/60 p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
             />
