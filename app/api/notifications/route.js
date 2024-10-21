@@ -26,6 +26,16 @@ export async function POST(req) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
+    // Check if a notification with the same noteDate and noticeDate already exists
+    const existingNotification = user.notifications.find(notification =>
+      notification.noteDate.getTime() === new Date(noteDate).getTime() &&
+      notification.noticeDate.getTime() === new Date(noticeDate).getTime()
+    );
+    
+    if (existingNotification) {
+      return NextResponse.json({ message: "Notification already exists for this entry and date." }, { status: 400 });
+    }
+
     const newNotification = {
       noteDate: new Date(noteDate),
       noticeDate: new Date(noticeDate)
