@@ -210,15 +210,20 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         body: JSON.stringify({
           email,
           date: noteDate.toISOString(),
+          deleteNotifications: true,
         }),
       });
   
       if (!response.ok) {
         throw new Error('Failed to delete entry.');
       }
-  
       const result = await response.json();
       console.log('Deleted entry:', result);
+      
+      // handle notification removal logic
+      if (result.deletedNotifications) {
+        console.log('Deleted associated notifications:', result.deletedNotifications);
+      }
   
       // Notify parent component about the deletion
       if (onSave) {
