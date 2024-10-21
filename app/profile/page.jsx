@@ -130,8 +130,8 @@ export default function Profile() {
 
   return (
     <div className="flex justify-center wrapper pb-10">
-      <div className="flex items-center mt-[123px]">
-        <Navbar />
+      <div className="flex items-center mt-[195px] " style={{ zIndex: 10000000 }}>
+        <Navbar  />
       </div>
 
       <div className="flex flex-col w-screen bg-transparent text-white align-start pt-20 pl-20 gap-3">
@@ -213,7 +213,7 @@ export default function Profile() {
 
           <div className="flex items-center mb-4">
             <input
-              type={passwordVisible ? "password" : "text"} // Toggle between "password" and "text"
+              type={passwordVisible2 ? "password" : "text"} // Toggle between "password" and "text"
               id="confirmPassword"
               name="confirmPassword"
               value={formData.confirmPassword}
@@ -238,11 +238,12 @@ export default function Profile() {
           {error && <p className="" style={{ color: 'red' }}>
             {error}
             </p>}
-          {success && <div className='fixed inset-0 flex justify-center items-center z-50'>
+          {success && <div className='fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50'>
           {/* Save message container */}
-          <div className='fixed inset-0 flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}>
+          <div className="overlay_blur"></div>
+          <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
             {/* Message */}
-            <div className='mb-4'>
+            <div className='mb-4' style={{ fontFamily: 'Darker Grotesque' }}>
               {success}
             </div>
             {/* Check icon */}
@@ -263,7 +264,7 @@ export default function Profile() {
 
       {/* User Picture and Logo */}
       <div>
-        <div className="fixed top-12 right-16 w-[150px] h-[150px] z-1000 mt-16" style={{ zIndex: 10000000 }}>
+        <div className="fixed top-12 right-16 w-[150px] h-[150px] z-1000 mt-16" style={{  }}>
           <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
         <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>
