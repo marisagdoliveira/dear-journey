@@ -79,12 +79,12 @@ export async function PATCH(req) {
 }
 
 
-// Delete a whole entry + smallNotes:
+// Delete a whole entry + smallNotes + notifications:
 export async function DELETE(req) {
   try {
     // Parse request body to extract the data
-    const { email, date } = await req.json();
-    console.log('Received DELETE request:', { email, date });
+    const { email, date, deleteNotifications } = await req.json();
+    console.log('Received DELETE request:', { email, date, deleteNotifications });
 
     // Connect to the database
     await connectDB();
@@ -112,6 +112,19 @@ export async function DELETE(req) {
 
     // Remove the entry from the user's library
     user.library.splice(entryIndex, 1);
+
+    
+     // Remove associated notifications:
+
+     if (deleteNotifications) {
+      user.notifications = user.notifications.filter(notification => {
+        // Check if notification.date exists and is a valid date, returning a new notifications array with notifications that did not match the entry date that's being removed
+        return notification.date && notification.date.getTime() !== entryDate.getTime(); // A remoção das notificações aqui funciona de forma inversa, em que, em vez de se remover uma notificação específica, cria-se um novo array (que substitui o antigo) com todas as notificações existentes que não tenham a mesma data da entry que está a ser apagada -> notification.date.getTime() !== entryDate.getTime();
+      }); // Se notification.date for falsy (se a propriedade date não existir ou for null), a condição retorna false e a notificação é excluída do novo array;
+      // Se for true, então essa parte da condição é avaliada para verificar se a data da notificação é diferente da data da entrada que está a ser removida;
+      // se for diferente, a notificação é mantida no novo array -> user.notifications.filter(notification (...)).
+    }
+
 
     // Save the updated user document
     await user.save();
