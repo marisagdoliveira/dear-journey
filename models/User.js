@@ -4,6 +4,7 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
+
 // Notification schema without content
 const NotificationSchema = new Schema({
   noteDate: {
@@ -90,5 +91,10 @@ const UserSchema = new Schema({
   notifications: [NotificationSchema], // Array of notifications
   support: [SupportSchema], // Array of support tickets
 }, { timestamps: true });
+
+// Add the comparePassword method - AFTER NEXTAUTH!!! && ADD TO ORIGINAL PROJ ---------------v
+//UserSchema.methods.comparePassword = async function(candidatePassword) {
+//  return await bcrypt.compare(candidatePassword, this.password);
+//};
 
 module.exports = mongoose.models.User || mongoose.model('User', UserSchema);

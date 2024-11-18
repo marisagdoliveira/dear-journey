@@ -3,17 +3,31 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
-import UserPic from "../components/UserPic";
+import UserPic from "../components/UserPic";import MonthGraph from "../components/MonthGraph";
 import VisibilityHidden from "../../public/assets/VisibilityHidden.svg"
 import VisibilityOpen from "../../public/assets/VisibilityOpen.svg"
+import StatsJournaling from "../../public/assets/StatsJournaling.svg"
 import Link from "next/link";
 import { FaRegCircleCheck } from "react-icons/fa6";
+import { BsJournals } from "react-icons/bs";
+
+import ArrowDropdown from "../../public/assets/ArrowDropdown.svg"
+import ChartIcon from "../../public/assets/ChartIcon.svg"
+import StatsInsightsIcon from "../../public/assets/StatsInsightsIcon.svg"
+import JournalEntriesIcon from "../../public/assets/JournalEntriesIcon.svg"
+import StatsMonthIcon from "../../public/assets/StatsMonthIcon.svg"
+import ActiveNotificationIcon from "../../public/assets/ActiveNotificationIcon.svg"
+
+
+
+
 
 
 export default function Profile() {
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState("");// Stores user email
+  const [journalEntries, setJournalEntries] = useState([]); 
   const [formData, setFormData] = useState({
     email: '',
     username: '',
@@ -26,10 +40,99 @@ export default function Profile() {
   const [passwordVisible, setPasswordVisible] = useState(true);
   const [passwordVisible2, setPasswordVisible2] = useState(true);
   const [isChangingPassword, setIsChangingPassword] = useState(false); // Track password change
+  const [monthlyCounts, setMonthlyCounts] = useState(Array(12).fill(0)); // Stores monthly entry counts
+  const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Default to current year
+  const [dropdownIsOpen, setDropdownIsOpen] = useState(false); // State to manage dropdown visibility
+  const [totalCountsMainContent, setTotalCountsMainContent] = useState(0);
+  const [totalCountsSmallNotes, setTotalCountsSmallNotes] = useState(0);
+  const [journalingTendency, setJournalingTendency] = useState(0);
+  const [notifications, setNotifications] = useState([]);
+  const [navbarIsOpen, setNavbarIsOpen] = useState(true);  // State to hold the isOpen value
+
+
+
+
+
+
+
   
+
+    
+    useEffect(() => {
+      fetchUserAndJournalEntries();
+    }, []);
+  
+    const fetchUserAndJournalEntries = async () => {
+      try {
+        const response = await fetch(`/api/user`);
+        if (response.ok) {
+          const data = await response.json();
+          setEmail(data.user.email);
+          setJournalEntries(data.user.library); // Assuming `library` contains all journal entries
+          setNotifications(data.user.notifications); // Store notifications in state
+
+          
+        // Calculate monthly journaling counts based on selected year
+        const counts = Array(12).fill(0);
+        let mainEntriesCount = 0;
+        let insightsCount = 0;
+
+        data.user.library.forEach(entry => {
+          const entryDate = new Date(entry.date);
+          
+            // Check if the entry belongs to the selected year
+            if (entryDate.getFullYear() === Number(selectedYear)) {
+              // Count Main Entries
+              if (entry.mainContent !== "" && entry.title !== "") {
+                mainEntriesCount++;
+                const month = entryDate.getMonth();
+                counts[month] += 1;
+              }
+             
+              // Count insights (small notes) - count non-empty smallNotes arrays
+              if (entry.smallNotes && entry.smallNotes.length > 0) {
+                insightsCount += entry.smallNotes.length;  // Increment insights count by the number of small notes
+              }
+            }
+          });
+          setMonthlyCounts(counts);
+          setTotalCountsMainContent(mainEntriesCount);
+          setTotalCountsSmallNotes(insightsCount);
+
+          console.log(counts);
+          console.log(mainEntriesCount);
+          console.log(insightsCount);
+
+          // Calculate journaling tendency as a percentage of days in the year
+          const daysInYear = selectedYear === currentYear ? 
+          Math.ceil((new Date() - new Date(selectedYear, 0, 1)) / (1000 * 60 * 60 * 24)) :
+          365;
+          const tendencyPercentage = Math.round((mainEntriesCount / daysInYear) * 100);
+          setJournalingTendency(tendencyPercentage);
+
+        } else {
+          throw new Error("Failed to fetch user data.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    }
+
 
 
   const router = useRouter();
+  
+ //useEffect(() => {
+ //  // Only proceed when the router is ready and query is available
+ //  if (router.isReady && router.query) {
+ //    const openState = router.query.isOpen === 'true'; // Convert query to boolean
+ //    console.log(openState)
+ //    setIsOpen(openState);
+ //  }
+ //}, [router.isReady, router.query]); // Trigger when router is ready or query changes
+
+
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -76,83 +179,117 @@ export default function Profile() {
     } // ---------------------------------------------------------------------------------------------
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    console.log("Form submitted", formData); // <-- Add this line to check if the form submits.
+const handleSubmit = async (e) => {
+  e.preventDefault();
+  console.log("Form submitted", formData);
 
-    
-    // Add validation for password confirmation only if password is being changed
-    if (isChangingPassword) {
-      if (formData.password !== formData.confirmPassword) {
-        setError('Passwords do not match!');
-        return;
-    }
-
-    if (!formData.confirmPassword) {  // If the user is changing the password, confirmPassword is required
+  if (isChangingPassword) {
+    if (!formData.confirmPassword) {
       setError('Password confirmation is required!');
       return;
     }
-
-    try {
-      console.log("Sending update request"); // <-- Add this line to see if the fetch is attempted.
-
-      const res = await fetch('/api/user', {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          email: formData.email,
-          username: formData.username,
-          password: formData.password
-        })
-      });
-        console.log("Response received:", res); // <-- Log the response to check its status.
-
-
-      const data = await res.json();
-
-      if (res.ok) {
-        setSuccess('Profile updated successfully!');
-        setError('');
-
-        // Refresh the page after 3 seconds of displaying the above success message
-        setTimeout(() => {
-          window.location.reload();
-      }, 3000);
-
-      } else {
-        setError(data.message || 'Failed to update profile.');
-      }
-    } catch (err) {
-      setError('An error occurred.');
-      console.error(err);
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match!');
+      return;
     }
-  }};
+  }
+
+  try {
+    console.log("Sending update request");
+
+    const res = await fetch('/api/user', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: formData.email,
+        username: formData.username,
+        password: formData.password,
+      }),
+    });
+
+    const data = await res.json();
+    console.log("Response received:", res.status, data);
+
+    if (res.ok) {
+      setSuccess('Profile updated successfully!');
+      setError('');
+
+      setTimeout(() => {
+        window.location.reload();
+      }, 3000);
+    } else {
+      setError(data.message || 'Failed to update profile.');
+    }
+  } catch (err) {
+    setError('An error occurred.');
+    console.error('Fetch error:', err);
+  }
+};
+
+  // Get the current year
+  const currentYear = new Date().getFullYear();
+
+  // Generate an array of years from 2023 to the current year
+  const years = [];
+  for (let year = 2023; year <= currentYear; year++) {
+    years.push(year);
+  }
+
+
+  // Calculate the month with the maximum journal entries
+  const maxEntries = Math.max(...monthlyCounts);
+  const maxMonthIndex = monthlyCounts.indexOf(maxEntries);
+
+  // Calculate the percentage of entries for the max month relative to the total
+  const maxMonthPercentage = totalCountsMainContent > 0 
+    ? ((maxEntries / totalCountsMainContent) * 100).toFixed(1)  // Rounded to 1 decimal place
+    : 0;
+
+  let maxMonth = '';
+  if (maxEntries > 0) {
+    maxMonth = new Date(0, maxMonthIndex).toLocaleString('en', { month: 'long' });
+  }
+
+
+
+  // Handle year change for graph
+  const handleYearChange = (year) => {
+    setSelectedYear(year); // Set the selected year directly
+    setDropdownIsOpen(false); // Optionally close the dropdown after selection
+  };
+
+  // Fetch data on component mount and when selectedYear changes
+  useEffect(() => {
+    fetchUserAndJournalEntries();
+  }, [selectedYear]); // Dependency on selectedYear
+
 
   return (
     <div className="flex justify-center wrapper pb-10">
       <div className="flex items-center mt-[195px] " style={{ zIndex: 10000000 }}>
-        <Navbar  />
+        <Navbar setNavbarIsOpen={setNavbarIsOpen} />
       </div>
 
-      <div className="flex flex-col w-screen bg-transparent text-white align-start pt-20 pl-20 gap-3">
+      <div className="flex flex-col w-screen bg-transparent text-white align-start pt-10 pl-20 gap-3">
         {/* Greeting */}
         <div className="flex flex-row">
-          <h1 className="darker-grotesque-main" style={{ fontFamily: 'Darker Grotesque', fontSize: 55, fontWeight: 500 }}>
+          <h1 className="darker-grotesque-main" style={{ fontFamily: 'Darker Grotesque', fontSize: 45, fontWeight: 600 }}>
             It's good to see you,
           </h1>
-          <span className="w-[80px] pr-16 darker-grotesque-main" style={{ whiteSpace: "normal", fontFamily: 'Darker Grotesque', fontSize: 55, fontWeight: 500 }}>
+          <span className="w-[80px] pr-16 darker-grotesque-main" style={{ whiteSpace: "normal", fontFamily: 'Darker Grotesque', fontSize: 45, fontWeight: 550 }}>
             &nbsp;{username}!
           </span>
         </div>
 
-        <p className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 40, fontWeight: 400 }}>
+        <p className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 30, fontWeight: 450 }}>
           This is your personal space.
         </p>
 
-        <p className="absolute top-[255px] left-[330px] flex" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 450 }}>Edit your information</p>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="space-y-4 mt-24">
+        <form onSubmit={handleSubmit} className="space-y-4 mt-5">
+        <p className="flex" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 450, marginBottom: -10 }}>
+          Edit your information</p>
           <div className="flex items-center mb-4">
             <input
               type="text"
@@ -162,10 +299,10 @@ export default function Profile() {
               onChange={handleChange}
               placeholder="username"
               required
-              className="bg-transparent border border-white/60 p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+              className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
             />
-            <label htmlFor="username" className="" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+            <label htmlFor="username" className="" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
               username
             </label>
           </div>
@@ -179,15 +316,15 @@ export default function Profile() {
               onChange={handleChange}
               placeholder="email"
               required
-              className="bg-transparent border p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+              className="bg-transparent border p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400, color: 'white' }}
             />
-            <label htmlFor="email" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+            <label htmlFor="email" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
               your email
             </label>
           </div>
 
-          <div className="flex items-center mb-4">
+          <div className="flex relative items-center mb-4">
             <input
               type={passwordVisible ? "password" : "text"} // Toggle between "password" and "text"
               id="password"
@@ -196,22 +333,22 @@ export default function Profile() {
               onChange={handleChange}
               placeholder="new password"
               required={isChangingPassword} // Dynamically required
-              className="relative bg-transparent border border-white/60 p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+              className="relative bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
             />
-            <div className="w-25 h-25 absolute left-[690px] cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
+            <div className="w-25 h-25 absolute left-[360px] cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
               {!passwordVisible ? (
                 <VisibilityOpen/>
               ) : (
                 <VisibilityHidden/>
               )}
             </div>
-            <label htmlFor="password" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+            <label htmlFor="password" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
               new password
             </label>
           </div>
 
-          <div className="flex items-center mb-4">
+          <div className="flex items-center relative mb-4">
             <input
               type={passwordVisible2 ? "password" : "text"} // Toggle between "password" and "text"
               id="confirmPassword"
@@ -220,17 +357,17 @@ export default function Profile() {
               onChange={handleChange}
               placeholder="confirm password"
               required={isChangingPassword} // Dynamically required
-              className="bg-transparent border border-white/60 p-2 rounded-xl max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+              className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
               style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
             />
-            <div className="w-25 h-25 absolute left-[690px] cursor-pointer" onClick={() => setPasswordVisible2(!passwordVisible2)}>
+            <div className="w-25 h-25 absolute left-[360px] cursor-pointer" onClick={() => setPasswordVisible2(!passwordVisible2)}>
               {!passwordVisible2 ? (
                 <VisibilityOpen/>
               ) : (
                 <VisibilityHidden/>
               )}
             </div>
-            <label htmlFor="confirmPassword" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+            <label htmlFor="confirmPassword" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
               confirm password
             </label>
           </div>
@@ -253,18 +390,142 @@ export default function Profile() {
         <div className="flex max-w-[400px] justify-end">
           <button
             type="submit"
-            className="button-pop2 flex justify-end bg-[#8585f25e] rounded-xl border border-white/65 text-white px-4 pb-1"
+            className="button-pop2 mt-2 flex justify-end bg-[#8585f25e] rounded-xl border border-white/65 text-white px-4 pb-1"
             style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}
           >
             Save
           </button>
           </div>
         </form>
+      
+      {/* Journal Tracker - graph */}
+      <div className="flex justify-end items-center w-[750px] h-[180px] pr-5 bg-gradient-to-tr from-[#C6BCFF] to-[#AA9BFE] border-none rounded-[30px] shadow-[#6760bba6] mt-7 shadow-lg">
+        <div className="journal-analysis p-4 text-white">
+          <h2 className="journal-analysis-title text-md mb-4 pl-10 relative" style={{ fontFamily: "Vibur", fontSize: 20 }}>
+            <ChartIcon className="absolute bottom-1 left-0" />Your Journaling Analysis for {selectedYear}
+          </h2>
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-2 journal-analysis-content text-sm tracking-wide ">
+              <span><JournalEntriesIcon/></span>
+              <span className="text-[#6D6BC8] font-bold">{totalCountsMainContent}</span>Journal Entries
+            </div>
+            <div className="flex gap-2 journal-analysis-content text-sm tracking-wide">
+              <span><StatsInsightsIcon size={44}/></span>
+              <span className="text-[#6D6BC8] font-bold">{totalCountsSmallNotes}</span>Insights
+            </div>
+          </div>
+                    
+          {/* New item to display the month with the most entries and its percentage */}
+          <div className="journal-analysis-content text-sm tracking-wide mt-2 relative">
+            <div className="flex justify-end">
+              <span className="text-white max-w-[185px] break-words absolute top-[-61px] right-[-25px]">
+                <div className="relative">
+                  <span className="absolute right-[193px]"><StatsMonthIcon /></span>
+                </div>
+                {/* Check if there are no entries */}
+                {maxEntries > 0 ? (
+                  <>
+                    <span className="text-[#6D6BC8] font-bold ">{maxMonth}</span> leads with <span className="text-[#6D6BC8] font-bold">{maxEntries}</span> entries, making up <span className="text-[#6D6BC8] font-bold">{maxMonthPercentage}%</span> of the total.
+                  </>
+                ) : (
+                  <span className="text-[#6D6BC8] font-bold">No entries found for the selected year</span>
+                )}
+              </span>
+            </div>
+          </div>
+
+        {/* Journaling tendency sentence */}
+        <div className="text-sm flex relative gap-3 mt-1 ">
+          <div className="checkmark-container absolute top-2">
+            <div className="circle"></div>
+            <div className="checkmark"></div>
+          </div>
+          <div className="text-[#6D6BC8] tracking-wider " style={{ fontFamily: "Darker Grotesque", fontWeight: 600 }}>
+            This corresponds to an overall journaling tendency of{" "}
+            <span className="text-white font-bold">{journalingTendency}%</span> throughout the year.
+          </div>
+        </div>
       </div>
 
+      {/* Year Selection and StatsJournaling */}
+      <div className="relative w-[350px] h-[130px] bg-[#cdc6ff] border-none rounded-2xl">
+        {/* Current Year display & dropdown year Selection */}
+        <div className="relative">
+          <div className="bg-transparent text-white pl-3 current-year year-option">
+            {selectedYear}
+          </div>
+          <ArrowDropdown
+            className="absolute top-7 left-[82px] cursor-pointer"
+            style={{ fontSize: 24 }}
+            onClick={() => setDropdownIsOpen(!dropdownIsOpen)}
+          />
+          {dropdownIsOpen && (
+            <ul className="absolute left-8 top-11 border-none rounded-lg p-1 pb-0 pt-0 bg-[#cdc6ff76] backdrop-blur-sm text-white max-h-16 overflow-auto z-10">
+              {years.map((year) => (
+                <li
+                  key={year}
+                  className="relative cursor-pointer"
+                  onClick={() => handleYearChange(year.toString())} // Pass the year directly as a string
+                >
+                  {year}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+              
+        {/* Container for Year and StatsJournaling SVG positioned to the left */}
+        <div className="absolute bottom-1 left-4 flex flex-col items-center">
+          <StatsJournaling className="w-[50px] h-[50px]" />
+        </div>
+              
+        {/* Monthly Counts Graph */}
+        <div className="relative h-full">
+          <div className="flex gap-1 items-end w-[400px] p-4 pl-[130px] pb-[25px] h-full">
+            {monthlyCounts.map((count, index) => {
+              const year = new Date().getFullYear();
+              const monthDays = new Date(year, index + 1, 0).getDate();
+              const heightPercentage = count > 0 ? Math.min(count * 4, 170) : 1;
+            
+              return (
+                <div key={index} className="flex flex-col items-center">
+                  <div
+                    className="relative bg-gradient-to-r from-[#a3a1f5] to-[#8C8ADB] w-3 flex items-end justify-center rounded-t-xl transition-all duration-300 graph_bar"
+                    style={{ height: `${heightPercentage}px` }}
+                  >
+                    <span className="absolute text-[#ffffff2f] text-xs tooltip">{count}/{monthDays}</span>
+                  </div>
+                  <span className="text-white text-xs mb-1">
+                    {new Date(0, index).toLocaleString('en', { month: 'short' }).charAt(0)}
+                  </span>
+                </div>
+              );
+            })}
+
+            {/* Ruler on the right side */}
+            <div className="absolute bottom-[31px] left-[350px] h-[120px] flex flex-col justify-between items-center">
+              <div className="h-36 relative">
+                {[5, 10, 15, 20, 25, 30].map((day, idx) => (
+                  <div
+                    key={idx}
+                    className="absolute left-0 -translate-x-full text-xs text-[#675E99] flex items-center"
+                    style={{ bottom: `${(day / 30) * 100}%` }}
+                  >
+                    <span className="mr-0.5">{day}</span>
+                    <span className="w-1 border-t border-[#675E99]"></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+      </div>
       {/* User Picture and Logo */}
       <div>
-        <div className="fixed top-12 right-16 w-[150px] h-[150px] z-1000 mt-16" style={{  }}>
+        <div className="fixed top- right-16 w-[120px] h-[120px] z-1000 mt-11" style={{  }}>
           <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
         <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>
@@ -275,6 +536,32 @@ export default function Profile() {
           </div>
         </div>
       </div>
+
+      {/* Notification Center - Active Notifications */}
+
+      <div className="active-notifications-title">
+        <p
+          className={`absolute top-52 tracking-wider border border-white/45 p-2.5 rounded-2xl bg-[#cebdf614] transition-all duration-500 ${navbarIsOpen ? 'right-[40px]' : 'right-[115px]'}`}
+          style={{ fontFamily: "Darker Grotesque", fontWeight: 400, fontSize: 20 }}
+        >
+          <span className="inline-block h-3 w-3 bg-[#6D6BC8] border-none rounded-full mr-2 blinking-circle"></span>
+          Active notifications
+        </p>
+      </div>
+     <div className="h-[100vh] flex justify-center items-end pr-10 pb-10 ">
+                  
+     <div className={`notification-container max-h-[434px] overflow-y-auto scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'  }`}>
+         {notifications.map((notification, index) => (
+           <div key={index} className="notification-item cursor-pointer">
+             <div className="icon-container">
+               <ActiveNotificationIcon /> 
+               <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
+             </div>
+           </div>
+         ))}
+       </div>
+     </div>
+
     </div>
   );
 }

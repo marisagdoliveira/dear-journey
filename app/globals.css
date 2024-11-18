@@ -3,6 +3,7 @@
 @import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Snippet&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=BioRhyme:wght@200..800&family=Linden+Hill:ital@0;1&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
 
 
 
@@ -77,7 +78,25 @@ body{
 }
 
 
-
+.tooltip{
+  opacity: 0;
+  background: #eeebfa;
+  border-radius: 5px;
+  border: 0.5px solid #9393e8;
+  transition: all;
+  padding: 1px;
+  color: #8f8fe1;
+  top: -4px;
+  right: 7px;
+  font-family: "Darker Grotesque";
+  font-weight: 500;
+}
+.graph_bar{
+  transition: height 1s ease-in-out;
+}
+.graph_bar:hover .tooltip{
+  opacity: 1;
+}
 
 
 @keyframes morph {
@@ -615,3 +634,160 @@ function */
 }
 
 /*----------------------------------------------------------------*/
+
+.current-year{
+  font-family: "Varzimatn", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-size: 30px;
+}
+.year-option {
+  color: white; /* Ensures the option text color is white */
+  text-shadow: 2px 2.5px 3px rgb(141, 130, 241); /* Add shadow to the text */
+}
+
+/*----------------------------------------------------------------*/
+
+.journal-analysis-title{
+  text-shadow: 2px 2.5px 3px #6c64ffc1; /* Add shadow to the text */;
+}
+
+.journal-analysis-content{
+  font-family: "Darker Grotesque", sans-serif;
+  font-weight: 600;
+}
+
+.journal-analysis-content::marker{
+  font-size: 11px;
+  transform: translateY(5px);
+}
+
+/*----------------------------------------------------------------*/
+
+/* Container for centering */
+.checkmark-container {
+  background-color: none;
+  position: relative;
+  width: 25px;
+  height: 25px;
+}
+
+/* Circle style and animation */
+.circle {
+  width: 23.5px;
+  height: 23.5px;
+  border-radius: 50%;
+  background-color: #A3A3FF;
+  opacity: 0;
+  animation: circleAppear 0.5s forwards ease-in-out;
+}
+
+/* Checkmark style and animation */
+.checkmark {
+  position: absolute;
+  top: 5px;
+  left: 6px;
+  width: 17.16px;
+  height: 4.66px;
+  border-bottom: 1.5px solid white;
+  border-left: 1.5px solid white;
+  transform: rotate(-75deg);
+  opacity: 0;
+  animation: checkmarkAppear 0.3s forwards ease-in-out;
+  animation-delay: 0.5s;
+}
+
+/* Circle animation keyframes */
+@keyframes circleAppear {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* Checkmark animation keyframes */
+@keyframes checkmarkAppear {
+  from {
+    transform: scale(0) rotate(-65deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(-45deg);
+    opacity: 1;
+  }
+}
+
+.notification-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* Ensure the content is centered horizontally */
+  margin-bottom: 15px;  /* Optional: Adds space between items */
+}
+
+.icon-container {
+  position: relative;  /* Set position to relative to position the text inside */
+  width: 140px;  /* Ensure the container has the right size */
+  height: 130px;  /* Ensure the container has the right size */
+  display: flex;
+  justify-content: center;  /* Centers the icon horizontally */
+  align-items: center;  /* Centers the icon vertically */
+}
+
+.icon-container p {
+  position: absolute;  /* Position the text inside the icon container */
+  bottom: 15px;  /* Position the text inside, 10px from the bottom of the container */
+  left: 62%;  /* Horizontally center the text */
+  transform: translateX(-70%);  /* Correct for centering */
+  margin: 0;  /* Remove any default margin */
+  font-family: "Roboto Mono", monospace;
+  font-size: 14px;  /* Adjust font size as needed */
+  color: #ffffff;  /* Set the text color */
+  text-align: center;  /* Ensure the text is centered inside the container */
+}
+
+
+.notification-container {
+  transition: width 0.5s ease; /* Optional: adds a smooth transition */
+}
+/* Ensure the icon fits inside the container */
+.icon-container svg {
+  width: 90%;  /* Makes the icon fit inside the container */
+  height: 90%;  /* Makes the icon fit inside the container */
+}
+
+.two-columns{
+  width: 350px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-evenly;
+}
+
+.single-column{
+  width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0;
+  }
+}
+
+.blinking-circle {
+  animation: blink 2s infinite; /* Adjust the duration (1s) as needed */
+}
+
+
+/*.icon-container svg:hover path {
+  fill: rgba(0, 0, 0, 0.3);  
+}*/

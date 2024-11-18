@@ -25,7 +25,7 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, fetchTheReminder }) => {
+const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, fetchTheReminder, setShowPopupReminder, showPopupReminder, showPopupReminderDate }) => {
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -69,9 +69,12 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           setEmail(data.user.email);
           setJournalEntries(data.user.library);
           console.log('Journal entries:', data.user.library);
-          
+          console.log()
           // Automatically update the small notes for the current date
-          const entry = data.user.library.find(entry => new Date(entry.date).toISOString() === noteDate.toISOString());
+          const entry = data.user.library.find(entry => {
+            
+            return new Date(entry.date).toISOString() === noteDate.toISOString();
+          });
           if (entry) {
             setTitle(entry.title || '');
             setMainContent(entry.mainContent || '');
@@ -200,45 +203,56 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
 
 
-  const deleteEntry = async () => {
-    try {
-      const response = await fetch('/api/register', {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email,
-          date: noteDate.toISOString(),
-          deleteNotifications: true,
-        }),
-      });
+    const deleteEntry = async () => {
+      try {
+          // Log the payload being sent
+          console.log("Deleting entry for:", { email, noteDate: noteDate.toISOString() });
   
-      if (!response.ok) {
-        throw new Error('Failed to delete entry.');
-      }
-      const result = await response.json();
-      console.log('Deleted entry:', result);
-      
-      // handle notification removal logic
-      if (result.deletedNotifications) {
-        console.log('Deleted associated notifications:', result.deletedNotifications);
-      }
+          const response = await fetch('/api/register', {
+              method: 'DELETE',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  email,
+                  date: noteDate,
+                  deleteNotifications: true,
+              }),
+          });
   
-      // Notify parent component about the deletion
-      if (onSave) {
-        onSave(noteDate, '', '', []);
-      }
+          if (!response.ok) {
+              throw new Error('Failed to delete entry.');
+          }
   
-      // Clear the current state
-      setTitle('');
-      setMainContent('');
-      setSmallNotes([]);
-      setTitle1("");
-    } catch (error) {
-      console.error('Error deleting journal entry:', error);
-    }
+          const result = await response.json();
+          console.log('Deleted entry:', result);
+  
+          // Handle notification removal logic
+          if (result.deletedNotifications) {
+              console.log('Deleted associated notifications:', result.deletedNotifications);
+          }
+  
+          // Notify parent component about the deletion
+          if (onSave) {
+              onSave(noteDate, '', '', []);
+          }
+  
+          // Clear the current state
+          setTitle('');
+          setMainContent('');
+          setSmallNotes([]);
+          setTitle1("");
+  
+          // Update the state for entries to reflect the deletion
+          setEntries(prevEntries => 
+              prevEntries.filter(entry => entry.date.getTime() !== noteDate.getTime())
+          );
+  
+      } catch (error) {
+          console.error('Error deleting journal entry:', error);
+      }
   };
+  
 
   const handleDeleteConfirmation = async (confirm) => {
     if (confirm) {

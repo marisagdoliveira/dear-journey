@@ -10,7 +10,7 @@ import PlusIcon from "../../public/assets/PlusIcon.svg"
 import CalendarContainerOriginal from "../../public/assets/CalendarContainerOriginal.svg"
 import TodayCalendarContainerPurp from "../../public/assets/TodayCalendarContainerPurp.svg"
 
-export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder }) {
+export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder, showPopupReminder, setShowPopupReminder, showPopupReminderDate }) {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [journalEntries, setJournalEntries] = useState([]);
   const [email, setEmail] = useState('');
@@ -40,9 +40,13 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
     fetchUserAndJournalEntries();
   }, [currentMonth, title]);
   
-  //useEffect(() => {
-  //  fetchUserAndJournalEntries();
-  //}, [title]);
+  useEffect(() => {
+    if (showPopupReminder) {
+      setNoteDate(new Date(showPopupReminderDate));
+      setShowPopup(true);
+      setShowPopupReminder(false);
+    };
+  });
 
   const fetchUserAndJournalEntries = async () => {
     try {
@@ -123,7 +127,8 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
     }
     // setReminderTitle(title);
   };
-  
+
+
 
  
 
@@ -173,10 +178,16 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
          </span>
           
          {/* Title (centered, truncates if too long) */}
+         
+         {entry.title? 
+         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+          {entry.title}
+       </div>
+         : 
          <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
-           {entry.title}
+           
          </div>
-          
+          }
          {/* Small notes indicator (bottom-right) */}
          <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" style={{ fontWeight: 700 }}>
            {entry.smallNotes.length}
@@ -203,7 +214,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
               </div>
               <div className="flex items-center">
                 <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setTitle1={setTitle} getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} />
+                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
                 <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>

@@ -272,7 +272,7 @@ export default function Support() {
 
             
             <div className="absolute top-[153px] right-[180px] flex flex-col justify-center items-center"><FAQIcon/></div>
-            <div className="relative w-[450px]   mt-40 max-h-[400px]  overflow-hidden overflow-y-auto scroll-container-faq">
+            <div className="relative w-[450px]   mt-40 max-h-[448px]  overflow-hidden overflow-y-auto scroll-container-faq">
                 
                 <ol className="flex flex-col items-center gap-3">
                   {/* Question 1 */}

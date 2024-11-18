@@ -8,7 +8,7 @@ export async function GET(req) {
   try {
     await connectDB(); // Connect to MongoDB
 
-    const getUser = await User.findOne({ _id: "6679d45c98cafb1fbc68a1e1" });
+    const getUser = await User.findOne({ _id: "671bd8b3b9f90b65e92d30e1" });
 
     if (!getUser) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
@@ -26,13 +26,15 @@ export async function GET(req) {
 export async function PATCH(req) {
   try {
     
-    const { email, username, password } = await req.json();
+    const { email, username, password, currentPassword } = await req.json();
     await connectDB();
 
     const user = await User.findOne({ email });
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
+    
+
     if (username) {
       user.username = username;
     }
