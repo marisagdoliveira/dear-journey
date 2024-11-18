@@ -34,6 +34,9 @@ export default function Support() {
   const [toggle4, setToggle4] = useState(false);
   const [toggle5, setToggle5] = useState(false);
 
+  const [navbarIsOpen, setNavbarIsOpen] = useState(false);
+
+
 
 
   const router = useRouter(); // router for redirection
@@ -138,7 +141,7 @@ export default function Support() {
   
       {/* ------------------------------------ Navbar Section ------------------------------------------------------------------------ */}
       <div className="fixed top-[240px] w-[440px]" style={{ zIndex: 1000 }}>
-        <Navbar />
+        <Navbar setNavbarIsOpen={setNavbarIsOpen} />
       </div>
   
       {/* User Picture */}

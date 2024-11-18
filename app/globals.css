@@ -89,7 +89,7 @@ body{
   top: -4px;
   right: 7px;
   font-family: "Darker Grotesque";
-  font-weight: 500;
+  font-weight: 600;
 }
 .graph_bar{
   transition: height 1s ease-in-out;
@@ -787,7 +787,92 @@ function */
   animation: blink 2s infinite; /* Adjust the duration (1s) as needed */
 }
 
+/* Icon container path styling */
+.icon-container svg path {
 
-/*.icon-container svg:hover path {
-  fill: rgba(0, 0, 0, 0.3);  
-}*/
+  transition: fill 0.3s ease; /* Only transition the fill color */
+}
+
+/* Hover effect */
+.icon-container:hover svg path {
+fill: #7474CB;
+transition: opacity 0.1s ease-in-out;
+}
+
+
+
+.icon-container:hover .icon-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Default state */
+.icon-actions {
+  position: absolute;
+  top: 49px;
+  left: 15px;
+  width: 112px;
+  height: 40px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #7474cb; /*  overlay */
+
+  pointer-events: none;
+  animation: none; /* No animation by default */
+}
+
+/* On hover: fade in */
+.icon-container:hover .icon-actions {
+  animation: fadeIn 0.3s ease forwards; /* Slow fade-in */
+  pointer-events: auto;
+}
+
+/* On hover-out: fade out */
+.icon-container:not(:hover) .icon-actions {
+  animation: fadeOut 0.1s ease forwards; /* Fast fade-out */
+  pointer-events: none;
+}
+
+/* Keyframe for fade-in (slower) */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Keyframe for fade-out (faster) */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+/* Action icons inside hover */
+.action-icon {
+  background: none;
+  border: none;
+  color: white ;
+  cursor: pointer;
+  font-size: 1rem;
+  margin: 0 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action-icon:hover {
+  transform: scale(1); /* Slight zoom on hover */
+  
+}
+
+.trash-notific {
+  size: 1;
+}
+

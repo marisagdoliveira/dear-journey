@@ -341,9 +341,9 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         {saveMessage && (
         <div className='fixed inset-0 flex justify-center items-center z-50'>
           {/* Save message container */}
-          <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}>
+          <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 16 }}>
             {/* Message */}
-            <div className='mb-4'>
+            <div className='mb-4 tracking-wider'>
               {saveMessage}
             </div>
             {/* Check icon */}

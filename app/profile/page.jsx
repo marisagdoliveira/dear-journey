@@ -16,7 +16,10 @@ import ChartIcon from "../../public/assets/ChartIcon.svg"
 import StatsInsightsIcon from "../../public/assets/StatsInsightsIcon.svg"
 import JournalEntriesIcon from "../../public/assets/JournalEntriesIcon.svg"
 import StatsMonthIcon from "../../public/assets/StatsMonthIcon.svg"
-import ActiveNotificationIcon from "../../public/assets/ActiveNotificationIcon.svg"
+import ActiveNotificationsIcon from "../../public/assets/ActiveNotificationsIcon.svg"
+import OpenNotifications from "../../public/assets/OpenNotifications.svg"
+import TrashNotifications from "../../public/assets/TrashNotifications.svg"
+
 
 
 
@@ -47,7 +50,10 @@ export default function Profile() {
   const [totalCountsSmallNotes, setTotalCountsSmallNotes] = useState(0);
   const [journalingTendency, setJournalingTendency] = useState(0);
   const [notifications, setNotifications] = useState([]);
-  const [navbarIsOpen, setNavbarIsOpen] = useState(true);  // State to hold the isOpen value
+  const [navbarIsOpen, setNavbarIsOpen] = useState(true);  // State to hold the isOpen value (prop)
+
+  const [isPasswordFocused, setIsPasswordFocused] = useState(false);
+  const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
 
 
 
@@ -324,53 +330,67 @@ const handleSubmit = async (e) => {
             </label>
           </div>
 
-          <div className="flex relative items-center mb-4">
-            <input
-              type={passwordVisible ? "password" : "text"} // Toggle between "password" and "text"
-              id="password"
-              name="password"
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="new password"
-              required={isChangingPassword} // Dynamically required
-              className="relative bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
-              style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-            />
-            <div className="w-25 h-25 absolute left-[360px] cursor-pointer" onClick={() => setPasswordVisible(!passwordVisible)}>
-              {!passwordVisible ? (
-                <VisibilityOpen/>
-              ) : (
-                <VisibilityHidden/>
-              )}
-            </div>
-            <label htmlFor="password" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
-              new password
-            </label>
+      <div className="flex items-center relative mb-4">
+        <input
+          type={passwordVisible ? 'text' : 'password'}
+          id="password"
+          name="password"
+          value={formData.password}
+          onChange={handleChange}
+          placeholder="Password"
+          required
+          className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+          onFocus={() => setIsPasswordFocused(true)}
+          onBlur={() => setIsPasswordFocused(false)}
+        />
+        {(isPasswordFocused || formData.password) && (
+          <div
+            className="w-25 h-25 absolute left-[360px] cursor-pointer"
+            onClick={() => setPasswordVisible(!passwordVisible)}
+          >
+            {!passwordVisible ? <VisibilityOpen /> : <VisibilityHidden />}
           </div>
+        )}
+        <label
+          htmlFor="password"
+          className="whitespace-nowrap"
+          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+        >
+          Password
+        </label>
+      </div>
 
-          <div className="flex items-center relative mb-4">
-            <input
-              type={passwordVisible2 ? "password" : "text"} // Toggle between "password" and "text"
-              id="confirmPassword"
-              name="confirmPassword"
-              value={formData.confirmPassword}
-              onChange={handleChange}
-              placeholder="confirm password"
-              required={isChangingPassword} // Dynamically required
-              className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
-              style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-            />
-            <div className="w-25 h-25 absolute left-[360px] cursor-pointer" onClick={() => setPasswordVisible2(!passwordVisible2)}>
-              {!passwordVisible2 ? (
-                <VisibilityOpen/>
-              ) : (
-                <VisibilityHidden/>
-              )}
-            </div>
-            <label htmlFor="confirmPassword" className="whitespace-nowrap" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}>
-              confirm password
-            </label>
+      <div className="flex items-center relative mb-4">
+        <input
+          type={passwordVisible2 ? 'text' : 'password'}
+          id="confirmPassword"
+          name="confirmPassword"
+          value={formData.confirmPassword}
+          onChange={handleChange}
+          placeholder="Confirm Password"
+          required={isChangingPassword}
+          className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+          onFocus={() => setIsConfirmPasswordFocused(true)}
+          onBlur={() => setIsConfirmPasswordFocused(false)}
+        />
+        {(isConfirmPasswordFocused || formData.confirmPassword) && (
+          <div
+            className="w-25 h-25 absolute left-[360px] cursor-pointer"
+            onClick={() => setPasswordVisible2(!passwordVisible2)}
+          >
+            {!passwordVisible2 ? <VisibilityOpen /> : <VisibilityHidden />}
           </div>
+        )}
+        <label
+          htmlFor="confirmPassword"
+          className="whitespace-nowrap"
+          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+        >
+          Confirm Password
+        </label>
+      </div>
 
           {error && <p className="" style={{ color: 'red' }}>
             {error}
@@ -554,8 +574,23 @@ const handleSubmit = async (e) => {
          {notifications.map((notification, index) => (
            <div key={index} className="notification-item cursor-pointer">
              <div className="icon-container">
-               <ActiveNotificationIcon /> 
+               <ActiveNotificationsIcon /> {/* This is your icon */}
                <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
+
+               {/* Hover actions */}
+                <div className="icon-actions absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <button
+                    className="action-icon hover:scale-110 transition-transform mr-2"
+                    onClick={() => handleDeleteNotification(notification)}
+                  ><TrashNotifications className="pt-[3px]" /> {/* Replace with your eye icon */}
+                  </button>
+                  <button
+                    className="action-icon hover:scale-110 transition-transform mr-2"
+                    onClick={() => handleOpenNotification(notification)}
+                  >
+                    <OpenNotifications className="pt-[6px]"/> {/* Replace with your trash icon */}
+                  </button>
+                </div>
              </div>
            </div>
          ))}

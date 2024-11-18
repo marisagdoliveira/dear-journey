@@ -33,6 +33,8 @@ export default function Homepage() {
   const [showPopupReminderDate, setShowPopupReminderDate] = useState("");
   const [additionalTitlesDates, setAdditionalTitlesDates] = useState([]);
   const [reminderTitleDate, setReminderTitleDate] = useState([]);
+  const [navbarIsOpen, setNavbarIsOpen] = useState(false);
+
   
   
 
@@ -290,7 +292,7 @@ export default function Homepage() {
 
     {/* Navbar */}
     <div className="mt-24" style={{ zIndex: "100000000000" }}>
-      <Navbar />
+      <Navbar setNavbarIsOpen={setNavbarIsOpen}  />
     </div>
 
     {/* Calendar */}
