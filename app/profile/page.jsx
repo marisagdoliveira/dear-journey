@@ -729,7 +729,7 @@ const handleSubmit = async (e) => {
                   </button>
                   <button
                     className="action-icon hover:scale-110 transition-transform mr-2"
-                    onClick={() => handleOpenNotification(new Date(notification.noticeDate))}
+                    onClick={() => handleOpenNotification(new Date(notification.noteDate))}
                   >
 
                     <OpenNotifications className="pt-[6px]" />
