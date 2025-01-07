@@ -798,6 +798,7 @@ const handleSubmit = async (e) => {
                       }}
                       setTitle1={setTitle1}
                       showSmallNotesCalendar={showSmallNotesCalendar}
+                      setShowSmallNotesCalendar={setShowSmallNotesCalendar}
                       fetchTheReminder={fetchTheReminder}
                       
 
