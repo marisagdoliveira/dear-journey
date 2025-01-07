@@ -3,6 +3,7 @@ import CancelX from "../../public/assets/CancelX.svg";
 import { FaCheck } from "react-icons/fa6";
 import { BsCalendarDate } from "react-icons/bs";
 import { TbClockFilled, TbMailHeart } from "react-icons/tb";
+import { useReminder } from "@/context/ReminderContext";
 import MailHeart from "../../public/assets/MailHeart.svg"
 
 
@@ -10,7 +11,10 @@ import MailHeart from "../../public/assets/MailHeart.svg"
 
 
 
-const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry, fetchTheReminder }) => {
+const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry }) => {
+
+  const fetchTheReminder = useReminder();
+
   const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {

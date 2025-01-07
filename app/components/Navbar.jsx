@@ -12,7 +12,7 @@ import Logout from '../../public/assets/Logout.svg'
 import Welcome from '../../public/assets/Welcome.svg'
 //import { HomeIcon, UserIcon, ChatAltIcon, BellIcon, LogoutIcon } from '@heroicons/react/outline'; // Adjust icon imports as per your version 2
 
-const NavBar = ({ setNavbarIsOpen }) => {
+const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
     const [isOpen, setIsOpen] = useState(true); // State to manage sidebar open/close
 
     const toggleSideBar = () => {
@@ -74,8 +74,8 @@ const NavBar = ({ setNavbarIsOpen }) => {
                         Welcome!
                     </div>
                 </Link>
-                <Link href={`/profile?isOpen=${isOpen}`} className={`flex items-center py-[13px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Profile className="ml-2 w-8 h-8"/> 
+                <Link href={`/profile?isOpen=${isOpen} `} element={<Profile fetchTheReminder={fetchTheReminder} />} className={`flex items-center py-[13px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
+                    <Profile  className="ml-2 w-8 h-8"/> 
                     <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
                         Profile
                     </div>

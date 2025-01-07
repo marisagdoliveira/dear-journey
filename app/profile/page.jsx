@@ -3,13 +3,23 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Navbar from "../components/Navbar";
-import UserPic from "../components/UserPic";import MonthGraph from "../components/MonthGraph";
+import UserPic from "../components/UserPic";
+import Popup from "../components/Popup";
+import MonthGraph from "../components/MonthGraph";
 import VisibilityHidden from "../../public/assets/VisibilityHidden.svg"
 import VisibilityOpen from "../../public/assets/VisibilityOpen.svg"
 import StatsJournaling from "../../public/assets/StatsJournaling.svg"
 import Link from "next/link";
 import { FaRegCircleCheck } from "react-icons/fa6";
+import { FaRegCircleXmark } from "react-icons/fa6";
+import { FiAlertCircle } from "react-icons/fi";
+import { MdInbox } from "react-icons/md";
+
+
+
 import { BsJournals } from "react-icons/bs";
+
+import { useReminder } from "@/context/ReminderContext";
 
 import ArrowDropdown from "../../public/assets/ArrowDropdown.svg"
 import ChartIcon from "../../public/assets/ChartIcon.svg"
@@ -19,6 +29,10 @@ import StatsMonthIcon from "../../public/assets/StatsMonthIcon.svg"
 import ActiveNotificationsIcon from "../../public/assets/ActiveNotificationsIcon.svg"
 import OpenNotifications from "../../public/assets/OpenNotifications.svg"
 import TrashNotifications from "../../public/assets/TrashNotifications.svg"
+import Close from "../../public/assets/Close.svg"
+import Calenleft from "../../public/assets/Calenleft.svg"
+import Calenright from "../../public/assets/Calenright.svg"
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
 
 
 
@@ -26,7 +40,14 @@ import TrashNotifications from "../../public/assets/TrashNotifications.svg"
 
 
 
-export default function Profile() {
+
+
+
+export default function Profile({  }) {
+
+  const fetchTheReminder = useReminder();
+
+
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
   const [email, setEmail] = useState("");// Stores user email
@@ -40,8 +61,10 @@ export default function Profile() {
   
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
-  const [passwordVisible, setPasswordVisible] = useState(true);
-  const [passwordVisible2, setPasswordVisible2] = useState(true);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [passwordVisible, setPasswordVisible] = useState(false);
+  const [passwordVisible2, setPasswordVisible2] = useState(false);
+  const [currentPasswordVisible, setCurrentPasswordVisible] = useState(false);
   const [isChangingPassword, setIsChangingPassword] = useState(false); // Track password change
   const [monthlyCounts, setMonthlyCounts] = useState(Array(12).fill(0)); // Stores monthly entry counts
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear()); // Default to current year
@@ -54,6 +77,15 @@ export default function Profile() {
 
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
   const [isConfirmPasswordFocused, setIsConfirmPasswordFocused] = useState(false);
+  const [isCurrentPasswordFocused, setIsCurrentPasswordFocused] = useState(false);
+  const [successFeedbackMessage, setSuccessFeedbackMessage] = useState(null);  // Success status Message on deleting notification
+  const [failFeedbackMessage, setFailFeedbackMessage] = useState(null);  // Fail Status Message on deleting notification
+
+  const [showPopupFromNotific, setShowPopupFromNotific] = useState(false);
+  const [noteDate, setNoteDate] = useState("");
+  const [title1, setTitle1] = useState("");
+  const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+
 
 
 
@@ -210,6 +242,7 @@ const handleSubmit = async (e) => {
         email: formData.email,
         username: formData.username,
         password: formData.password,
+        currentPassword,
       }),
     });
 
@@ -270,13 +303,82 @@ const handleSubmit = async (e) => {
   }, [selectedYear]); // Dependency on selectedYear
 
 
+
+  async function handleDeleteNotification(notification) {
+    const { noteDate, noticeDate } = notification;
+
+    if (!email) {
+        console.error('Email is not available yet.');
+        setFailFeedbackMessage('Failed to delete notification!'); // Email might be missing
+        setTimeout(() => setFailFeedbackMessage(null), 3000); // Hide after 3 seconds
+        return;
+    }
+
+    if (!noteDate || !noticeDate) {
+        console.error('Missing required fields:', { email, noteDate, noticeDate });
+        setFailFeedbackMessage('Failed to delete notification!'); // Required fields might be missing
+        setTimeout(() => setFailFeedbackMessage(null), 3000); // Hide after 3 seconds
+        return;
+    }
+
+    try {
+        const response = await fetch('/api/delnotifications', {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ email, noteDate, noticeDate }), // Use email from state
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Failed to delete notification:', errorData.message);
+            setFailFeedbackMessage('An error occurred while deleting the notification!');
+            setTimeout(() => setFailFeedbackMessage(null), 3000); // Hide after 3 seconds
+            return;
+        }
+
+        const result = await response.json();
+        console.log('Notification deleted successfully:', result.message);
+
+        // Update state/UI
+        setNotifications((prevNotifications) =>
+            prevNotifications.filter(
+                (n) =>
+                    !(n.noteDate === noteDate && n.noticeDate === noticeDate)
+            )
+        );
+
+        setSuccessFeedbackMessage('Notification deleted successfully!');
+        setTimeout(() => setSuccessFeedbackMessage(null), 3000); // Hide after 3 seconds
+        } catch (error) {
+            console.error('Error deleting notification:', error);
+            setFailFeedbackMessage('An error occurred while deleting the notification.');
+            setTimeout(() => setFailFeedbackMessage(null), 3000); // Hide after 3 seconds
+        }
+
+      }
+
+
+  const handleOpenNotification = (date) => {
+    setNoteDate(date); // Set the date or any data you want to pass
+    setShowPopupFromNotific(true);
+  };
+
+  const handleClosePopup = () => {
+    setShowPopupFromNotific(false);
+  };
+
+  
+
+
   return (
     <div className="flex justify-center wrapper pb-10">
       <div className="flex items-center mt-[195px] " style={{ zIndex: 10000000 }}>
         <Navbar setNavbarIsOpen={setNavbarIsOpen} />
       </div>
 
-      <div className="flex flex-col w-screen bg-transparent text-white align-start pt-10 pl-20 gap-3">
+      <div className="flex flex-col w-screen bg-transparent text-white align-start pt-5 pl-20 gap-2">
         {/* Greeting */}
         <div className="flex flex-row">
           <h1 className="darker-grotesque-main" style={{ fontFamily: 'Darker Grotesque', fontSize: 45, fontWeight: 600 }}>
@@ -287,14 +389,14 @@ const handleSubmit = async (e) => {
           </span>
         </div>
 
-        <p className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 30, fontWeight: 450 }}>
+        <p className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 30, fontWeight: 470 }}>
           This is your personal space.
         </p>
 
 
         {/* Form */}
         <form onSubmit={handleSubmit} className="space-y-4 mt-5">
-        <p className="flex" style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 450, marginBottom: -10 }}>
+        <p className="flex" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 450, marginBottom: -10 }}>
           Edit your information</p>
           <div className="flex items-center mb-4">
             <input
@@ -330,71 +432,111 @@ const handleSubmit = async (e) => {
             </label>
           </div>
 
-      <div className="flex items-center relative mb-4">
-        <input
-          type={passwordVisible ? 'text' : 'password'}
-          id="password"
-          name="password"
-          value={formData.password}
-          onChange={handleChange}
-          placeholder="Password"
-          required
-          className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
-          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-          onFocus={() => setIsPasswordFocused(true)}
-          onBlur={() => setIsPasswordFocused(false)}
-        />
-        {(isPasswordFocused || formData.password) && (
-          <div
-            className="w-25 h-25 absolute left-[360px] cursor-pointer"
-            onClick={() => setPasswordVisible(!passwordVisible)}
-          >
-            {!passwordVisible ? <VisibilityOpen /> : <VisibilityHidden />}
+          <div className="flex items-center relative mb-4">
+            <input
+              type={currentPasswordVisible ? 'text' : 'password'}
+              id="currentPassword"
+              name="currentPassword"
+              value={formData.currentPassword}
+              onChange={handleChange}
+              placeholder="type current password"
+              required={isChangingPassword}
+              className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+              style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+              onFocus={() => setIsCurrentPasswordFocused(true)}
+              onBlur={() => setIsCurrentPasswordFocused(false)}
+            />
+            {(isCurrentPasswordFocused || formData.currentPassword) && (
+              <div
+                className="w-25 h-25 absolute left-[360px] cursor-pointer"
+                onClick={() => setCurrentPasswordVisible(!currentPasswordVisible)}
+              >
+                {currentPasswordVisible ? <VisibilityOpen /> : <VisibilityHidden />}
+              </div>
+            )}
+            <label
+              htmlFor="currentPassword"
+              className="whitespace-nowrap"
+              style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+            >
+              current password
+            </label>
           </div>
-        )}
-        <label
-          htmlFor="password"
-          className="whitespace-nowrap"
-          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-        >
-          Password
-        </label>
-      </div>
 
-      <div className="flex items-center relative mb-4">
-        <input
-          type={passwordVisible2 ? 'text' : 'password'}
-          id="confirmPassword"
-          name="confirmPassword"
-          value={formData.confirmPassword}
-          onChange={handleChange}
-          placeholder="Confirm Password"
-          required={isChangingPassword}
-          className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
-          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-          onFocus={() => setIsConfirmPasswordFocused(true)}
-          onBlur={() => setIsConfirmPasswordFocused(false)}
-        />
-        {(isConfirmPasswordFocused || formData.confirmPassword) && (
-          <div
-            className="w-25 h-25 absolute left-[360px] cursor-pointer"
-            onClick={() => setPasswordVisible2(!passwordVisible2)}
+        <div className="flex items-center relative mb-4">
+          <input
+            type={passwordVisible ? 'text' : 'password'}
+            id="password"
+            name="password"
+            value={formData.password}
+            onChange={handleChange}
+            placeholder="type new password"
+            required={isChangingPassword}
+            className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+            style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+            onFocus={() => setIsPasswordFocused(true)}
+            onBlur={() => setIsPasswordFocused(false)}
+          />
+          {(isPasswordFocused || formData.password) && (
+            <div
+              className="w-25 h-25 absolute left-[360px] cursor-pointer"
+              onClick={() => setPasswordVisible(!passwordVisible)}
+            >
+              {passwordVisible ? <VisibilityOpen /> : <VisibilityHidden />}
+            </div>
+          )}
+          <label
+            htmlFor="new password"
+            className="whitespace-nowrap"
+            style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
           >
-            {!passwordVisible2 ? <VisibilityOpen /> : <VisibilityHidden />}
-          </div>
-        )}
-        <label
-          htmlFor="confirmPassword"
-          className="whitespace-nowrap"
-          style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
-        >
-          Confirm Password
-        </label>
-      </div>
+            new password
+          </label>
+        </div>
 
-          {error && <p className="" style={{ color: 'red' }}>
-            {error}
-            </p>}
+        <div className="flex items-center relative mb-4">
+          <input
+            type={passwordVisible2 ? 'text' : 'password'}
+            id="confirmPassword"
+            name="confirmPassword"
+            value={formData.confirmPassword}
+            onChange={handleChange}
+            placeholder="type new password confirmation"
+            required={isChangingPassword}
+            className="bg-transparent border border-white/60 p-1 rounded-lg max-w-[400px] mr-4 pl-2 input-field placeholder-white/80"
+            style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+            onFocus={() => setIsConfirmPasswordFocused(true)}
+            onBlur={() => setIsConfirmPasswordFocused(false)}
+          />
+          {(isConfirmPasswordFocused || formData.confirmPassword) && (
+            <div
+              className="w-25 h-25 absolute left-[360px] cursor-pointer"
+              onClick={() => setPasswordVisible2(!passwordVisible2)}
+            >
+              {passwordVisible2 ? <VisibilityOpen /> : <VisibilityHidden />}
+            </div>
+          )}
+          <label
+            htmlFor="confirmPassword"
+            className="whitespace-nowrap"
+            style={{ fontFamily: 'Darker Grotesque', fontSize: 19, fontWeight: 400 }}
+          >
+            confirm new password
+          </label>
+        </div>
+
+          {error && <div className='fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50'>
+          {/* Save message container */}
+          <div className="overlay_blur"></div>
+          <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
+            {/* Message */}
+            <div className='mb-4' style={{ fontFamily: 'Darker Grotesque' }}>
+              {error}
+            </div>
+            {/* Alert icon */}
+            <FiAlertCircle className='text-[rgb(255,172,201)]' size={34} />
+          </div>
+            </div>}
           {success && <div className='fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50'>
           {/* Save message container */}
           <div className="overlay_blur"></div>
@@ -404,7 +546,7 @@ const handleSubmit = async (e) => {
               {success}
             </div>
             {/* Check icon */}
-            <FaRegCircleCheck className='text-[rgb(173,172,255)]' size={34} />
+            <FaRegCircleCheck className='text-[rgb(172,255,226)]' size={34} />
           </div>
         </div>}
         <div className="flex max-w-[400px] justify-end">
@@ -419,7 +561,7 @@ const handleSubmit = async (e) => {
         </form>
       
       {/* Journal Tracker - graph */}
-      <div className="flex justify-end items-center w-[750px] h-[180px] pr-5 bg-gradient-to-tr from-[#C6BCFF] to-[#AA9BFE] border-none rounded-[30px] shadow-[#6760bba6] mt-7 shadow-lg">
+      <div className="flex justify-end items-center w-[750px] h-[180px] pr-5 bg-gradient-to-tr from-[#C6BCFF] to-[#AA9BFE] border-none rounded-[30px] shadow-[#6760bba6] mt-5 shadow-lg">
         <div className="journal-analysis p-4 text-white">
           <h2 className="journal-analysis-title text-md mb-4 pl-10 relative" style={{ fontFamily: "Vibur", fontSize: 20 }}>
             <ChartIcon className="absolute bottom-1 left-0" />Your Journaling Analysis for {selectedYear}
@@ -494,7 +636,7 @@ const handleSubmit = async (e) => {
           )}
         </div>
               
-        {/* Container for Year and StatsJournaling SVG positioned to the left */}
+        {/* Container for Year and StatsJournaling SVG - left */}
         <div className="absolute bottom-1 left-4 flex flex-col items-center">
           <StatsJournaling className="w-[50px] h-[50px]" />
         </div>
@@ -522,7 +664,7 @@ const handleSubmit = async (e) => {
               );
             })}
 
-            {/* Ruler on the right side */}
+            {/* Ruler - right */}
             <div className="absolute bottom-[31px] left-[350px] h-[120px] flex flex-col justify-between items-center">
               <div className="h-36 relative">
                 {[5, 10, 15, 20, 25, 30].map((day, idx) => (
@@ -558,7 +700,6 @@ const handleSubmit = async (e) => {
       </div>
 
       {/* Notification Center - Active Notifications */}
-
       <div className="active-notifications-title">
         <p
           className={`absolute top-52 tracking-wider border border-white/45 p-2.5 rounded-2xl bg-[#cebdf614] transition-all duration-500 ${navbarIsOpen ? 'right-[40px]' : 'right-[115px]'}`}
@@ -568,35 +709,106 @@ const handleSubmit = async (e) => {
           Active notifications
         </p>
       </div>
-     <div className="h-[100vh] flex justify-center items-end pr-10 pb-10 ">
+     <div className="absolute top-[280px] right-0 h-fit flex justify-center items-end pr-10 pb-10 ">
                   
-     <div className={`notification-container max-h-[434px] overflow-y-auto scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'  }`}>
-         {notifications.map((notification, index) => (
-           <div key={index} className="notification-item cursor-pointer">
-             <div className="icon-container">
-               <ActiveNotificationsIcon /> {/* This is your icon */}
-               <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
-
-               {/* Hover actions */}
+     <div className={`notification-container scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'} ${notifications.length > 0 ? 'max-h-[434px] overflow-y-auto' : ''}`}>
+        {notifications.length > 0 ? (
+          notifications.map((notification, index) => (
+            <div key={index} className="notification-item cursor-pointer">
+              <div className="icon-container">
+                <ActiveNotificationsIcon /> 
+                <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
+          
+                {/* Hover actions */}
                 <div className="icon-actions absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity">
                   <button
                     className="action-icon hover:scale-110 transition-transform mr-2"
                     onClick={() => handleDeleteNotification(notification)}
-                  ><TrashNotifications className="pt-[3px]" /> {/* Replace with your eye icon */}
+                  >
+                    <TrashNotifications className="pt-[3px]" />
                   </button>
                   <button
                     className="action-icon hover:scale-110 transition-transform mr-2"
-                    onClick={() => handleOpenNotification(notification)}
+                    onClick={() => handleOpenNotification(new Date(notification.noticeDate))}
                   >
-                    <OpenNotifications className="pt-[6px]"/> {/* Replace with your trash icon */}
+
+                    <OpenNotifications className="pt-[6px]" />
                   </button>
                 </div>
-             </div>
-           </div>
-         ))}
-       </div>
-     </div>
+              </div>
+            </div>
+          ))
+        ) : ( 
 
-    </div>
+          <div className=" relative text-center text-[#ffffff] pr-3 w-full tracking-wide scroll-none" style={{ fontFamily: "Darker Grotesque", fontWeight: 400, fontSize: 20 }}>   {/* When there's no notifications */}
+            <div className="no-notific bg-[#aba2ff6c] p-2 border-none rounded-xl flex flex-col items-center justify-center gap-5">
+            <p>Nothing to show ...</p>
+            <MdInbox className="mb-2 text-[#6f6ed7]" size={44} />
+            </div>
+          </div>
+        )}
+      </div>
+          {/* Display feedback message */}
+          {successFeedbackMessage && (
+            <div className='fixed inset-0 flex justify-center items-center z-50'>
+            {/* Save message container */}
+            <div className='flex flex-col items-center justify-center gap-1 bg-gradient-to-br from-[#a49ef68c] to-[#4e44a7ab] border border-white/60 backdrop-blur-[2px] h-[150px] w-fit text-white text-lg pl-6 pr-6 p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}>
+              {/* Message */}
+              <div className='mb-4 tracking-wider'>
+                {successFeedbackMessage}
+              </div>
+              {/* Check icon */}
+              <FaRegCircleCheck className='text-[rgb(172,255,226)]' size={34} />
+            </div>
+          </div>
+          )}
+
+          {failFeedbackMessage && (
+            <div className='fixed inset-0 flex justify-center items-center z-50'>
+            {/* Save message container */}
+            <div className='flex flex-col items-center justify-center gap-1 bg-gradient-to-br from-[#a49ef68c] to-[#4e44a7ab] border border-white/60 backdrop-blur-[2px] h-[150px] w-fit text-white text-lg pl-6 pr-6 p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}>
+              {/* Message */}
+              <div className='mb-4 tracking-wider'>
+                {failFeedbackMessage}
+              </div>
+              {/* error icon */}
+              <FiAlertCircle className='text-[rgb(255,172,201)]' size={34} />
+            </div>
+          </div>
+          )}
+          
+          {showPopupFromNotific && (
+            
+            <div className="fixed inset-0" style={{ zIndex: 1000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
+              <div className="overlay_blur"></div>
+              <div className="popup border border-white/45 z-40 ">
+                <div className="popup-content flex flex-col justify-center items-center relative">
+                  <div className="flex w-full justify-end items-end">
+                    <button className="close-button self-end pr-2 top-5 absolute" onClick={() => handleClosePopup()}>
+                      <Close />
+                    </button>
+                  </div>
+                  <div className="flex items-center">
+                    <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
+                     <Popup
+                      noteDate={noteDate}
+                      showPopupFromNotific={showPopupFromNotific}
+                      onSave={(date, title, mainContent, smallNotes) => {
+                        console.log("Entry saved:", { date, title, mainContent, smallNotes });
+                      }}
+                      setTitle1={setTitle1}
+                      showSmallNotesCalendar={showSmallNotesCalendar}
+                      fetchTheReminder={fetchTheReminder}
+                      
+
+                    />
+                  <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
+              </div>
+          </div>
+        </div>
+      </div>
+       )}
+    </div>     
+  </div>
   );
 }

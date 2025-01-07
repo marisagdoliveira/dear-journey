@@ -157,49 +157,50 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
    
        {/* Container for calendar and overlay */}
        <div className={`relative flex flex-wrap max-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
-   {daysInMonth.map((day, index) => {
-     const entry = getDateEntry(day);
-     const isToday = isSameDay(day, today); // Check if the day is today
+        {daysInMonth.map((day, index) => {
+        const entry = getDateEntry(day);
+        const isToday = isSameDay(day, today); // Check if the day is today
     
-     return (
-       <div key={index} className="relative w-32 h-32 flex items-center justify-center"> {/* Increased size of the container */}
-         {/* Conditional rendering of CalendarContainer or TodayCalendarContainer */}
-         {isToday ? (
-           <TodayCalendarContainerPurp className="pulsingToday absolute  w-full h-full z-10 pointer-events-none" style={{ transform: 'scale(1.05)'
+         return (
+           <div key={index} className="relative w-32 h-32 flex items-center justify-center"> {/* Increased size of the container */}
+             {/* Conditional rendering of CalendarContainer or TodayCalendarContainer */}
+             {isToday ? (
+               <TodayCalendarContainerPurp className="pulsingToday absolute  w-full h-full z-10 pointer-events-none" style={{ transform: 'scale(1.05)'
+            
+              }} />
+             ) : (
+               <CalendarContainerOriginal className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
+             )}
 
-          }} />
-         ) : (
-           <CalendarContainerOriginal className="absolute inset-0 w-full h-full z-10 pointer-events-none" />
-         )}
-  
-         {/* Date (top-right) */}
-         <span className="absolute top-5 right-5 text-md text-white z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>
-           {format(day, 'd')}
-         </span>
-          
-         {/* Title (centered, truncates if too long) */}
-         
-         {entry.title? 
-         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
-          {entry.title}
-       </div>
-         : 
-         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
-           
-         </div>
-          }
-         {/* Small notes indicator (bottom-right) */}
-         <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" style={{ fontWeight: 700 }}>
-           {entry.smallNotes.length}
-         </div>
-          
-         {/* Plus icon (top-left) */}
-         <button className="absolute top-6 left-4 text-white text-2xl z-20" onClick={() => { setShowPopup(true); setNoteDate(day); }}>
-           <PlusIcon className="text-white text-2xl text-[#dcd6ff]" />
-         </button>
-       </div>
-     );
-   })}
+             {/* Date (top-right) */}
+             <span className="absolute top-5 right-5 text-md text-white z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 700 }}>
+               {format(day, 'd')}
+             </span>
+
+             {/* Title (centered, truncates if too long) */}
+            
+             {entry.title? 
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+              {entry.title}
+           </div>
+             : 
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+
+             </div>
+              }
+             {/* Small notes indicator (bottom-right) */}
+             <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" style={{ fontWeight: 700 }}>
+               {entry.smallNotes.length}
+             </div>
+
+             {/* Plus icon (top-left) */}
+             <button className="absolute top-6 left-4 text-white text-2xl z-20" onClick={() => { setShowPopup(true); setNoteDate(day); }}>
+               <PlusIcon className="text-white text-2xl text-[#dcd6ff]" />
+             </button>
+           </div>
+         );
+      }
+    )}
    </div>
   
       {showPopup && (

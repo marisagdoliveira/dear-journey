@@ -133,7 +133,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                                     setUpdatedNotes(updatedNotes);
                                 }}
                                 placeholder='Write your retrospective here...'
-                                className='w-[130%] h-[20vh] mt-5 bg-transparent p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]'
+                                className='w-[130%] h-[20vh] mt-5 bg-transparent placeholder-white p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]'
                             />
                         </div>
                         {/* Added the onClick handler for deleting a specific note */}

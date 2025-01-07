@@ -11,6 +11,17 @@
 @tailwind components;
 @tailwind utilities;
 
+
+
+html, body {
+  margin-top: 0 !important; /* Ensures no additional margin */
+}
+
+#_gcal_opt_in_banner {
+  display: none !important; /* Hides the banner */
+}
+
+
 .vibur-regular {
   font-family: "Vibur", cursive;
   font-style: normal;
@@ -876,3 +887,8 @@ transition: opacity 0.1s ease-in-out;
   size: 1;
 }
 
+.no-notific {
+  outline: 1.5px dashed #c9c8eee8; /* Adjust dash thickness */
+
+
+}

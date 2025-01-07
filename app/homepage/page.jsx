@@ -292,7 +292,7 @@ export default function Homepage() {
 
     {/* Navbar */}
     <div className="mt-24" style={{ zIndex: "100000000000" }}>
-      <Navbar setNavbarIsOpen={setNavbarIsOpen}  />
+      <Navbar setNavbarIsOpen={setNavbarIsOpen} fetchTheReminder={fetchTheReminder}  />
     </div>
 
     {/* Calendar */}

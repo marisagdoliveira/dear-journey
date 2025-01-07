@@ -4,17 +4,20 @@ import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
 import CancelX from "../../public/assets/CancelX.svg";
 import SmallNotesPopup from './SmallNotesPopup';
+import { useReminder } from "@/context/ReminderContext";
 import { FaCheck } from "react-icons/fa6";
 import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
 import { TbBell } from "react-icons/tb";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import ThoughtIcon from "../../public/assets/ThoughtIcon.svg";
+import AddInsightIcon from "../../public/assets/AddInsightIcon.svg";
 
 
 
 
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
+import { FiAlertCircle } from 'react-icons/fi';
 
 
 const capitalizeFirstLetter = (text) => {
@@ -25,14 +28,21 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, fetchTheReminder, setShowPopupReminder, showPopupReminder, showPopupReminderDate }) => {
+const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific }) => {
+  
+  const fetchTheReminder = useReminder();
+
+  
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
   const [email, setEmail] = useState('');
   const [isSaving, setIsSaving] = useState(false);
-  const [saveMessage, setSaveMessage] = useState('');
+  const [saveEntryMessageSuccess, setSaveEntryMessageSuccess] = useState('');
+  const [saveEntryMessageFail, setSaveEntryMessageFail] = useState('');
+  const [deleteMessageSuccess, setDeleteMessageSuccess] = useState('');
+  const [deleteMessageFail, setDeleteMessageFail] = useState('');
   const [smallPopupOpen, setSmallPopupOpen] = useState(false);
   const [updatedNotes, setUpdatedNotes] = useState([]);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
@@ -60,6 +70,11 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
   
   useEffect(() => {
+
+    if (!noteDate) {
+      console.error("noteDate is undefined or null");
+      return; // Early return if noteDate is not valid
+    }
     // Fetch user data and journal entries when the component mounts
     const fetchUserAndJournalEntries = async () => {
       try {
@@ -182,10 +197,10 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         setSmallNotes(formattedSmallNotes);
         onSave(noteDate, title, mainContent, formattedSmallNotes);
 
-        setSaveMessage('Entry updated successfully');
+        setSaveEntryMessageSuccess('Entry updated successfully!');
         } catch (error) {
             console.error('Error saving journal entry:', error);
-            setSaveMessage('Failed to save entry. Please try again.');
+            setSaveEntryMessageFail('Failed to save entry. Please try again.');
         } finally {
             setIsSaving(false);
             // Reset the button state after a short delay
@@ -194,7 +209,8 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           }, 100);
             // Clear the save message after 2 seconds
             setTimeout(() => {
-              setSaveMessage('');
+              setSaveEntryMessageSuccess('');
+              setSaveEntryMessageFail('');
           }, 1000);
         }
     };
@@ -276,8 +292,6 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
     console.log('Reminder date:', date); // Log here
 
     setReminderDate(date);
-    // You may want to handle saving this date to your backend or state here:
-
     
   };
 
@@ -325,47 +339,76 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
             >
               {isSaving ? 'Save' : 'Save'}
             </button>
-            <GoTrash className="h-14 size-9 text-white/30 hover:text-white/85 transition-colors duration-300"
+            <GoTrash className="h-14 size-9 text-white/30 cursor-pointer hover:text-white/75 transition-colors duration-300"
               onClick={() => setShowConfirmDelete(true)} />
           </div>
-          {smallNotes.length > 0 && (
+          {/*{smallNotes.length > 0 && (
             <div className='flex items-center pt-4 pl-1'>
-              <ThoughtIcon className='mr-2' /> {/* Adjust the margin as needed */}
+              <ThoughtIcon className='mr-2' />  Adjust the margin as needed 
               <p className='darker-grotesque-main' style={{ fontSize: 20 }}>
                 My latest insights:
               </p>
             </div>
+          )}*/}
+          {mainContent.length > 0 && (
+            <>
+              <div className="flex items-center pt-4 pl-1 darker-grotesque-main" style={{ fontSize: 20 }}>
+                <ThoughtIcon className="mr-2" /> {/* Adjust the margin as needed */}
+                {smallNotes.length > 0 ? (
+                  <p>
+                    My latest insights:
+                  </p>
+                ) : (
+                  <p>Add your insights:</p>
+                )}
+              </div>
+                
+              <div className="flex items-center z-100000 w-80 pb-5 max-h-24 mt-8">
+                <div className="scroll-container mt-14 mb-14 max-h-[100px] h-fit flex flex-wrap overflow-x-hidden overflow-y-auto">
+                  {smallNotes.map((note, index) => (
+                    <div key={index} className="relative cursor-pointer">
+                      <p className="absolute left-9 top-8">{index + 1}</p>
+                      <SmallPopupIconSmall className="size-24" onClick={handleOpenPopup} />
+                    </div>
+                  ))}
+                    <AddInsightIcon className="size-24 mt-0.5 cursor-pointer" onClick={handleOpenPopup} />
+                </div>
+            
+              </div>
+            </>
           )}
         </div>
         <div className='relative'>
-        {saveMessage && (
+        {saveEntryMessageSuccess && (
         <div className='fixed inset-0 flex justify-center items-center z-50'>
           {/* Save message container */}
           <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 16 }}>
-            {/* Message */}
+            {/* Success Message */}
             <div className='mb-4 tracking-wider'>
-              {saveMessage}
+              {saveEntryMessageSuccess}
             </div>
             {/* Check icon */}
-            <FaRegCircleCheck className='text-[rgb(173,172,255)]' size={34} />
+            <FaRegCircleCheck className='text-[rgb(172,255,226)]' size={34} />
           </div>
+        </div>
+        )}
+
+        {saveEntryMessageFail && (
+        <div className='fixed inset-0 flex justify-center items-center z-50'>
+          {/* Save message container */}
+          <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 16 }}>
+            {/* Error Message */}
+            <div className='mb-4 tracking-wider'>
+              {saveEntryMessageFail}
+            </div>
+            {/* Alert icon */}
+            <FiAlertCircle className='text-[rgb(255,172,201)]' size={34} />
+          </div>
+        </div>
+        )}
+        </div>
         </div>
       )}
-        </div>
-        <div className='flex items-center z-100000'>
-          <div className='mt-5 max-w-[50%] max-h-[120px] pb-5 gap-4 min-h-32 h-fit flex flex-wrap items-center overflow-y-auto overflow-x-hidden mr-6 scroll-container'>
-            {smallNotes.map((note, index) => (
-              <div key={index} className='relative cursor-pointer'>
-                <p className="absolute left-9 top-8">{index + 1}</p>
-                <SmallPopupIconSmall className="size-24" onClick={handleOpenPopup} />
-              </div>
-            ))}
-          </div>
-          {/* Make sure the size matches and is properly aligned */}
-          <AddIconSmall className="size-24 pt-5 cursor-pointer" onClick={handleOpenPopup} />
-        </div>
-      </div>
-    )}
     {smallPopupOpen && (
       <SmallNotesPopup
         smallNotes={smallNotes}
@@ -382,13 +425,13 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
         {/* Overlay */}
         <div className='absolute inset-0 bg-transparent backdrop-blur-[2px]'></div>
     
-        {/* Confirmation Dialog */}
+        {/* Delete Confirmation Dialog */}
           <div className='relative bg-[#7e74ff]/60 backdrop-blur-[2px] p-6 border rounded-3xl shadow-lg  border-white/60 bg-gradient-to-br from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] z-50'>
             <div className='flex justify-end gap-3'>
               <p className='mb-0 text-lg' style={{ fontFamily: "Darker Grotesque", fontWeight: 600, fontSize: 20 }}>
               Are you sure you want to delete the whole entry? </p>
               <div className='w-10 h-10 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
-                <GoTrash className='text-white' size={26} />
+                <GoTrash className='text-white cursor-pointer' size={26} />
               </div>
             </div>
               <p className='' style={{ fontFamily: 'Darker Grotesque', fontSize: 20 }}>This action <b className='text-[#433c68]'>can't</b> be reversed.</p>
