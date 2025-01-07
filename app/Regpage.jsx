@@ -39,6 +39,8 @@ export default function Regpage() {
 
       const data = await res.json();
       setMessage(data.message || "User registered successfully.");
+      setTimeout(() => setMessage(''), 3000);  // Optional: Clear the message after a delay
+
     } catch (error) {
       console.error("Error registering user:", error);
       setMessage("Failed to register user. Please try again later.");
@@ -67,6 +69,8 @@ export default function Regpage() {
 
       const data = await res.json();
       setMessage(data.message || "Logged in successfully.");
+      setTimeout(() => setMessage(''), 3000);  // Optional: Clear the message after a delay
+
       router.replace("/homepage");
     } catch (error) {
       console.error("Error logging in:", error);
@@ -117,7 +121,7 @@ export default function Regpage() {
              
               <div
                 className="mt-3 text-[#5c62da] text-s cursor-pointer flex align-center justify-center" style={{ fontFamily: 'Vibur, cursive' }}
-                onClick={() => setShowLogin(false)}
+                onClick={() => {setShowLogin(false); setMessage('');}}
               >
                 Don't have an account?{" "}
                 <span className="flex text-[#5c62da] text-s hover:underline  align-center justify-center pl-1" style={{ fontFamily: 'Vibur, cursive' }}>
@@ -171,7 +175,8 @@ export default function Regpage() {
 
               <div
                 className="flex align-center justify-center mt-3 text-[#5c62da] cursor-pointer text-s hover:underline" style={{ fontFamily: 'Vibur, cursive' }}
-                onClick={() => setShowLogin(true)}
+                onClick={() => {setShowLogin(true); setMessage('');}}
+
               >
                 Already have an account?
               </div>
