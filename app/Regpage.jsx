@@ -13,6 +13,7 @@ export default function Regpage() {
   const [email, setEmail] = useState(""); // register
   const [password, setPassword] = useState(""); // register ----- Estes comparam com login: 
   const [message, setMessage] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
   const [loginEmail, setLoginEmail] = useState(""); // login
   const [loginPassword, setLoginPassword] = useState(""); // login
   const router = useRouter();
@@ -22,6 +23,25 @@ export default function Regpage() {
 
       if (!email || !password || !username) {
         setMessage("All fields are required.");
+        return;
+      }
+      
+       // Check if the email is already in use using the new GET endpoint
+      const checkEmailRes = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`, {
+        method: "GET", // Use GET method for the email check
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!checkEmailRes.ok) {
+        console.error("Failed to check email:", checkEmailRes); // Log if the request fails
+        throw new Error("Network response was not ok");
+      }
+
+      const checkEmailData = await checkEmailRes.json();
+      if (checkEmailData.exists) {
+        setErrorMessage("This email is already in use.");
         return;
       }
 
