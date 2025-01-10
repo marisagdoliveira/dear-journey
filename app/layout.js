@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { ReminderProvider } from '../../my-app/context/ReminderContext'; // Adjust the path if needed
+import { AuthProvider } from "./Providers";
 
 
 const inter = Inter({ subsets: ["latin"] });
@@ -14,9 +15,11 @@ export default function RootLayout({ children }) {
   return (
     <html lang="pt-pt">
       <body className={inter.className}>
-        <ReminderProvider>
-          {children}
-        </ReminderProvider>
+        <AuthProvider>
+          <ReminderProvider>
+            {children}
+          </ReminderProvider>
+        </AuthProvider>
       </body>
     </html>
   );

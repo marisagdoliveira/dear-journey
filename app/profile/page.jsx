@@ -33,6 +33,7 @@ import Close from "../../public/assets/Close.svg"
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
+import { getSession } from "next-auth/react";
 
 
 
@@ -102,7 +103,20 @@ export default function Profile({  }) {
   
     const fetchUserAndJournalEntries = async () => {
       try {
-        const response = await fetch(`/api/user`);
+
+        const session = await getSession();
+        console.log("Session:", session);
+    
+        if (!session || !session.user?.email) {
+          console.error("User not authenticated");
+          return; // Exit if no session
+        }
+
+        //const email = session.user.email; // Extract email here
+        //console.log("Email from session:", email);
+
+
+        const response = await fetch(`/api/user?email=${session.user.email}`);
         if (response.ok) {
           const data = await response.json();
           setEmail(data.user.email);
@@ -170,34 +184,48 @@ export default function Profile({  }) {
  //}, [router.isReady, router.query]); // Trigger when router is ready or query changes
 
 
+      
 
 
   useEffect(() => {
     const fetchUser = async () => {
-      try {
-        const res = await fetch("/api/user", { method: "GET" });
-        if (!res.ok) throw new Error("Network response was not ok");
-        
-        const data = await res.json();
-        if (!data.user.username) throw new Error("User not authenticated");
+    try {
+      const session = await getSession();
+      console.log(session)
+    if (!session) router.push("/");
 
-        setUsername(data.user.username);
-        setUserPic(data.user.img || null);
-        setEmail(data.user.email);
+    // Include the email as a query parameter
+    const res = await fetch(`/api/user?email=${encodeURIComponent(session.user.email)}`, {
+      method: "GET",
+    });
 
-        // Prefill the form with fetched user data
-        setFormData({
-          email: data.user.email,
-          username: data.user.username,
-          password: '',
-          confirmPassword: ''
-        });
-        
-      } catch (error) {
-        console.error("Error fetching user data:", error);
-        router.replace("/"); // Redirect to login if not authenticated
-      }
-    };
+    if (!res.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const data = await res.json();
+    if (!data.user || !data.user.username) {
+      throw new Error("User not authenticated or data incomplete");
+    }
+
+    setUsername(data.user.username);
+    setUserPic(data.user.img || null);
+    setEmail(data.user.email);
+
+    // Prefill the form with fetched user data
+    setFormData({
+      email: data.user.email,
+      username: data.user.username,
+      password: '',
+      confirmPassword: '',
+    });
+  } catch (error) {
+    console.error("Error fetching user data:", error);
+    router.push("/")
+    // Handle redirection or error display
+  }
+};
+
 
     fetchUser();
   }, [router]);
@@ -233,9 +261,18 @@ const handleSubmit = async (e) => {
   }
 
   try {
+    
+    const session = await getSession();
+    console.log("Session:", session);
+
+    if (!session || !session.user?.email) {
+      console.error("User not authenticated");
+      return; // Exit if no session
+    }
+
     console.log("Sending update request");
 
-    const res = await fetch('/api/user', {
+    const res = await fetch(`/api/user?email=${session.user.email}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -373,6 +410,7 @@ const handleSubmit = async (e) => {
 
 
   return (
+    
     <div className="flex justify-center wrapper pb-10">
       <div className="flex items-center mt-[195px] " style={{ zIndex: 10000000 }}>
         <Navbar setNavbarIsOpen={setNavbarIsOpen} />
@@ -793,6 +831,7 @@ const handleSubmit = async (e) => {
                      <Popup
                       noteDate={noteDate}
                       showPopupFromNotific={showPopupFromNotific}
+                      
                       onSave={(date, title, mainContent, smallNotes) => {
                         console.log("Entry saved:", { date, title, mainContent, smallNotes });
                       }}

@@ -1,4 +1,6 @@
 import { useState, useEffect } from "react";
+import { getSession } from "next-auth/react";
+
 import { useCapitalizeFirstLetter } from '../hooks/useCapitalizeFirstLetter';
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
 import { IoIosAddCircle } from "react-icons/io";
@@ -11,6 +13,9 @@ import CalendarContainerOriginal from "../../public/assets/CalendarContainerOrig
 import TodayCalendarContainerPurp from "../../public/assets/TodayCalendarContainerPurp.svg"
 
 export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder, showPopupReminder, setShowPopupReminder, showPopupReminderDate }) {
+  const { data: session, status } = getSession(); // Valid usage of hook inside a component
+
+
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [journalEntries, setJournalEntries] = useState([]);
   const [email, setEmail] = useState('');
@@ -48,23 +53,83 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
     };
   });
 
+  // const fetchUserAndJournalEntries = async () => {
+  //   const fetchUser = async () => {
+  //     if (status === "loading") return; // Skip if loading
+  //     const { session: session } = getSession(); // Get session data from NextAuth
+      
+  //     if (!session) {
+  //       console.log("User not authenticated");
+  //       return; // Exit if no session (user not authenticated)
+  //     }
+
+  //     const email = session.user.email;
+  //     console.log("Email from session:", email);  // Log the email to confirm it's being retrieved
+
+
+  
+  //     try {
+
+  //       // Ensure email is passed correctly in the URL
+
+      
+        
+  //       const res = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });
+
+  
+  //       if (res.ok) {
+  //         const data = await res.json();
+  
+  //         // Store the user data (email and journal entries)
+  //         setEmail(data.user.email);
+  //         setJournalEntries(data.user.library);
+  
+  //         console.log("Journal entries:", data.user.library);
+  //       } else {
+  //         throw new Error("Failed to fetch user data.");
+  //       }
+  //     } catch (error) {
+  //       console.error("Error fetching user data: ", error);
+  //     }
+  //   };
+  
+  //   // Call the fetchUser function to trigger the data fetching
+  //   fetchUser();
+  // };
+
   const fetchUserAndJournalEntries = async () => {
     try {
-      const response = await fetch(`/api/user`);
-      if (response.ok) {
-        const data = await response.json();
-        setEmail(data.user.email);
-        setJournalEntries(data.user.library);
-        console.log('Journal entries:', journalEntries);
-
-
-      } else {
+      const session = await getSession();
+      console.log("Session:", session);
+  
+      if (!session || !session.user?.email) {
+        console.error("User not authenticated");
+        return; // Exit if no session
+      }
+  
+      const email = session.user.email;
+      console.log("Email from session:", email);
+  
+      const res = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });
+  
+      if (!res.ok) {
+        const error = await res.text(); // Capture error message
+        console.error("API Error:", error);
         throw new Error("Failed to fetch user data.");
       }
+  
+      const data = await res.json();
+  
+      // Set the user email and journal entries
+      setEmail(data.user.email);
+      setJournalEntries(data.user.library);
+  
+      console.log("Journal entries:", data.user.library);
     } catch (error) {
-      console.error("Error fetching user data: ", error);
+      console.error("Error fetching user data:", error);
     }
   };
+  
 
   const saveEntry = async (title, date, mainContent, smallNotes) => {
     console.log('Before saving2:', { title, email, date, mainContent, smallNotes });
@@ -215,7 +280,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
               </div>
               <div className="flex items-center">
                 <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
                 <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>

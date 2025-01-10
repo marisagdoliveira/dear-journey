@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useSession, signIn } from "next-auth/react";
+import { getSession } from "next-auth/react";
+
 import SmallPopupIconSmall from "../../public/assets/SmallPopupIconSmall.svg";
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import BackIcon from "../../public/assets/BackIcon.svg";
@@ -28,7 +31,7 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific }) => {
+const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
   
   const fetchTheReminder = useReminder();
 
@@ -37,7 +40,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(session_email);
   const [isSaving, setIsSaving] = useState(false);
   const [saveEntryMessageSuccess, setSaveEntryMessageSuccess] = useState('');
   const [saveEntryMessageFail, setSaveEntryMessageFail] = useState('');
@@ -78,10 +81,20 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
     // Fetch user data and journal entries when the component mounts
     const fetchUserAndJournalEntries = async () => {
       try {
-        const response = await fetch(`/api/user`);
+
+        const session = await getSession();
+        console.log("Session:", session);
+    
+        if (!session || !session.user?.email) {
+          console.error("User not authenticated");
+          return; // Exit if no session
+        }
+
+        const response = await fetch(`/api/user?email=${session.user.email}`);
         if (response.ok) {
           const data = await response.json();
-          setEmail(data.user.email);
+          console.log()
+
           setJournalEntries(data.user.library);
           console.log('Journal entries:', data.user.library);
           console.log()

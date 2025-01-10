@@ -10,18 +10,32 @@ export async function GET(req) {
   try {
     await connectDB(); // Connect to MongoDB
 
-    const getUser = await User.findOne({ _id: "671bd8b3b9f90b65e92d30e1" });
+    // Use the correct method to retrieve query parameters
+    const email = req.nextUrl.searchParams.get("email");
+
+    // Log the email to confirm the query parameter is received
+    console.log("Email from query params:", email);
+
+    if (!email) {
+      return NextResponse.json({ message: "Email is required." }, { status: 400 });
+    }
+
+    // Find the user in the database
+    const getUser = await User.findOne({ email });
 
     if (!getUser) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
 
+    // Return the user data
     return NextResponse.json({ user: getUser }, { status: 200 });
   } catch (error) {
+    // Log and return a generic error message
     console.error("Error fetching user:", error);
     return NextResponse.json({ message: "An error occurred while finding the user." }, { status: 500 });
   }
 }
+
 
 // Updating user personal info:
 

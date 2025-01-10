@@ -3,6 +3,7 @@ import { FaCheck } from "react-icons/fa6";
 import SmallPopupIcon from "../../public/assets/SmallNoteIcon.svg"
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import { TbTrashX } from "react-icons/tb";
+import { getSession } from 'next-auth/react';
 
 const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes, setUpdatedNotes, saveEntry }) => {
     const [newNote, setNewNote] = React.useState('');
@@ -14,6 +15,9 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
     
       
     const saveSmallNotes = async (updatedNotes) => {
+        const session = await getSession();
+        console.log(session)
+      if (!session) router.push("/");
       try {
           const response = await fetch('/api/smallnotes', {
               method: 'PATCH',
@@ -21,7 +25,7 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                   'Content-Type': 'application/json',
               },
               body: JSON.stringify({
-                  email,
+                  email: session.user.email,
                   date: noteDate.toISOString(),
                   smallNotes: updatedNotes,
               }),

@@ -12,6 +12,7 @@ import FAQIcon from "../../public/assets/FAQIcon.svg"
 import { IoChevronDownCircleOutline } from "react-icons/io5";
 
 import Link from "next/link";
+import { getSession } from "next-auth/react";
 
 
 export default function Support() {
@@ -44,7 +45,10 @@ export default function Support() {
   // Fetch user data
   const fetchUser = async () => {
     try {
-      const res = await fetch("/api/user", {
+      const session = await getSession();
+      console.log(session)
+      if (!session) router.push("/");
+      const res = await fetch(`/api/user?email=${encodeURIComponent(session.user.email)}`, {
         method: "GET",
       });
 

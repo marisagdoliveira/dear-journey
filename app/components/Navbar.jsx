@@ -1,3 +1,5 @@
+"use client";
+
 // components/NavBar.js
 
 import React, { useState } from 'react';
@@ -10,6 +12,9 @@ import Support from '../../public/assets/Support.svg'
 import Notifications from '../../public/assets/Notifications.svg'
 import Logout from '../../public/assets/Logout.svg'
 import Welcome from '../../public/assets/Welcome.svg'
+import { signOut } from "next-auth/react";
+
+
 //import { HomeIcon, UserIcon, ChatAltIcon, BellIcon, LogoutIcon } from '@heroicons/react/outline'; // Adjust icon imports as per your version 2
 
 const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
@@ -26,27 +31,7 @@ const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
         return null; // Handle cases where router is not available
     }
 
-    // Handle logout
-    const handleLogout = async () => {
-      try {
-        const res = await fetch("/api/logout", {
-          method: "GET",
-        });
-    
-        if (!res.ok) {
-          throw new Error("Network response was not ok");
-        }
-    
-        const data = await res.json();
-        console.log(data.message);
-    
-        // Redirect to login page upon successful logout
-        router.replace("/"); // Adjust this route to match your actual login route
-      } catch (error) {
-        console.error("Error logging out:", error);
-      }
-    };
-
+  
     return (
         <div className={`h-[430px] ${isOpen ? 'w-[200px]' : 'w-[75px]'} px-4 flex items-center py-8 relative border ml-12 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] transition-all duration-300 ease-in-out`}>
             <div style={{ 
@@ -88,14 +73,14 @@ const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
                 </Link>
                 <Link href="/profile" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
                     <Notifications className="ml-2 w-8 h-8"/> 
-                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
+                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px] pointer-events-none'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
                         Notifications
                     </div>
                 </Link>
                 <button 
                     className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} 
                     style={{ fontFamily: 'Darker Grotesque' }}
-                    onClick={handleLogout}
+                    onClick={() => signOut()}
                 >
                     <Logout className="ml-2 w-8 h-8 pt-1.5" /> 
                     <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px]'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>

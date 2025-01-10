@@ -1,6 +1,7 @@
 import React from 'react';
 import { NextResponse } from 'next/server';
 import { useState, useEffect } from "react";
+import { getSession } from "next-auth/react";
 
 
 const MonthGraph = () => {
@@ -16,7 +17,16 @@ const MonthGraph = () => {
   
     const fetchUserAndJournalEntries = async () => {
       try {
-        const response = await fetch(`/api/user`);
+
+        const session = await getSession();
+        console.log("Session:", session);
+    
+        if (!session || !session.user?.email) {
+          console.error("User not authenticated");
+          return; // Exit if no session
+        }
+
+        const response = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });
         if (response.ok) {
           const data = await response.json();
           setEmail(data.user.email);

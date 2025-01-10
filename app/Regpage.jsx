@@ -1,13 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import Logo from "../public/assets/Logo.svg";
 import "../../my-app/postcss.config.mjs"; // Ensure this path is correct
+import { useSession, signIn } from "next-auth/react";
 
 
-export default function Regpage() {
+export default function Regpage() {  
+  
+  const { data: session } = useSession();
+  const router = useRouter();
   const [showLogin, setShowLogin] = useState(true);
   const [username, setUsername] = useState(""); // register
   const [email, setEmail] = useState(""); // register
@@ -16,7 +20,13 @@ export default function Regpage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [loginEmail, setLoginEmail] = useState(""); // login
   const [loginPassword, setLoginPassword] = useState(""); // login
-  const router = useRouter();
+
+  
+  useEffect(() => {
+    if (session) {
+      router.push("/homepage");
+    }
+  }, [session, router]);
 
   const handleRegister = async () => {
     try {
@@ -28,7 +38,7 @@ export default function Regpage() {
       
        // Check if the email is already in use using the new GET endpoint
       const checkEmailRes = await fetch(`/api/check-email?email=${encodeURIComponent(email)}`, {
-        method: "GET", // Use GET method for the email check
+        method: "GET", 
         headers: {
           "Content-Type": "application/json",
         },
@@ -59,13 +69,77 @@ export default function Regpage() {
 
       const data = await res.json();
       setMessage(data.message || "User registered successfully.");
-      setTimeout(() => setMessage(''), 3000);  // Optional: Clear the message after a delay
+      setTimeout(() => setMessage(''), 3000);  // Clear the message after a delay
 
     } catch (error) {
       console.error("Error registering user:", error);
       setMessage("Failed to register user. Please try again later.");
     }
   };
+
+  //const handleLogin = async () => {
+  //  if (!loginEmail || !loginPassword) {
+  //    setMessage("All fields are required.");
+  //    return;
+  //  }
+//
+//
+  //  try {
+  //    const res = await fetch("/api/login", {
+  //      method: "POST",
+  //      headers: {
+  //        "Content-Type": "application/json",
+  //      },
+  //      body: JSON.stringify({ email: loginEmail, password: loginPassword }),
+  //    });
+//
+  //    if (!res.ok) {
+  //      throw new Error("Network response was not ok");
+  //    }
+//
+  //    const data = await res.json();
+  //    setMessage(data.message || "Logged in successfully.");
+  //    setTimeout(() => setMessage(''), 3000);  // Clear the message after a delay
+//
+  //    router.replace("/homepage");
+  //  } catch (error) {
+  //    console.error("Error logging in:", error);
+  //    setMessage("Failed to log in. Please try again later.");
+  //  }
+  //};
+  // const handleLogin = async () => {
+  //   if (!loginEmail || !loginPassword) {
+  //     setMessage("All fields are required.");
+  //     return;
+  //   }
+
+
+  //   try {
+  //     const res = await signIn("credentials", {
+  //       email: loginEmail,
+  //       password: loginPassword,
+  //       redirect: false,
+  //     })
+
+  //     console.log(res); // Log the response for debugging
+
+
+  //     if (!res.ok) {
+  //       throw new Error("Network response was not ok");
+  //       return;
+  //     }
+
+  //     const data = await res.json();
+  //     setMessage(data.message || "Logged in successfully.");
+  //     setTimeout(() => setMessage(''), 3000);  // Clear the message after a delay
+
+  //     router.replace("homepage");
+  //   } catch (error) {
+  //     console.error("Error logging in:", error);
+  //     setMessage("Failed to log in. Please try again later.");
+  //   }
+  // };
+
 
   const handleLogin = async () => {
     if (!loginEmail || !loginPassword) {
@@ -75,23 +149,25 @@ export default function Regpage() {
 
 
     try {
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email: loginEmail, password: loginPassword }),
-      });
+      const res = await signIn("credentials", {
+        email: loginEmail,
+        password: loginPassword,
+        redirect: false,
+      })
+
+      console.log(res); // Log the response for debugging
+
 
       if (!res.ok) {
         throw new Error("Network response was not ok");
+        return;
       }
 
       const data = await res.json();
       setMessage(data.message || "Logged in successfully.");
-      setTimeout(() => setMessage(''), 3000);  // Optional: Clear the message after a delay
+      setTimeout(() => setMessage(''), 3000);  // Clear the message after a delay
 
-      router.replace("/homepage");
+      router.replace("homepage");
     } catch (error) {
       console.error("Error logging in:", error);
       setMessage("Failed to log in. Please try again later.");

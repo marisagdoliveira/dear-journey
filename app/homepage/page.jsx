@@ -1,6 +1,6 @@
 "use client";
-
-import { useRouter } from "next/navigation";
+import { getSession } from "next-auth/react"; // Import getSession for server-side session handling
+import { redirect, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Calendar from "../components/Calendar";
 import Navbar from "../components/Navbar";
@@ -53,7 +53,18 @@ export default function Homepage() {
   const fetchTheReminder = () => {
     const fetchUser = async () => {
       try {
-        const res = await fetch("/api/user", { method: "GET" });
+
+      const session = await getSession();
+      console.log("Session:", session);
+    
+      if (!session || !session.user?.email) {
+        console.error("User not authenticated");
+        return; // Exit if no session
+      }
+      
+        
+      const res = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });
+
         if (!res.ok) throw new Error("Network response was not ok");
   
         const data = await res.json();
