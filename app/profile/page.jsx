@@ -14,6 +14,8 @@ import { FaRegCircleCheck } from "react-icons/fa6";
 import { FaRegCircleXmark } from "react-icons/fa6";
 import { FiAlertCircle } from "react-icons/fi";
 import { MdInbox } from "react-icons/md";
+import { LuShieldAlert } from "react-icons/lu";
+
 
 
 
@@ -33,8 +35,7 @@ import Close from "../../public/assets/Close.svg"
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
-import { getSession } from "next-auth/react";
-
+import { getSession, signOut } from "next-auth/react";
 
 
 
@@ -86,6 +87,13 @@ export default function Profile({  }) {
   const [noteDate, setNoteDate] = useState("");
   const [title1, setTitle1] = useState("");
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+  const [isEmailChanged, setIsEmailChanged] = useState(false);
+  const [isPasswordChanged, setIsPasswordChanged] = useState(false);
+
+  const [ChangeDetailsSuccessFeedbackMessage, setChangeDetailsSuccessFeedbackMessage] = useState(null)
+  const [counter, setCounter] = useState(null);  // Add this state in your component
+
+  
 
 
 
@@ -242,6 +250,12 @@ export default function Profile({  }) {
      // Set isChangingPassword if password field is filled or cleared ---> new - 14/10!!! -----------
      if (name === 'password') {
       setIsChangingPassword(!!value);  // true if password has value, false if it's cleared
+    }
+      if (name === 'email') {
+        setIsEmailChanged(true);
+    }
+      if (name === 'password') {
+        setIsPasswordChanged(true);
     } // ---------------------------------------------------------------------------------------------
   };
 
@@ -287,20 +301,63 @@ const handleSubmit = async (e) => {
     console.log("Response received:", res.status, data);
 
     if (res.ok) {
-      setSuccess('Profile updated successfully!');
-      setError('');
+      let isEmailOrPasswordChanged = false;
+      // Check if either email or password was changed to trigger success message
+      if (formData.email !== session.user.email) {
+        setIsEmailChanged(true);
+        setChangeDetailsSuccessFeedbackMessage(true);
+        isEmailOrPasswordChanged = true;
+      }
 
-      setTimeout(() => {
+      if (formData.password !== currentPassword) {
+        setIsPasswordChanged(true);
+        setChangeDetailsSuccessFeedbackMessage(true);
+        isEmailOrPasswordChanged = true;
+      }
+      // Only show the general success message if no email/password change
+      if (!isEmailOrPasswordChanged) {
+        setSuccess('Profile updated successfully!');
+      }
+      setError('');   
+
+      
+      // Only sign out if email or password was changed
+      if (formData.email !== session.user.email || formData.password) {
+      // Countdown and sign out logic
+        let countdown = 10; // 10 seconds countdown
+        const timer = setInterval(() => {
+          console.log(`${countdown} ...`);
+          setCounter(countdown); // Update UI with the countdown (make sure counter is in state)
+          countdown--;
+          if (countdown < 0) {
+            clearInterval(timer);
+          }
+        }, 1000);
+
+        setTimeout(() => {
+          signOut(); // Sign out if email or password was updated
+        }, 10000); // 10 seconds delay
+      
+      } else {
+        setTimeout(() => {
         window.location.reload();
-      }, 3000);
+        }, 10000); // mudar novamente para 3000
+      }
+ 
     } else {
       setError(data.message || 'Failed to update profile.');
+      setTimeout(() => {
+        window.location.reload();
+      }, 24000);
     }
   } catch (err) {
     setError('An error occurred.');
+    
     console.error('Fetch error:', err);
   }
 };
+
+
 
   // Get the current year
   const currentYear = new Date().getFullYear();
@@ -405,6 +462,7 @@ const handleSubmit = async (e) => {
   const handleClosePopup = () => {
     setShowPopupFromNotific(false);
   };
+
 
   
 
@@ -568,7 +626,7 @@ const handleSubmit = async (e) => {
           <div className="overlay_blur"></div>
           <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
             {/* Message */}
-            <div className='mb-4' style={{ fontFamily: 'Darker Grotesque' }}>
+            <div className='mb-4 tracking-wider' style={{ fontFamily: 'Darker Grotesque' }}>
               {error}
             </div>
             {/* Alert icon */}
@@ -578,15 +636,52 @@ const handleSubmit = async (e) => {
           {success && <div className='fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50'>
           {/* Save message container */}
           <div className="overlay_blur"></div>
-          <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
+          <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[250px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
             {/* Message */}
-            <div className='mb-4' style={{ fontFamily: 'Darker Grotesque' }}>
+            <div className='mb-4 tracking-wider' style={{ fontFamily: 'Darker Grotesque' }}>
               {success}
             </div>
             {/* Check icon */}
             <FaRegCircleCheck className='text-[rgb(172,255,226)]' size={34} />
           </div>
         </div>}
+        
+        {/* Success message display based on changes */}
+        
+        {(isPasswordChanged || isEmailChanged) && ChangeDetailsSuccessFeedbackMessage && (
+      <>
+        <div className="fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50">
+          <div className="overlay_blur"></div>
+          <div className="fixed inset-0 flex justify-center items-center z-50">
+            {/* Save message container */}
+            <div
+              className="flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[160px] w-fit text-white text-lg pl-6 pr-6 p-4 rounded-3xl shadow-lg"
+              style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18 }}
+            >
+              {/* Message */}
+              <div className="mb-4 tracking-wider" style={{ fontFamily: 'Darker Grotesque' }}>
+                <p>Profile updated successfully!</p>
+                <div className="flex flex-row">
+                  <LuShieldAlert className="fixed top-[63px] text-[rgb(255,172,201)]" size={18} />
+                  <p className="text-sm mt-3 tracking-wide pl-5">This change requires a new Sign In</p>
+                </div>
+              </div>
+              {/* Counter */}
+              {counter !== null && (
+                <div
+                  className="fixed text-sm top-[123px] left-[225px] w-[27px] text-center bg-[#bfc1ff46] rounded-2xl"
+                  style={{ fontWeight: '600' }}
+                >
+                  <div className="relative text-[rgb(57,56,95)] py-[3px]">{`${counter}`}</div>
+                </div>
+              )}
+              {/* Check icon */}
+              <FaRegCircleCheck className="text-[rgb(172,255,226)]" size={34} />
+            </div>
+          </div>
+        </div>
+      </>
+    )}
         <div className="flex max-w-[400px] justify-end">
           <button
             type="submit"

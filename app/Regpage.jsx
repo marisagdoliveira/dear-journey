@@ -170,7 +170,7 @@ export default function Regpage() {
       router.replace("homepage");
     } catch (error) {
       console.error("Error logging in:", error);
-      setMessage("Failed to log in. Please try again later.");
+      //setMessage("Failed to log in. Please try again later.");
     }
   };
 

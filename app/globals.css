@@ -656,6 +656,10 @@ function */
   color: white; /* Ensures the option text color is white */
   text-shadow: 2px 2.5px 3px rgb(141, 130, 241); /* Add shadow to the text */
 }
+.logout-countdown {
+  color: rgb(197, 196, 255);  /* Ensures the option text color is white */
+  text-shadow: 1px 1.5px 4px rgba(51, 45, 101, 0.685); /* Add shadow to the text */
+}
 
 /*----------------------------------------------------------------*/
 

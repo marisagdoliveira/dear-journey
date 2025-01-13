@@ -44,7 +44,10 @@ export async function PATCH(req) {
     const { email, username, password, currentPassword } = await req.json();
     await connectDB();
 
-    const user = await User.findOne({ email });
+    // Use the correct method to retrieve query parameters
+    const oldEmail = req.nextUrl.searchParams.get("email");  // receber oldEmail
+
+    const user = await User.findOne({ email: oldEmail }); // encontrar o user pelo oldEmail (current)
     if (!user) {
       return NextResponse.json({ message: "User not found." }, { status: 404 });
     }
@@ -74,7 +77,7 @@ export async function PATCH(req) {
       user.username = username;
     }
     if (email) {
-      user.email = email;
+      user.email = email; // atualizar o user email - mudar o oldEmail (current) para o novo (updated)
     }
 
     await user.save();

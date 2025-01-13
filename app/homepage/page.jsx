@@ -59,8 +59,11 @@ export default function Homepage() {
     
       if (!session || !session.user?.email) {
         console.error("User not authenticated");
+        router.replace("/");
         return; // Exit if no session
       }
+
+    
       
         
       const res = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });

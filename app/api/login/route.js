@@ -39,7 +39,6 @@ export async function POST(req) {
 
     // Set a session cookie upon successful login
     const response = NextResponse.json({ message: "User logged in.", user: { id: user._id, username: user.username, email: user.email } });
-    //response.cookies.set('session', 'some-session-value', { httpOnly: true, maxAge: 60 * 60 * 24 }); // Example session cookie
     return response;
   } catch (error) {
     console.log("Error: ", error);
