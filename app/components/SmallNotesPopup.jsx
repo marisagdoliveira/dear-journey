@@ -14,55 +14,57 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
       
     
       
-    const saveSmallNotes = async (updatedNotes) => {
+      const saveSmallNotes = async (updatedNotes) => {
         const session = await getSession();
-        console.log(session)
-      if (!session) router.push("/");
-      try {
-          const response = await fetch('/api/smallnotes', {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  email: session.user.email,
-                  date: noteDate.toISOString(),
-                  smallNotes: updatedNotes,
-              }),
-          });
-  
-          if (!response.ok) {
-              throw new Error('Failed to save small notes.');
-          }
-  
-          setSmallNotes(updatedNotes); // Update the local state
-          setUpdatedNotes(updatedNotes);
-          
-          
-           // Update parent state
-          //setSmallPopupOpen(false); // Optionally close the popup after saving
-      } catch (error) {
-          console.error('Error saving small notes:', error);
-      }
-  };
-  
+        if (!session) router.push("/");
+    
+        const updatedNotesWithDate = updatedNotes.map(note => ({
+            ...note,
+            writtenDate: note.writtenDate || new Date().toISOString() // if no writtenDate ? add current date when saving
+        }));
+    
+        try {
+            const response = await fetch('/api/smallnotes', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    email: session.user.email,
+                    date: noteDate.toISOString(), // Note's main date
+                    smallNotes: updatedNotesWithDate, // Send notes with writtenDate
+                }),
+            });
+    
+            if (!response.ok) {
+                throw new Error('Failed to save small notes.');
+            }
+    
+            setSmallNotes(updatedNotesWithDate); // Update local state with writtenDate
+            setUpdatedNotes(updatedNotesWithDate);
+        } catch (error) {
+            console.error('Error saving small notes:', error);
+        }
+    };
+
 
 
     const handleSaveNote = (index) => {
         const updatedNotes = [...smallNotes];
-        updatedNotes[index] = { content: smallNotes[index].content }; // Ensure it's updated correctly
+        updatedNotes[index] = { 
+            content: smallNotes[index].content,
+            date: smallNotes[index].date || new Date()  }; // Ensure it's updated correctly
         setSmallNotes(updatedNotes);
         setUpdatedNotes(updatedNotes);
-        saveSmallNotes(updatedNotes);
-         // Save only small notes
-         fetchUser();
+        saveSmallNotes(updatedNotes); // Save only small notes
+        fetchUser();
         console.log("Updated smallNotes (handleSaveNote):", updatedNotes);
         
     };
 
     const handleAddNewNote = () => {
         if (newNote.trim() !== '') {
-            const updatedNotes = [...smallNotes, { content: newNote }];
+            const updatedNotes = [...smallNotes, { content: newNote, date: new Date() }];
             setSmallNotes(updatedNotes);
             setUpdatedNotes(updatedNotes);
             saveSmallNotes(updatedNotes); // Save only small notes
@@ -123,32 +125,40 @@ const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes
                 <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
             </div>
             {smallNotes.map((note, index) => (
-                <div key={index}>
-                    <div className='relative '>
-                        <SmallPopupIcon className="size-72 shadow-transparent hover:shadow-white-lg"/>
-                        <p className="absolute left-5 top-5">{index+1}</p>
-                        <div className='roboto-mono-popup absolute top-16' style={{ fontSize: 14 }}>
-                            <textarea
-                                value={note.content}
-                                onChange={(e) => {
-                                    const updatedNotes = [...smallNotes];
-                                    updatedNotes[index].content = capitalizeFirstLetter(e.target.value);
-                                    setSmallNotes(updatedNotes);
-                                    setUpdatedNotes(updatedNotes);
-                                }}
-                                placeholder='Write your retrospective here...'
-                                className='w-[130%] h-[20vh] mt-5 bg-transparent placeholder-white p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]'
-                            />
-                        </div>
-                        {/* Added the onClick handler for deleting a specific note */}
-                        <TbTrashX
-                            className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all"
-                            size={30}
-                            onClick={() => handleDeleteSmallNote(index)} // Attach handler for deletion
-                        />
-                        <FaCheck onClick={() => handleSaveNote(index)} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
-                    </div>
+              <div key={note._id}> {/* Using note._id as the key */}
+                <div className="relative">
+                  <SmallPopupIcon className="size-72 shadow-transparent hover:shadow-white-lg" />
+                  <p className="absolute left-5 top-5">{index + 1}</p>
+                  <div className="roboto-mono-popup absolute top-16" style={{ fontSize: 14 }}>
+                    <textarea
+                      value={note.content}
+                      onChange={(e) => {
+                        const updatedNotes = [...smallNotes];
+                        updatedNotes[index].content = capitalizeFirstLetter(e.target.value);
+                        setSmallNotes(updatedNotes);
+                        setUpdatedNotes(updatedNotes);
+                      }}
+                      placeholder="Write your retrospective here..."
+                      className="w-[130%] h-[20vh] mt-5 bg-transparent placeholder-white p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]"
+                    />
+                    <p className="text-gray-200 absolute left-36 top-44 mt-2">
+                      {note.writtenDate ? new Date(note.writtenDate).toLocaleDateString() : 'No Date'}
+                    </p>
+                  </div>
+                  
+                  {/* Added the onClick handler for deleting a specific note */}
+                  <TbTrashX
+                    className="absolute left-5 bottom-5 text-[#4E4EA7] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all"
+                    size={30}
+                    onClick={() => handleDeleteSmallNote(index)} // Attach handler for deletion
+                  />
+                  <FaCheck
+                    onClick={() => handleSaveNote(index)}
+                    className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all"
+                    style={{ fontSize: "25px" }}
+                  />
                 </div>
+              </div>
             ))}
         </div>
     </div>

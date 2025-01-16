@@ -24,7 +24,11 @@ const SmallNotesSchema = new Schema({
     required: false,
     default: undefined
   },
-});
+  date: {
+    type: Date,
+    required: true,
+    default: () => Date.now(), // Ensure default is applied only when `date` is not provided
+}});
 
 // Library Entry schema
 const LibraryEntrySchema = new Schema({

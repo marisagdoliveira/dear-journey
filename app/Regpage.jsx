@@ -68,8 +68,17 @@ export default function Regpage() {
       }
 
       const data = await res.json();
-      setMessage(data.message || "User registered successfully.");
-      setTimeout(() => setMessage(''), 3000);  // Clear the message after a delay
+      setMessage(data.message || "User registered successfully!");
+      setTimeout(() => {
+        setMessage('');  // Clear the message after a delay
+        setShowLogin(true);  // Set showLogin to true after the delay
+
+         // Reset the input fields
+        setUsername('');
+        setEmail('');
+        setPassword('');
+
+    }, 1000);
 
     } catch (error) {
       console.error("Error registering user:", error);

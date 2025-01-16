@@ -20,6 +20,7 @@ export default function Homepage() {
   const [reminderTitle, setReminderTitle] = useState("");  // New state for the reminder title
   const [additionalReminderTitlesToday, setAdditionalReminderTitlesToday] = useState([]); // State for additional reminder titles
 
+  const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,14 +41,14 @@ export default function Homepage() {
 
   const router = useRouter();
 
+ 
 
-
-
+  
   // Fetch user data to confirm authentication - BEFORE USERPIC LOGIC:
   useEffect(() => {
     fetchTheReminder()
   }, [router]);
-
+  
 
 
   const fetchTheReminder = () => {
@@ -310,7 +311,7 @@ export default function Homepage() {
     </div>
 
     {/* Calendar */}
-    <Calendar className="pt-10" setReminderTitle={setReminderTitle} fetchTheReminder={fetchTheReminder} showPopupReminder={showPopupReminder} setShowPopupReminder={setShowPopupReminder} showPopupReminderDate={showPopupReminderDate} />
+    <Calendar className="pt-10" setReminderTitle={setReminderTitle} fetchTheReminder={fetchTheReminder} showPopupReminder={showPopupReminder} setShowPopupReminder={setShowPopupReminder}  showPopupReminderDate={showPopupReminderDate} />
   </div>
   );
 }

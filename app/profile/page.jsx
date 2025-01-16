@@ -93,8 +93,6 @@ export default function Profile({  }) {
   const [ChangeDetailsSuccessFeedbackMessage, setChangeDetailsSuccessFeedbackMessage] = useState(null)
   const [counter, setCounter] = useState(null);  // Add this state in your component
 
-  
-
 
 
 
@@ -845,42 +843,50 @@ const handleSubmit = async (e) => {
      <div className="absolute top-[280px] right-0 h-fit flex justify-center items-end pr-10 pb-10 ">
                   
      <div className={`notification-container scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'} ${notifications.length > 0 ? 'max-h-[434px] overflow-y-auto' : ''}`}>
-        {notifications.length > 0 ? (
-          notifications.map((notification, index) => (
-            <div key={index} className="notification-item cursor-pointer">
-              <div className="icon-container">
-                <ActiveNotificationsIcon /> 
-                <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
-          
-                {/* Hover actions */}
-                <div className="icon-actions absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity">
-                  <button
-                    className="action-icon hover:scale-110 transition-transform mr-2"
-                    onClick={() => handleDeleteNotification(notification)}
-                  >
-                    <TrashNotifications className="pt-[3px]" />
-                  </button>
-                  <button
-                    className="action-icon hover:scale-110 transition-transform mr-2"
-                    onClick={() => handleOpenNotification(new Date(notification.noteDate))}
-                  >
+      {notifications.filter(notification => {
+        const noticeDate = new Date(notification.noticeDate).setHours(0, 0, 0, 0); // Normalize to midnight
+        const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
+        return noticeDate >= today; // Include only today or future dates
+        }).length > 0 ? (
+          notifications
+            .filter(notification => {
+              const noticeDate = new Date(notification.noticeDate).setHours(0, 0, 0, 0); // Normalize to midnight
+              const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
+              return noticeDate >= today; // Include only today or future dates
+            })
+            .map((notification, index) => (
+              <div key={index} className="notification-item cursor-pointer">
+                <div className="icon-container">
+                  <ActiveNotificationsIcon />
+                  <p>{new Date(notification.noticeDate).toLocaleDateString()}</p>
 
-                    <OpenNotifications className="pt-[6px]" />
-                  </button>
+                  {/* Hover actions */}
+                  <div className="icon-actions absolute top-0 left-0 w-full h-full flex justify-center items-center bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      className="action-icon hover:scale-110 transition-transform mr-2"
+                      onClick={() => handleDeleteNotification(notification)}
+                    >
+                      <TrashNotifications className="pt-[3px]" />
+                    </button>
+                    <button
+                      className="action-icon hover:scale-110 transition-transform mr-2"
+                      onClick={() => handleOpenNotification(new Date(notification.noteDate))}
+                    >
+                      <OpenNotifications className="pt-[6px]" />
+                    </button>
+                  </div>
                 </div>
               </div>
+            ))
+         ) : ( 
+            <div className=" relative text-center text-[#ffffff] pr-3 w-full tracking-wide scroll-none p-1" style={{ fontFamily: "Darker Grotesque", fontWeight: 400, fontSize: 20 }}>   {/* When there's no notifications */}
+              <div className="no-notific bg-[#aba2ff6c] p-2 border-none rounded-xl flex flex-col items-center justify-center gap-5">
+              <p>Nothing to show ...</p>
+              <MdInbox className="mb-2 text-[#6f6ed7]" size={44} />
+              </div>
             </div>
-          ))
-        ) : ( 
-
-          <div className=" relative text-center text-[#ffffff] pr-3 w-full tracking-wide scroll-none" style={{ fontFamily: "Darker Grotesque", fontWeight: 400, fontSize: 20 }}>   {/* When there's no notifications */}
-            <div className="no-notific bg-[#aba2ff6c] p-2 border-none rounded-xl flex flex-col items-center justify-center gap-5">
-            <p>Nothing to show ...</p>
-            <MdInbox className="mb-2 text-[#6f6ed7]" size={44} />
-            </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
           {/* Display feedback message */}
           {successFeedbackMessage && (
             <div className='fixed inset-0 flex justify-center items-center z-50'>
@@ -934,8 +940,6 @@ const handleSubmit = async (e) => {
                       showSmallNotesCalendar={showSmallNotesCalendar}
                       setShowSmallNotesCalendar={setShowSmallNotesCalendar}
                       fetchTheReminder={fetchTheReminder}
-                      
-
                     />
                   <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>

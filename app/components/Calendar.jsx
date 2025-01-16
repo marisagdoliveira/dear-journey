@@ -9,10 +9,18 @@ import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
 import PlusIcon from "../../public/assets/PlusIcon.svg"
+import { TbBell } from "react-icons/tb";
+
+
+
+
 import CalendarContainerOriginal from "../../public/assets/CalendarContainerOriginal.svg"
 import TodayCalendarContainerPurp from "../../public/assets/TodayCalendarContainerPurp.svg"
+import { useReminder } from "@/context/ReminderContext";
 
-export default function Calendar({ setReminderTitle, handleReminderSave, fetchTheReminder, showPopupReminder, setShowPopupReminder, showPopupReminderDate }) {
+
+
+export default function Calendar({ setReminderTitle, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate}) {
   const { data: session, status } = getSession(); // Valid usage of hook inside a component
 
 
@@ -22,7 +30,12 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
   const [title, setTitle] = useState('');
   const [showPopup, setShowPopup] = useState(false);
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+  const [notifications, setNotifications] = useState([])
+
   const [noteDate, setNoteDate] = useState("");
+
+  const fetchTheReminder = useReminder();
+ 
   
   
   useCapitalizeFirstLetter(); 
@@ -123,6 +136,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
       // Set the user email and journal entries
       setEmail(data.user.email);
       setJournalEntries(data.user.library);
+      setNotifications(data.user.notifications);
   
       console.log("Journal entries:", data.user.library);
     } catch (error) {
@@ -225,6 +239,9 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
         {daysInMonth.map((day, index) => {
         const entry = getDateEntry(day);
         const isToday = isSameDay(day, today); // Check if the day is today
+        const isNotificationDate = notifications.some(
+          (notification) => new Date(notification.noticeDate).toDateString() === day.toDateString()
+        ); // Check if the day has notifications
     
          return (
            <div key={index} className="relative w-32 h-32 flex items-center justify-center"> {/* Increased size of the container */}
@@ -245,7 +262,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
              {/* Title (centered, truncates if too long) */}
             
              {entry.title? 
-             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" title="Entry" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
               {entry.title}
            </div>
              : 
@@ -253,8 +270,16 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
 
              </div>
               }
+            {/* Notification bell (if any) */}
+            {isNotificationDate && (
+              <p className="fa fa-bell notification-bell absolute top-[85px] right-[15px] text-[#6769b1] text-[20px] z-30" style={{ strokeWidth: 10 }}
+                >
+                  <TbBell/> 
+              </p>
+            )}
+
              {/* Small notes indicator (bottom-right) */}
-             <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" style={{ fontWeight: 700 }}>
+             <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" title="Notes" style={{ fontWeight: 700 }}>
                {entry.smallNotes.length}
              </div>
 
@@ -280,7 +305,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, fetchTh
               </div>
               <div className="flex items-center">
                 <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <Popup  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
                 <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>

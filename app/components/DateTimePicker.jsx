@@ -11,11 +11,22 @@ import MailHeart from "../../public/assets/MailHeart.svg"
 
 
 
+
+
+
 const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry }) => {
+
+
+  // Fetch user data to confirm authentication - BEFORE USERPIC LOGIC:
+  
+
 
   const fetchTheReminder = useReminder();
 
   const [selectedDate, setSelectedDate] = useState(new Date());
+
+  
+
 
   useEffect(() => {
     if (entryDate) {
@@ -65,6 +76,8 @@ const DateTimePicker = ({ isOpen, onClose, onSave, entryDate, email, saveEntry }
 
       await response.json();
       onSave(noticeDate); // Call the onSave callback with the new date
+      fetchTheReminder()
+
     } catch (error) {
       console.error('Error saving notification:', error);
     }

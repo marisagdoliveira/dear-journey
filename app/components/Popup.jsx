@@ -106,7 +106,12 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           if (entry) {
             setTitle(entry.title || '');
             setMainContent(entry.mainContent || '');
-            setSmallNotes(entry.smallNotes || []);
+            // Ensure each small note has a `writtenDate` before setting the small notes
+           const updatedSmallNotes = entry.smallNotes.map(note => ({
+            ...note,
+            writtenDate: note.writtenDate || new Date().toISOString(), // If no writtenDate, set it to now
+          }));
+            setSmallNotes(updatedSmallNotes || []);
             setTitle1(entry.title || "");
           } else {
             setTitle('');
