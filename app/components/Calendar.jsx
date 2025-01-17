@@ -274,7 +274,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
               }
             {/* Notification bell (if any) */}
             {isNotificationDate && (
-              <p className="fa fa-bell notification-bell absolute top-[85px] right-[15px] text-[#6769b1] text-[20px] z-30 pointer-events-none" style={{ strokeWidth: 10 }}
+              <p className="fa fa-bell notification-bell absolute top-[85px] right-[17px] text-[#6769b1] text-[20px] z-30 pointer-events-none" style={{ strokeWidth: 10 }}
                 >
                   <MiniBell />
               </p>
