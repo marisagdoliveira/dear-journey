@@ -10,6 +10,8 @@ import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
 import PlusIcon from "../../public/assets/PlusIcon.svg"
 import { TbBell } from "react-icons/tb";
+import MiniBell from "../../public/assets/MiniBell.svg"
+
 
 
 
@@ -272,9 +274,9 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
               }
             {/* Notification bell (if any) */}
             {isNotificationDate && (
-              <p className="fa fa-bell notification-bell absolute top-[85px] right-[15px] text-[#6769b1] text-[20px] z-30" style={{ strokeWidth: 10 }}
+              <p className="fa fa-bell notification-bell absolute top-[85px] right-[15px] text-[#6769b1] text-[20px] z-30 pointer-events-none" style={{ strokeWidth: 10 }}
                 >
-                  <TbBell/> 
+                  <MiniBell />
               </p>
             )}
 
