@@ -28,7 +28,6 @@ export async function PATCH(req) {
               ...note,
               writtenDate: new Date(note.writtenDate), // Store the written date for each small note
           }));
-
       } else {
           // Create a new entry if none exists for that date
           libraryEntry = {
@@ -51,6 +50,8 @@ export async function PATCH(req) {
       return NextResponse.json({ message: "An error occurred while updating small notes." }, { status: 500 });
   }
 }
+
+
 
 
   

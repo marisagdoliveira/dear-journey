@@ -26,6 +26,7 @@ const SmallNotes = ({ email, noteDate }) => {
     fetchSmallNotes();
   }, [noteDate]);
 
+  
   // Function to save a small note
   const saveSmallNote = async (index) => {
     const date = noteDate.toISOString(); // Convert the noteDate to ISO string format

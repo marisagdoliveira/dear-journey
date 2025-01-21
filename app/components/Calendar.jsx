@@ -9,9 +9,7 @@ import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
 import Close from "../../public/assets/Close.svg"
 import PlusIcon from "../../public/assets/PlusIcon.svg"
-import { TbBell } from "react-icons/tb";
 import MiniBell from "../../public/assets/MiniBell.svg"
-
 
 
 
@@ -22,9 +20,11 @@ import { useReminder } from "@/context/ReminderContext";
 
 
 
-export default function Calendar({ setReminderTitle, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate}) {
-  const { data: session, status } = getSession(); // Valid usage of hook inside a component
+export default function Calendar({ setShowAdditionalTitles, setReminderTitle, title1, noteContent, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate}) {
 
+ 
+  const { data: session, status } = getSession(); // Valid usage of hook inside a component
+  console.log("calendar props: ", {  noteContent, title1 });
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [journalEntries, setJournalEntries] = useState([]);
@@ -139,6 +139,8 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
       setEmail(data.user.email);
       setJournalEntries(data.user.library);
       setNotifications(data.user.notifications);
+      console.log("Notifications:", notifications);
+      console.log("Notifications:", data.user.notifications);
   
       console.log("Journal entries:", data.user.library);
     } catch (error) {
@@ -264,7 +266,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
              {/* Title (centered, truncates if too long) */}
             
              {entry.title? 
-             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" title="Entry" onClick={() => { setShowPopup(true); setNoteDate(day); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" title="Entry" onClick={() => { setShowPopup(true); setNoteDate(day); setShowAdditionalTitles(false); }} style={{ top: 'calc(50% - 2px)', fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
               {entry.title}
            </div>
              : 
@@ -276,12 +278,12 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
             {isNotificationDate && (
               <p className="fa fa-bell notification-bell absolute top-[85px] right-[17px] text-[#6769b1] text-[20px] z-30 pointer-events-none" style={{ strokeWidth: 10 }}
                 >
-                  <MiniBell />
+                  <MiniBell /> 
               </p>
             )}
 
              {/* Small notes indicator (bottom-right) */}
-             <div onClick={() => openPopupWithSmallNotes(day)} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" title="Notes" style={{ fontWeight: 700 }}>
+             <div onClick={() => { openPopupWithSmallNotes(day); setShowAdditionalTitles(false); }} className="absolute bottom-6 left-4 w-5 h-5 bg-[#ccc4ff90] border-[#ffffffdf]/60 border-[1.5px] text-[#6464D3] rounded-full flex justify-center items-center text-xs cursor-pointer z-20" title="Notes" style={{ fontWeight: 700 }}>
                {entry.smallNotes.length}
              </div>
 
@@ -296,7 +298,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
    </div>
   
       {showPopup && (
-        <div className="fixed inset-0" style={{ zIndex: 1000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
+        <div className="fixed inset-0" style={{ zIndex: 10000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
           <div className="overlay_blur"></div>
           <div className="popup border border-white/45 z-40 ">
             <div className="popup-content flex flex-col justify-center items-center relative">
@@ -307,7 +309,7 @@ export default function Calendar({ setReminderTitle, handleReminderSave, showPop
               </div>
               <div className="flex items-center">
                 <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <Popup setShowAdditionalTitles={setShowAdditionalTitles} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
                 <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>

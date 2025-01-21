@@ -455,6 +455,7 @@ const handleSubmit = async (e) => {
   const handleOpenNotification = (date) => {
     setNoteDate(date); // Set the date or any data you want to pass
     setShowPopupFromNotific(true);
+
   };
 
   const handleClosePopup = () => {
@@ -818,7 +819,7 @@ const handleSubmit = async (e) => {
       </div>
       {/* User Picture and Logo */}
       <div>
-        <div className="fixed top- right-16 w-[120px] h-[120px] z-1000 mt-11" style={{  }}>
+        <div className="fixed top- right-16 w-[120px] h-[120px] z-[10000000000] mt-11" style={{  }}>
           <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
         </div>
         <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>

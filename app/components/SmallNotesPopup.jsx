@@ -5,7 +5,7 @@ import AddIconSmall from "../../public/assets/AddIconSmall.svg";
 import { TbTrashX } from "react-icons/tb";
 import { getSession } from 'next-auth/react';
 
-const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes, setUpdatedNotes, saveEntry }) => {
+const SmallNotesPopup = ({ smallNotes, email, noteDate, fetchUser, setSmallNotes, setUpdatedNotes, saveEntry, }) => {
     const [newNote, setNewNote] = React.useState('');
     
     const capitalizeFirstLetter = (text) => {

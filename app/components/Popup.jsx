@@ -31,8 +31,11 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
-  
+const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
+  console.log("Popup props: ", { noteDate, noteContent, title1 });
+
+
+
   const fetchTheReminder = useReminder();
 
   
@@ -101,7 +104,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           // Automatically update the small notes for the current date
           const entry = data.user.library.find(entry => {
             
-            return new Date(entry.date).toISOString() === noteDate.toISOString();
+            return new Date(entry.date).toISOString() === noteDate.toISOString() || new Date(entry.date).toISOString() === noteDate;
           });
           if (entry) {
             setTitle(entry.title || '');
@@ -113,6 +116,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
           }));
             setSmallNotes(updatedSmallNotes || []);
             setTitle1(entry.title || "");
+
           } else {
             setTitle('');
             setMainContent('');
@@ -317,6 +321,8 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
 
   return (
     <div className='popup-content bg-[#2c2251b2] bg-gradient-to-tl from-[rgba(59,54,105,0.4)] to-[rgba(49,43,91,0.42)] transition-all duration-300 ease-in-out w-[100vh] h-[90vh] p-10 relative z-100001' >
+     
+     
       {smallPopupOpen && (
         <div className='absolute cursor-pointer top-5' style={{ left: "-7.5%", top: "15px", zIndex: 100000 }}>
           <BackIcon onClick={() => closeSmallNotes()} className="size-10 cursor-pointer"/>
@@ -429,6 +435,7 @@ const Popup = ({ noteDate, onSave, setTitle1, fetchUser, showPopup, showSmallNot
       )}
     {smallPopupOpen && (
       <SmallNotesPopup
+        setShowAdditionalTitles={setShowAdditionalTitles}
         smallNotes={smallNotes}
         email={email}
         noteDate={noteDate}

@@ -21,6 +21,10 @@ html, body {
   display: none !important; /* Hides the banner */
 }
 
+.highlight {
+  color: red;
+  font-weight: bold;
+}
 
 .vibur-regular {
   font-family: "Vibur", cursive;
@@ -251,6 +255,15 @@ body{
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 }
 
+/* For non-webkit browsers (e.g., Firefox) */
+.scroll-container-notific {
+  max-height: 150px; /* Adjust based on content */
+  overflow: auto;
+  z-index: 1000000000000000;
+  scrollbar-color: #5e5ea300 transparent;
+  scrollbar-width: thin;
+}
+
 
 .scroll-container2 {
   scrollbar-color: #5e5ea300 transparent; /* For Firefox */
@@ -433,9 +446,12 @@ textarea:-webkit-autofill {
 /* Define the cubic-bezier easing
 function */
 .arrow-container {
-  position: relative;
-  width: 10px; /* Adjust this for the smallest size */
-  height: 19px; /* Adjust this for the smallest size */
+  top: 181px;
+  left: 395px;
+  transform: translateY(-50%); /* Center vertically */
+  
+
+  height: 59px; /* Adjust this for the smallest size */
 }
 
 .moving-arrow-wrapper, .moving-arrow-fixed-wrapper {

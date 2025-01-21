@@ -1,7 +1,6 @@
 // app/api/notifications/route.js
 
 import User from "@/models/User";
-import Notification from "@/models/Notifications";
 
 import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
