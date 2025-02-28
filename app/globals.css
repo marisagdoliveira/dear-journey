@@ -4,6 +4,8 @@
 @import url('https://fonts.googleapis.com/css2?family=Snippet&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=BioRhyme:wght@200..800&family=Linden+Hill:ital@0;1&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
+@font-face {  font-family: "FX_LED";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/FX-LED.TTF");  }
+@font-face {  font-family: "hack";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/hack/Hack-Bold.ttf");  }
 
 
 
@@ -22,8 +24,8 @@ html, body {
 }
 
 .highlight {
-  color: red;
-  font-weight: bold;
+  color: #8282EB;
+  font-weight:550;
 }
 
 .vibur-regular {
@@ -32,6 +34,7 @@ html, body {
   font-weight: normal;
   letter-spacing:1px;
 }
+
 
 
 .darker-grotesque-main {
@@ -111,6 +114,20 @@ body{
 }
 .graph_bar:hover .tooltip{
   opacity: 1;
+}
+
+
+.tooltip-popup{
+  opacity: 0;
+  transition: all;
+  transform: translateX(50px);
+  transition:all 0.3s ease-in-out;
+  
+}
+
+.ai-icon:hover .tooltip-popup{
+  opacity: 1;
+  transform: translateX(0px);
 }
 
 
@@ -252,6 +269,11 @@ body{
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
   scrollbar-color: #5e5ea3cf transparent;
+  scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
+}
+
+.scroll-container-profile {
+  scrollbar-color: #5e5ea344 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 }
 
@@ -912,3 +934,67 @@ transition: opacity 0.1s ease-in-out;
 
 
 }
+
+
+
+/* DIGITAL CLOCK --------------------------------------------------- */
+@font-face {  font-family: "FX_LED";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/FX-LED.TTF");  }
+@font-face {  font-family: "hack";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/hack/Hack-Bold.ttf");  }
+
+.digital-clock {
+
+  display: flex;
+  flex-direction: column; /* Stack time above week */
+  align-items: center; /* Center everything */
+  user-select: none;
+  padding: 15px;
+  text-shadow: 
+  0 0 15px #8585f0,
+  0 0 25px #212188,
+  0 0 15px #cfcff500,
+  0 0 20px #6464d300,
+  0 0 25px #6464d304;
+  animation: neon 1.5s ease-in-out infinite;
+
+  white-space: nowrap;
+}
+
+.digital-clock .time {
+  font-family: "FX_LED";
+}
+
+.digital-clock .time .hour,
+.digital-clock .time .min,
+.digital-clock .time .dot {
+  display: inline-block;
+  font-size: 2rem;
+  color: #e9e9fc;
+}
+
+.digital-clock .time .invsi {
+  visibility: hidden;
+}
+
+/* Make weekdays appear in a row */
+.digital-clock .week {
+  display: flex;
+  flex-direction: row; /* Row layout */
+  justify-content: center;
+  gap: 5px; /* Add spacing between days */
+  margin-top: 2px; /* Space from time */
+  font-size: 0.6rem;
+  font-family: "hack";
+  font-weight: lighter;
+  color: #c8c8ddc7;
+}
+
+.digital-clock .week .active {
+  color: #e9e9fc;
+  font-weight: bold;
+}
+
+
+
+
+
+

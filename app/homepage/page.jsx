@@ -207,6 +207,36 @@ export default function Homepage() {
     setNotificationsOpen(!notificationsOpen);
   };
 
+
+  const now = new Date();
+  const [hours, setHours] = useState(now.getHours());
+  const [minutes, setMinutes] = useState(now.getMinutes());
+  const [seconds, setSeconds] = useState(now.getSeconds());
+  const [showDot, setShowDot] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSeconds((prevSeconds) => {
+        if (prevSeconds === 59) {
+          setMinutes((prevMinutes) => {
+            if (prevMinutes === 59) {
+              setHours((prevHours) => (prevHours + 1) % 24);
+              return 0;
+            }
+            return prevMinutes + 1;
+          });
+          return 0;
+        }
+        return prevSeconds + 1;
+      });
+
+      // Toggle the blinking `:` every second
+      setShowDot((prev) => !prev);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
  //if (loading) {
  //  return <div>Loading...</div>; <----------------- This was making the black loading screen!! DO NOT INCLUDE -------------
  //}
@@ -216,8 +246,8 @@ export default function Homepage() {
     <div className="flex items-center justify-center wrapper pb-10">
   <div>
     {/* SearchBar at Top Center */}
-    <div className="absolute text-black top-[41px] left-[600px] " style={{ zIndex: "1000" }}>
-      <SearchBar setIsOpen={setIsOpen}  setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} />
+    <div className="absolute text-black top-[41px] left-[540px] " style={{ zIndex: "1000" }}>
+      <SearchBar setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} />
     </div>
 
     {/* Outer Container with Fixed Position */}
@@ -337,6 +367,8 @@ export default function Homepage() {
   <Calendar
     className="pt-10"
     
+    setUserLibrary={setUserLibrary}
+    session_email={email}
     setShowAdditionalTitles={setShowAdditionalTitles}
     setReminderTitle={setReminderTitle}
     fetchTheReminder={fetchTheReminder}
@@ -344,6 +376,23 @@ export default function Homepage() {
     setShowPopupReminder={setShowPopupReminder}
     showPopupReminderDate={showPopupReminderDate}
   />
-</div>
+
+    <div className="digital-clock absolute top-[630px] left-[45px]">
+      <div className="time text-black">
+        <div className="hour">{String(hours).padStart(2, "0")}</div>
+        <div className={`dot ${showDot ? "invsi" : ""}`}>:</div>
+        <div className="min">{String(minutes).padStart(2, "0")}</div>
+      </div>
+
+      <div className="week">
+        {["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"].map((day, index) => (
+          <div key={index} className={index === now.getDay() ? "active" : ""}>
+            {day}
+          </div>
+        ))}
+      </div>
+    </div>
+          
+  </div>
   );
 }

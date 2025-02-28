@@ -5,16 +5,23 @@ import Popup from "../components/Popup";
 import Close from "../../public/assets/Close.svg"
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
+import SearchBox from "../../public/assets/SearchBox.svg"
+import MainEntry from "../../public/assets/MainEntry.svg"
+import MiniSmallnote from "../../public/assets/MiniSmallnote.svg"
+
 import { useReminder } from "@/context/ReminderContext";
+import { getSession } from "next-auth/react";
+import { IoIosArrowForward } from "react-icons/io";
 
 
 
-const MAX_CHARS = 25; // Define the maximum character limit for display
 
-// Utility function to truncate text
+const MAX_CHARS = 25; // Define the maximum character limit for display ---> ajustado a 27/01 ------------
+
 // Utility function to truncate text
 const truncateText = (text, maxLength = MAX_CHARS) => {
   if (text.length > maxLength) {
+    console.log("Truncating:", text.slice(0, maxLength) + "...");
     return text.slice(0, maxLength) + "...";
   }
   return text;
@@ -52,7 +59,9 @@ const highlightMatch = (text, term, maxLength = MAX_CHARS) => {
 };
 
 
-export default function SearchBar({ setIsOpen, userLibrary, setShowAdditionalTitles }) {
+export default function SearchBar({ setIsOpen, session_email, userLibrary, setShowAdditionalTitles }) {
+  console.log("User email:", session_email);
+
   
   const fetchTheReminder = useReminder();
 
@@ -65,6 +74,21 @@ export default function SearchBar({ setIsOpen, userLibrary, setShowAdditionalTit
   const [title1, setTitle1] = useState("");
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
   const [noteContent, setNoteContent] = useState("");
+  const [email, setEmail] = useState(null);
+
+
+  useEffect(() => {
+    const fetchSession = async () => {
+      const session = await getSession();
+      if (session && session.user && session.user.email) {
+        setEmail(session.user.email); // Update email when session is available
+      } else {
+        console.error("Failed to fetch session or email is missing.");
+      }
+    };
+  
+    fetchSession();
+  }, []);
 
 
 
@@ -159,6 +183,13 @@ export default function SearchBar({ setIsOpen, userLibrary, setShowAdditionalTit
 
 
 const handleOpenPopups = (result) => {
+
+    if (!email) {
+      console.error("Email not available yet.");
+      return;
+    }
+
+
     setSearchTerm(""); // close research when the popup opens
 
     setShowPopup(true); // outter laywer popup + inner conntent MainPopup
@@ -183,116 +214,118 @@ const handleOpenPopups = (result) => {
       setShowPopup(false);
       setShowSmallNotesCalendar(false);
   };
+  
 
   
   return (
-    <div className="text-black  w-[550px]" ref={searchBarRef}>
+    <div className="text-white text-lg w-[560px]" style={{ fontFamily: "Darker Grotesque" }} ref={searchBarRef}>
+    {/* Search Bar Container */}
+    <div className="relative search-bar-container mb-3"> {/* Added a bottom margin */}
+      <div className="pb-5"><SearchBox className="absolute -left-1" /></div>
       <input
+        className="absolute top-0 -left-1 bg-transparent placeholder-[#f0f0ff]"
         placeholder="Search..."
         value={searchTerm}
         onChange={handleChange}
         style={{
-          padding: "10px",
-          width: "540px",
-          marginBottom: "20px",
-          borderRadius: "5px",
-          border: "1px solid #ccc",
-          paddingLeft: "10px",
+          width: "555px",
+          height: "38px",
+          borderRadius: "60px",
+          border: "1px",
+          paddingLeft: "17px",
           paddingRight: "10px",
+          color: "white",
         }}
       />
+    </div>
 
-      <div className="scroll-container max-h-[224px] overflow-x-hidden overflow-y-auto">
-        {filteredData.map((result, index) => (
-          
-          <div className="***div-onde-fazer-onclick*****"
-            onClick={() => handleOpenPopups(result)}
-            key={index}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
-              padding: "10px",
-              marginBottom: "10px",
-              border: "1px solid #ccc",
-              borderRadius: "5px",
-              width: "550px",
-              backgroundColor: result.type === "main" ? "#E8EAF6" : "#F3E5F5",
-            }}
-          >
-            <div className="flex gap-3">
-              <p
-                dangerouslySetInnerHTML={{
-                  __html: highlightMatch(new Date(result.date).toLocaleDateString('en-GB'), searchTerm),
-                }}
-                style={{ fontWeight: "bold" }}
-              />
-              {result.type === "main" && (
-                <>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: result.title,
-                    }}
-                  />
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: result.content,
-                    }}
-                  />
-                </>
-              )}
-              {result.type === "small" && (
-                <>
-                  <p
-                    dangerouslySetInnerHTML={{
-                      __html: result.content,
-                    }}
-                  />
-                  <small style={{ display: "none" }}>
-                    {result.parentitle} - {new Date(result.parentDate).toLocaleDateString('en-GB')}
-                  </small>
-                </>
-              )}
-            </div>
-            <div className="pr-2">
-            { result.type === "main" ? (<div>Main</div>) : (<div>Small</div>) }
-            </div>
+    {/* Results Container */}
+      <div
+        className={`mt-7 w-[550px] max-h-[550px] bg-[#afa3fa80] backdrop-blur-[3px] -ml-[3px] rounded-3xl ${
+         searchTerm ? "border-[0.7px] border-white/65 pb-1 pl-2 " : "border-none"
+       }`}
+      >
+      <div>
+      </div>
+      <div
+      className="scroll-container max-h-[215px] w-[559px] overflow-x-hidden overflow-y-auto"
+      style={{ marginTop: "5px" }} // Adds spacing above the results
+    >
+      {filteredData.map((result, index) => (
+        <div
+          className="***div-onde-fazer-onclick***** "
+          onClick={() => handleOpenPopups(result)}
+          key={index}
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            padding: "10px",
+            marginBottom: "2px",
+            marginLeft: "1px",
+            borderRadius: "20px",
+            height:"37px",
+            width: "auto",
+            maxWidth: "540px", /* ------------> Adicionado hoje - 27/01 */
+            backgroundColor: "none",
+            overflow: "hidden", 
+            whiteSpace: "nowrap", /* Optional: Prevent text wrapping */
+
+          }}
+        >
+          <div className="flex gap-2" style={{ fontWeight: "500" }}>
+            <p
+              dangerouslySetInnerHTML={{
+                __html: highlightMatch(
+                  new Date(result.date).toLocaleDateString("en-GB"),
+                  searchTerm
+                ),
+              }}
+              style={{ fontWeight: "500" }}
+            /><IoIosArrowForward className="text-[#6a6abdc7] w-3 mt-2" size={14}/>
+            {result.type === "main" && (
+              <>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: result.title,
+                  }} 
+                />
+                <IoIosArrowForward className="text-[#6a6abdc7] w-3 mt-2" size={14}/>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: result.content,
+                  }}
+                />
+              </>
+            )}
+            {result.type === "small" && (
+              <>
+                <p
+                  dangerouslySetInnerHTML={{
+                    __html: result.content,
+                  }}
+                />
+                <small style={{ display: "none" }}>
+                  {result.parentitle} -{" "}
+                  {new Date(result.parentDate).toLocaleDateString(
+                    "en-GB"
+                  )}
+                </small>
+                
+              </>
+            )}
           </div>
-        ))}
-          {showPopup && (
-            <div className="fixed inset-0 text-white" style={{ zIndex: 1000000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
-              <div className="overlay_blur"></div>
-              <div className="popup border border-white/45 z-40 ">
-                <div className="popup-content flex flex-col justify-center items-center relative">
-                  <div className="flex w-full justify-end items-end">
-                    <button className="close-button self-end pr-2 top-5 absolute" onClick={() => handleClosePopup()}>
-                      <Close />
-                    </button>
-                  </div>
-                  <div className="flex items-center">
-                    <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                     
-                     <Popup className="absolute" style={{ zIndex: 1000000000000 }}
-                      noteDate={new Date(noteDate)}
-                      title1={title1}
-                      noteContent={noteContent}
-                      
-                      
-                      onSave={(date, title, mainContent, smallNotes) => {
-                        console.log("Entry saved:", { date, title, mainContent, smallNotes });
-                      }}
-                     
-                      setTitle1={setTitle1}
-                      showSmallNotesCalendar={showSmallNotesCalendar}
-                      setShowSmallNotesCalendar={setShowSmallNotesCalendar}
-                      fetchTheReminder={fetchTheReminder}
-                    />
-                  <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
-              </div>
+          <div className="pr-2">
+            {result.type === "main" ? (
+              <div><MainEntry /></div>
+            ) : (
+              <div><MiniSmallnote /></div>
+            )}
           </div>
         </div>
+        ))}
+
       </div>
-       )}
       </div>
     </div>
   );

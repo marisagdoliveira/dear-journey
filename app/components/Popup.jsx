@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { useSession, signIn } from "next-auth/react";
 import { getSession } from "next-auth/react";
 
 import SmallPopupIconSmall from "../../public/assets/SmallPopupIconSmall.svg";
@@ -15,12 +14,17 @@ import { TbBell } from "react-icons/tb";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import ThoughtIcon from "../../public/assets/ThoughtIcon.svg";
 import AddInsightIcon from "../../public/assets/AddInsightIcon.svg";
+import AIRobot from "../../public/assets/AIRobot.svg";
+import CloseMini from "../../public/assets/CloseMini.svg"
+
 
 
 
 
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
 import { FiAlertCircle } from 'react-icons/fi';
+import { useEmail } from '@/context/EmailContext';
+
 
 
 const capitalizeFirstLetter = (text) => {
@@ -31,19 +35,21 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
+const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, setShowAdditionalTitles, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
   console.log("Popup props: ", { noteDate, noteContent, title1 });
 
 
 
   const fetchTheReminder = useReminder();
+  const { email } = useEmail();
+
 
   
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
   const [journalEntries, setJournalEntries] = useState([]);
-  const [email, setEmail] = useState(session_email);
+  
   const [isSaving, setIsSaving] = useState(false);
   const [saveEntryMessageSuccess, setSaveEntryMessageSuccess] = useState('');
   const [saveEntryMessageFail, setSaveEntryMessageFail] = useState('');
@@ -59,6 +65,12 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
 
   const [animationState, setAnimationState] = useState('paused');
 
+ 
+
+
+  useEffect(() => {
+    console.log("Email in Popup:", email); // Should show my email
+  }, [email]);
 
 
   const closeSmallNotes = () => {
@@ -179,7 +191,10 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
 
   const saveEntry = async () => {
     
-
+    if (!email) {
+      console.error("Email not available for saving.");
+      return;
+    }
 
     console.log('Before saving:', { title, email, mainContent, smallNotes });
 
@@ -218,6 +233,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
         // Update state with the current saved data
         setSmallNotes(formattedSmallNotes);
         onSave(noteDate, title, mainContent, formattedSmallNotes);
+        
 
         setSaveEntryMessageSuccess('Entry updated successfully!');
         } catch (error) {
@@ -235,6 +251,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
               setSaveEntryMessageFail('');
           }, 1000);
         }
+        fetchUser();
     };
 
 
@@ -280,15 +297,17 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
           setMainContent('');
           setSmallNotes([]);
           setTitle1("");
+          fetchUser();
   
           // Update the state for entries to reflect the deletion
-          setEntries(prevEntries => 
-              prevEntries.filter(entry => entry.date.getTime() !== noteDate.getTime())
-          );
-  
+          //setEntries(prevEntries => 
+          //    prevEntries.filter(entry => entry.date.getTime() !== noteDate.getTime())
+          //);
+          
       } catch (error) {
           console.error('Error deleting journal entry:', error);
       }
+      
   };
   
 
@@ -366,6 +385,43 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
             <GoTrash className="h-14 size-9 text-white/30 cursor-pointer hover:text-white/75 transition-colors duration-300"
               onClick={() => setShowConfirmDelete(true)} />
           </div>
+          <div className="absolute w-[320px] top-[425px] right-[50px]">
+            <div className="flex justify-end h-[215px] items-start border border-red-600/0">
+              <div className={`relative ${mainContent <= 0 ? "ai-icon" : ""}`}>
+                {mainContent === "" && (
+                  <div
+                    className="absolute top-4 right-[38px] w-[165px] text-sm tracking-wide text-[#ffffffdc] border rounded-[60px] pb-1.5 p-1 pl-2 bg-gradient-to-r from-[#ccc4ff70] to-[#2c225101] border-red-600/0 tooltip-popup"
+                    style={{
+                      fontFamily: "Darker Grotesque",
+                      pointerEvents: "none", // Ensure tooltip doesn't block interaction
+                      zIndex: 10, // Tooltip behind the AIRobot
+                    }}
+                  >
+                    Try writing a thought first...
+                  </div>
+                )}
+                <AIRobot
+                  className={`cursor-pointer ${mainContent <= 0 ? "opacity-50" : ""}`}
+                  style={{
+                    zIndex: 1000000000000, // AIRobot is interactable and above the tooltip
+                  }}
+                  onClick={() => {
+                    if (mainContent !== "") setAiOutput(true);
+                  }}
+                />
+              </div>
+            {aiOutput && (
+            <div className='absolute top-[43px] right-[8px]'>
+              <div className='flex justify-end items-start h-[168px] w-[300px] border-transparent text-md shadow-lg shadow-[#26263d6c] rounded-xl p-2 bg-[#ccc4ff53] ' style={{ fontFamily: "Darker Grotesque" }}> 
+              
+              <CloseMini className="cursor-pointer"
+                onClick={() => setAiOutput(false)} />
+              </div>
+            </div>
+            )}
+          </div>
+          </div>
+         
           {/*{smallNotes.length > 0 && (
             <div className='flex items-center pt-4 pl-1'>
               <ThoughtIcon className='mr-2' />  Adjust the margin as needed 
@@ -388,7 +444,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
               </div>
                 
               <div className="flex items-center z-100000 w-80 pb-5 max-h-24 mt-8">
-                <div className="scroll-container mt-14 mb-14 max-h-[100px] h-fit flex flex-wrap overflow-x-hidden overflow-y-auto">
+                <div className="scroll-container mt-14 mb-14 max-h-[100px] gap-1 h-fit flex flex-wrap overflow-x-hidden overflow-y-auto">
                   {smallNotes.map((note, index) => (
                     <div key={index} className="relative cursor-pointer">
                       <p className="absolute left-9 top-8">{index + 1}</p>
@@ -399,6 +455,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
                 </div>
             
               </div>
+               
             </>
           )}
         </div>
@@ -437,7 +494,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
       <SmallNotesPopup
         setShowAdditionalTitles={setShowAdditionalTitles}
         smallNotes={smallNotes}
-        email={email}
+        session_email={email}
         noteDate={noteDate}
         setSmallNotes={setSmallNotes}
         setUpdatedNotes={setUpdatedNotes}
@@ -456,7 +513,7 @@ const Popup = ({ noteDate, noteContent, title1, onSave, setShowAdditionalTitles,
               <p className='mb-0 text-lg' style={{ fontFamily: "Darker Grotesque", fontWeight: 600, fontSize: 20 }}>
               Are you sure you want to delete the whole entry? </p>
               <div className='w-10 h-10 bg-[#675E99]/60 rounded-xl flex items-center justify-center'>
-                <GoTrash className='text-white cursor-pointer' size={26} />
+                <GoTrash className='text-white ' size={26} />
               </div>
             </div>
               <p className='' style={{ fontFamily: 'Darker Grotesque', fontSize: 20 }}>This action <b className='text-[#433c68]'>can't</b> be reversed.</p>

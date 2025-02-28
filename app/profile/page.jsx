@@ -754,7 +754,7 @@ const handleSubmit = async (e) => {
             onClick={() => setDropdownIsOpen(!dropdownIsOpen)}
           />
           {dropdownIsOpen && (
-            <ul className="absolute left-8 top-11 border-none rounded-lg p-1 pb-0 pt-0 bg-[#cdc6ff76] backdrop-blur-sm text-white max-h-16 overflow-auto z-10">
+            <ul className="absolute left-8 top-11 border-none rounded-lg p-1 pb-0 pt-0 bg-[#cdc6ff76] backdrop-blur-sm text-white max-h-16 overflow-auto z-10 scroll-container-profile">
               {years.map((year) => (
                 <li
                   key={year}

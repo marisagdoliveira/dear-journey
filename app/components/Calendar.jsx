@@ -20,11 +20,11 @@ import { useReminder } from "@/context/ReminderContext";
 
 
 
-export default function Calendar({ setShowAdditionalTitles, setReminderTitle, title1, noteContent, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate}) {
+export default function Calendar({  setShowAdditionalTitles, setUserLibrary, setReminderTitle, title1, noteContent, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate, session_email}) {
 
  
-  const { data: session, status } = getSession(); // Valid usage of hook inside a component
-  console.log("calendar props: ", {  noteContent, title1 });
+  //const { data: session, status } = getSession(); // Valid usage of hook inside a component
+  //console.log("calendar props: ", {  noteContent, title1 });
 
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const [journalEntries, setJournalEntries] = useState([]);
@@ -35,6 +35,9 @@ export default function Calendar({ setShowAdditionalTitles, setReminderTitle, ti
   const [notifications, setNotifications] = useState([])
 
   const [noteDate, setNoteDate] = useState("");
+
+  const [aiOutput, setAiOutput] = useState(false);
+
 
   const fetchTheReminder = useReminder();
  
@@ -139,6 +142,7 @@ export default function Calendar({ setShowAdditionalTitles, setReminderTitle, ti
       setEmail(data.user.email);
       setJournalEntries(data.user.library);
       setNotifications(data.user.notifications);
+      setUserLibrary(data.user.library);
       console.log("Notifications:", notifications);
       console.log("Notifications:", data.user.notifications);
   
@@ -308,9 +312,13 @@ export default function Calendar({ setShowAdditionalTitles, setReminderTitle, ti
                 </button>
               </div>
               <div className="flex items-center">
-                <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup setShowAdditionalTitles={setShowAdditionalTitles} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
-                <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
+                <p onClick={() => {setNoteDate(subDays(noteDate, 1)); 
+                  setAiOutput(false);
+                  }} className="pr-4 cursor-pointer"><Calenleft /></p>
+                <Popup aiOutput={aiOutput} setAiOutput={setAiOutput} setShowAdditionalTitles={setShowAdditionalTitles} email={email} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <p onClick={() => {setNoteDate(addDays(noteDate, 1)); 
+                  setAiOutput(false);
+                  }} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>
           </div>
