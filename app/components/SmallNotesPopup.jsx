@@ -85,7 +85,7 @@ const SmallNotesPopup = ({ smallNotes, session_email, noteDate, fetchUser, setSm
               'Content-Type': 'application/json',
             },
             body: JSON.stringify({
-              email,               // Assuming you have the user's email in your state
+              email: session_email,               // Assuming you have the user's email in your state
               date: noteDate.toISOString(),  // The date for the entry
               noteIndex,           // The index of the note to delete
             }),
@@ -101,7 +101,8 @@ const SmallNotesPopup = ({ smallNotes, session_email, noteDate, fetchUser, setSm
           // Update the state to remove the note from the local smallNotes array
           const updatedNotes = smallNotes.filter((_, index) => index !== noteIndex);
           setSmallNotes(updatedNotes);
-          setUpdatedNotes(updatedNotes); // Optional, if needed
+          setUpdatedNotes(updatedNotes);
+          fetchUser() // Optional, if needed
       
         } catch (error) {
           console.error('Error deleting small note:', error);
@@ -114,12 +115,12 @@ const SmallNotesPopup = ({ smallNotes, session_email, noteDate, fetchUser, setSm
             <div className='relative'>
                 <SmallPopupIcon className="size-72"/>
                 <AddIconSmall className="absolute left-5 top-5" />
-                <div className='absolute left-5 top-16'>
+                <div className='absolute left-3 top-16'>
                     <textarea
                         value={newNote}
                         onChange={(e) => setNewNote(capitalizeFirstLetter(e.target.value))}
-                        placeholder='Write your retrospective here...'
-                        className='w-[120%] h-[20vh] mt-5 bg-transparent p-2 focus:outline-none rounded-lg scroll-container'
+                        placeholder='Write your insight here...'
+                        className='w-[120%] h-[20vh] mt-7 bg-transparent p-2 focus:outline-none rounded-lg placeholder-[#ffffffb7] roboto-mono-popup text-sm  scroll-container' style={{ fontSize: 14 }}
                     />
                 </div>
                 <FaCheck onClick={handleAddNewNote} className="absolute right-5 bottom-5 text-[#a2a2dc] hover:text-white drop-shadow-md shadow-white cursor-pointer transition-all" style={{ fontSize: "25px" }} />
@@ -138,10 +139,10 @@ const SmallNotesPopup = ({ smallNotes, session_email, noteDate, fetchUser, setSm
                         setSmallNotes(updatedNotes);
                         setUpdatedNotes(updatedNotes);
                       }}
-                      placeholder="Write your retrospective here..."
-                      className="w-[130%] h-[20vh] mt-5 bg-transparent placeholder-white p-4 focus:outline-none rounded-lg scroll-container text-[#dad9ff]"
+                      placeholder="Write your insight here..."
+                      className="absolute text-justify left-3 w-[18vw] h-[20vh] mt-5 bg-transparent placeholder-[#ffffffb7] p-2 pl- focus:outline-none rounded-lg scroll-container text-[#dad9ff]"
                     />
-                    <p className="text-gray-200 absolute left-36 top-44 mt-2">
+                    <p className="text-gray-200 w-[80px] absolute left-36 top-44 mt-2">
                       {note.writtenDate ? new Date(note.writtenDate).toLocaleDateString() : 'No Date'}
                     </p>
                   </div>

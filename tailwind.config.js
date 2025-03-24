@@ -6,6 +6,13 @@ module.exports = {
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
+    screens: {
+      xs: '220px',  // Custom breakpoint for extra small devices (mobile phones)
+      sm: '500px',
+      md: '768px',
+      lg: '1024px',
+      xl: '1920px',
+    },
     extend: {
       fontSize: {
         '2xl': '1.5rem', // Adjust based on your design requirements

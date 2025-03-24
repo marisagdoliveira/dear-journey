@@ -35,7 +35,7 @@ const capitalizeFirstLetter = (text) => {
 
 
 
-const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, setShowAdditionalTitles, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
+const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles, setTitle1, fetchUser, showPopup, showSmallNotesCalendar, setShowSmallNotesCalendar, setShowPopupReminder, showPopupReminder, showPopupReminderDate, showPopupFromNotific, session_email }) => {
   console.log("Popup props: ", { noteDate, noteContent, title1 });
 
 
@@ -44,7 +44,7 @@ const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, s
   const { email } = useEmail();
 
 
-  
+  const [aiOutput, setAiOutput] = useState(false);
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -309,6 +309,12 @@ const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, s
       }
       
   };
+
+  useEffect(() => {
+    if (showPopup) {
+      setAiOutput(false);
+    }
+  }, [showPopup]);  
   
 
   const handleDeleteConfirmation = async (confirm) => {
@@ -397,7 +403,7 @@ const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, s
                       zIndex: 10, // Tooltip behind the AIRobot
                     }}
                   >
-                    Try writing a thought first...
+                    Try writing something first!
                   </div>
                 )}
                 <AIRobot
@@ -446,9 +452,9 @@ const Popup = ({ setAiOutput, aiOutput, noteDate, noteContent, title1, onSave, s
               <div className="flex items-center z-100000 w-80 pb-5 max-h-24 mt-8">
                 <div className="scroll-container mt-14 mb-14 max-h-[100px] gap-1 h-fit flex flex-wrap overflow-x-hidden overflow-y-auto">
                   {smallNotes.map((note, index) => (
-                    <div key={index} className="relative cursor-pointer">
+                    <div key={index} className="relative cursor-pointer" onClick={handleOpenPopup}>
                       <p className="absolute left-9 top-8">{index + 1}</p>
-                      <SmallPopupIconSmall className="size-24" onClick={handleOpenPopup} />
+                      <SmallPopupIconSmall className="size-24"  />
                     </div>
                   ))}
                     <AddInsightIcon className="size-24 mt-0.5 cursor-pointer" onClick={handleOpenPopup} />

@@ -20,7 +20,7 @@ import SecondArrow from "../../public/assets/SecondArrow.svg"
 export default function Homepage() {
   const [reminderTitle, setReminderTitle] = useState("");  // New state for the reminder title
   const [additionalReminderTitlesToday, setAdditionalReminderTitlesToday] = useState([]); // State for additional reminder titles
-
+  const [showPopup, setShowPopup] = useState(false);
   const [userLibrary, setUserLibrary] = useState(null);
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
@@ -36,7 +36,10 @@ export default function Homepage() {
   const [additionalTitlesDates, setAdditionalTitlesDates] = useState([]);
   const [reminderTitleDate, setReminderTitleDate] = useState([]);
   const [navbarIsOpen, setNavbarIsOpen] = useState(false);
-
+  const [title1, setTitle1] = useState('');
+  const [noteDate, setNoteDate] = useState("");
+  const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+  const [noteContent, setNoteContent] = useState("");
   
   
 
@@ -246,8 +249,10 @@ export default function Homepage() {
     <div className="flex items-center justify-center wrapper pb-10">
   <div>
     {/* SearchBar at Top Center */}
-    <div className="absolute text-black top-[41px] left-[540px] " style={{ zIndex: "1000" }}>
-      <SearchBar setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} />
+    <div className="absolute text-black top-[41px] left-[540px] lg:left-[540px] xl:left-[1000px] " style={{ zIndex: "1000" }}>
+      <SearchBar setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} 
+      setShowPopup={setShowPopup} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
+      />
     </div>
 
     {/* Outer Container with Fixed Position */}
@@ -358,26 +363,12 @@ export default function Homepage() {
     </div>
   </div>
 
-  {/* Navbar */}
+  {/* Navbar & Clock */}
+  <div className="flex flex-col mt-24">
   <div className="mt-24" style={{ zIndex: "100000000000" }}>
     <Navbar setNavbarIsOpen={setNavbarIsOpen} fetchTheReminder={fetchTheReminder} />
   </div>
-
-  {/* Calendar */}
-  <Calendar
-    className="pt-10"
-    
-    setUserLibrary={setUserLibrary}
-    session_email={email}
-    setShowAdditionalTitles={setShowAdditionalTitles}
-    setReminderTitle={setReminderTitle}
-    fetchTheReminder={fetchTheReminder}
-    showPopupReminder={showPopupReminder}
-    setShowPopupReminder={setShowPopupReminder}
-    showPopupReminderDate={showPopupReminderDate}
-  />
-
-    <div className="digital-clock absolute top-[630px] left-[45px]">
+  <div className="digital-clock " style={{ zIndex: "100000000000" }}>
       <div className="time text-black">
         <div className="hour">{String(hours).padStart(2, "0")}</div>
         <div className={`dot ${showDot ? "invsi" : ""}`}>:</div>
@@ -392,6 +383,25 @@ export default function Homepage() {
         ))}
       </div>
     </div>
+  </div>
+
+  {/* Calendar */}
+  <Calendar
+    className="pt-10"
+    setTitle1={setTitle1} setNoteDate={setNoteDate} noteDate={noteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} showSmallNotesCalendar={showSmallNotesCalendar} setNoteContent={setNoteContent}
+    setShowPopup={setShowPopup}
+    showPopup={showPopup}
+    setUserLibrary={setUserLibrary}
+    session_email={email}
+    setShowAdditionalTitles={setShowAdditionalTitles}
+    setReminderTitle={setReminderTitle}
+    fetchTheReminder={fetchTheReminder}
+    showPopupReminder={showPopupReminder}
+    setShowPopupReminder={setShowPopupReminder}
+    showPopupReminderDate={showPopupReminderDate}
+  />
+
+
           
   </div>
   );

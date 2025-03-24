@@ -5,7 +5,7 @@ import Popup from "../components/Popup";
 import Close from "../../public/assets/Close.svg"
 import Calenleft from "../../public/assets/Calenleft.svg"
 import Calenright from "../../public/assets/Calenright.svg"
-import SearchBox from "../../public/assets/SearchBox.svg"
+import SearchBox from "../../public/assets/SearchBarMini.svg"
 import MainEntry from "../../public/assets/MainEntry.svg"
 import MiniSmallnote from "../../public/assets/MiniSmallnote.svg"
 
@@ -16,7 +16,7 @@ import { IoIosArrowForward } from "react-icons/io";
 
 
 
-const MAX_CHARS = 25; // Define the maximum character limit for display ---> ajustado a 27/01 ------------
+const MAX_CHARS = 20; // Define the maximum character limit for display ---> ajustado a 27/01 ------------
 
 // Utility function to truncate text
 const truncateText = (text, maxLength = MAX_CHARS) => {
@@ -59,7 +59,7 @@ const highlightMatch = (text, term, maxLength = MAX_CHARS) => {
 };
 
 
-export default function SearchBar({ setIsOpen, session_email, userLibrary, setShowAdditionalTitles, setShowPopup, setTitle1, setNoteDate, setShowSmallNotesCalendar, setNoteContent}) {
+export default function SearchBarMini({ setIsOpen, session_email, userLibrary, setShowAdditionalTitles, setShowPopup, setTitle1, setNoteDate, setShowSmallNotesCalendar, setNoteContent}) {
   console.log("User email:", session_email);
 
   
@@ -88,7 +88,7 @@ export default function SearchBar({ setIsOpen, session_email, userLibrary, setSh
 
 
 
-  const searchBarRef = useRef(null);
+  const SearchBarMiniRef = useRef(null);
 
   useEffect(() => {
     if (userLibrary) {
@@ -157,7 +157,7 @@ export default function SearchBar({ setIsOpen, session_email, userLibrary, setSh
   // Logic to reset search term when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (searchBarRef.current && !searchBarRef.current.contains(event.target)) {
+      if (SearchBarMiniRef.current && !SearchBarMiniRef.current.contains(event.target)) {
         setSearchTerm(""); // Reset search term if clicked outside
       }
     };
@@ -213,7 +213,7 @@ const handleOpenPopups = (result) => {
 
   
   return (
-    <div className="text-white text-lg w-[560px]" style={{ fontFamily: "Darker Grotesque" }} ref={searchBarRef}>
+    <div className="text-white text-lg w-[560px]" style={{ fontFamily: "Darker Grotesque" }} ref={SearchBarMiniRef}>
     {/* Search Bar Container */}
     <div className="relative search-bar-container mb-3"> {/* Added a bottom margin */}
       <div className="pb-5"><SearchBox className="absolute -left-1" /></div>
@@ -248,6 +248,7 @@ const handleOpenPopups = (result) => {
       style={{ marginTop: "5px" }} // Adds spacing above the results
     >
       {filteredData.length > 0 && filteredData.map((result, index) => (
+        
         <div
           className="***div-onde-fazer-onclick***** "
           onClick={() => handleOpenPopups(result)}

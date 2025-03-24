@@ -7,6 +7,13 @@
 @font-face {  font-family: "FX_LED";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/FX-LED.TTF");  }
 @font-face {  font-family: "hack";  src: url("https://cdn.jsdelivr.net/gh/microanswer/common_font/hack/Hack-Bold.ttf");  }
 
+@font-face {
+  font-family: 'Vogue';
+  src: url('/fonts/vogue.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
 
 
 @tailwind base;
@@ -18,6 +25,8 @@
 html, body {
   margin-top: 0 !important; /* Ensures no additional margin */
 }
+
+
 
 #_gcal_opt_in_banner {
   display: none !important; /* Hides the banner */
@@ -35,6 +44,12 @@ html, body {
   letter-spacing:1px;
 }
 
+
+.no-resize {
+  width: 100vw; /* Fixed width */
+  height: 100vh; /* Fixed height */
+  overflow: hidden; /* Hide overflow */
+}
 
 
 .darker-grotesque-main {
@@ -86,11 +101,16 @@ body{
 
 .wrapper {
   height: 100vh;
+  width: 100vw;
+  min-width: 100vw;
+  min-height: 100vh;
+
   background-color: #8472FF;
-  background-image: radial-gradient(farthest-corner at 50% 50%, 
+  background-image: radial-gradient(circle farthest-corner at 50% 50%, 
     rgba(216, 198, 255, 1), 30%, 
     rgba(189, 171, 255, 0.5) 50%, 
     rgba(132, 114, 255, 0.5) 60%);
+    position: center;
   background-size: 100% 150%;
   animation: morph 10s ease-in-out infinite;
 }
@@ -931,7 +951,7 @@ transition: opacity 0.1s ease-in-out;
 
 .no-notific {
   outline: 1.5px dashed #c9c8eee8; /* Adjust dash thickness */
-
+  height: 300px;
 
 }
 
@@ -993,8 +1013,35 @@ transition: opacity 0.1s ease-in-out;
   font-weight: bold;
 }
 
+.fadedCountWelcome {
+  transition: opacity 0.5s ease-in-out;
+}
+
+.fadeIn {
+  opacity: 1;
+}
+
+.fadeOut {
+  opacity: 0;
+}
 
 
+.filter-btn {
+  padding: 3px 21px;
+  background-color: rgba(103, 103, 203, 0.4);
+  border-radius: 8px;
+  margin-right: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
 
+.filter-btn.active {
+  background-color: #6D6BC8; /* Highlight active button */
+  color: white;
+}
+
+.filter-btn:hover {
+  background-color: rgba(103, 103, 203, 0.6);
+}
 
 

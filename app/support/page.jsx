@@ -7,18 +7,25 @@ import UserPic from "../components/UserPic";
 import CheckSVG from "../../public/assets/CheckSVG.svg"
 import EmailSVG from "../../public/assets/EmailSVG.svg"
 import FAQIcon from "../../public/assets/FAQIcon.svg"
+import Close from "../../public/assets/Close.svg"
+import Calenleft from "../../public/assets/Calenleft.svg"
+import Calenright from "../../public/assets/Calenright.svg"
+import { format, startOfMonth, endOfMonth, eachDayOfInterval, addMonths, subMonths, addDays, subDays, startOfToday, isSameDay } from "date-fns";
 
 
 import { IoChevronDownCircleOutline } from "react-icons/io5";
 
 import Link from "next/link";
 import { getSession } from "next-auth/react";
+import SearchBarMini from "../components/SearchBarMini";
+import Popup from "../components/Popup";
 
 
 export default function Support() {
   const [username, setUsername] = useState("");
   const [userPic, setUserPic] = useState(null);
   const [email, setEmail] = useState("");
+    const [journalEntries, setJournalEntries] = useState([]); 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -37,8 +44,24 @@ export default function Support() {
 
   const [navbarIsOpen, setNavbarIsOpen] = useState(false);
 
+  const [notifications, setNotifications] = useState([]);
+  const [showPopupFromNotific, setShowPopupFromNotific] = useState(false);
+  const [noteDate, setNoteDate] = useState("");
+  const [title1, setTitle1] = useState("");
+  const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+
+  const [isOpen, setIsOpen] = useState(false);
+  const [showAdditionalTitles, setShowAdditionalTitles] = useState(false); 
+  const [userLibrary, setUserLibrary] = useState(null);
+  const [noteContent, setNoteContent] = useState("");
 
 
+
+
+  const fetchTheReminder = () => {
+    
+    fetchUser();
+  };
 
   const router = useRouter(); // router for redirection
 
@@ -72,6 +95,8 @@ export default function Support() {
         description: "",
         explanation: "",
       });
+      setUserLibrary(data.user.library);
+      setNotifications(data.user.notifications);
     } catch (error) {
       console.error("Error fetching user data:", error);
       router.replace("/"); // Redirect to login if not authenticated
@@ -126,6 +151,128 @@ export default function Support() {
     }
   };
 
+  const handleClosePopup = () => {
+    setShowPopupFromNotific(false);
+  };
+
+
+  
+
+  const saveEntry = async (title, date, mainContent, smallNotes) => {
+    console.log('Before saving2:', { title, email, date, mainContent, smallNotes });
+    const formattedSmallNotes = smallNotes.map(note => typeof note === 'string' ? { content: note } : note);
+    try {
+      const response = await fetch('/api/register', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ title:title, email, date:date, mainContent, smallNotes: formattedSmallNotes }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save entry.');
+      }
+
+      const savedEntry = await response.json();
+
+      console.log('Saved entry:', savedEntry);
+
+      fetchUser();
+    } catch (error) {
+      console.error('Error saving journal entry: ', error);
+    }
+  };
+    const handleEntryChange = (date, title, mainContent, smallNotes) => {
+      const existingEntry = journalEntries.find(entry => new Date(entry.date).toISOString() === date.toISOString());
+      if (existingEntry) {
+        existingEntry.title = title;
+        existingEntry.mainContent = mainContent;
+        existingEntry.smallNotes = smallNotes; // Ensure this line correctly updates smallNotes
+        saveEntry(title, date, mainContent, smallNotes);
+      } else {
+        const newEntry = { date, title, mainContent, smallNotes };
+        setJournalEntries([...journalEntries, newEntry]);
+        saveEntry(title, date, mainContent, smallNotes);
+      }
+      // setReminderTitle(title);
+    };
+  
+    useEffect(() => {
+      fetchTheReminder()
+    }, [router]);
+    
+
+    const fetchUserAndJournalEntries = async () => {
+      try {
+
+        const session = await getSession();
+        console.log("Session:", session);
+    
+        if (!session || !session.user?.email) {
+          console.error("User not authenticated");
+          return; // Exit if no session
+        }
+
+        //const email = session.user.email; // Extract email here
+        //console.log("Email from session:", email);
+
+
+        const response = await fetch(`/api/user?email=${session.user.email}`);
+        if (response.ok) {
+          const data = await response.json();
+          setEmail(data.user.email);
+          setJournalEntries(data.user.library); // Assuming `library` contains all journal entries
+          setNotifications(data.user.notifications); // Store notifications in state
+          setUserLibrary(data.user.library);
+
+          
+        // Calculate monthly journaling counts based on selected year
+        const counts = Array(12).fill(0);
+        let mainEntriesCount = 0;
+        let insightsCount = 0;
+
+        data.user.library.forEach(entry => {
+          const entryDate = new Date(entry.date);
+          
+            // Check if the entry belongs to the selected year
+            if (entryDate.getFullYear() === Number(selectedYear)) {
+              // Count Main Entries
+              if (entry.mainContent !== "" && entry.title !== "") {
+                mainEntriesCount++;
+                const month = entryDate.getMonth();
+                counts[month] += 1;
+              }
+             
+              // Count insights (small notes) - count non-empty smallNotes arrays
+              if (entry.smallNotes && entry.smallNotes.length > 0) {
+                insightsCount += entry.smallNotes.length;  // Increment insights count by the number of small notes
+              }
+            }
+          });
+          setMonthlyCounts(counts);
+          setTotalCountsMainContent(mainEntriesCount);
+          setTotalCountsSmallNotes(insightsCount);
+
+          console.log(counts);
+          console.log(mainEntriesCount);
+          console.log(insightsCount);
+
+          // Calculate journaling tendency as a percentage of days in the year
+          const daysInYear = selectedYear === currentYear ? 
+          Math.ceil((new Date() - new Date(selectedYear, 0, 1)) / (1000 * 60 * 60 * 24)) :
+          365;
+          const tendencyPercentage = Math.round((mainEntriesCount / daysInYear) * 100);
+          setJournalingTendency(tendencyPercentage);
+
+        } else {
+          throw new Error("Failed to fetch user data.");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+      }
+    }
+
 
   return (
     <div className="flex flex-col wrapper pb-10 w-[100vw] text-white">
@@ -146,15 +293,14 @@ export default function Support() {
       {/* ------------------------------------ Navbar Section ------------------------------------------------------------------------ */}
       <div className="fixed top-[240px] w-[440px]" style={{ zIndex: 1000 }}>
         <Navbar setNavbarIsOpen={setNavbarIsOpen} />
+        <div className="absolute text-black top-[-58px] left-[50px] w-[200px]" style={{ zIndex: "1000" }}>
+            <SearchBarMini setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} 
+            setShowPopup={setShowPopupFromNotific} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
+            />
+          </div>
       </div>
   
-      {/* User Picture */}
-      <div className="fixed top-12 right-16 w-[100px] h-[100px]" style={{ zIndex: 10000000 }}>
-        <UserPic
-          user={{ img: userPic, email: email, username: username }} // Pass userPic instead of UserPic
-          onPicChange={handlePicChange}
-        />
-      </div>
+   
   
       {/* ------------------------------------- Main Content -------------------------------------------------------------------------- */}
       {/* Ticket submission success message: */}
@@ -276,16 +422,23 @@ export default function Support() {
               </button>
             </form>
             </div>
-
+        {/* User Picture */}
+      <div className=" w-[100px] absolute top-12 h-[100px] right-16" style={{ zIndex: 10000000 }}>
+        <UserPic className=""
+          user={{ img: userPic, email: email, username: username }} // Pass userPic instead of UserPic
+          onPicChange={handlePicChange}
+        />
+      </div>
             
-            <div className="absolute top-[153px] right-[180px] flex flex-col justify-center items-center"><FAQIcon/></div>
-            <div className="relative w-[450px]   mt-40 max-h-[448px]  overflow-hidden overflow-y-auto scroll-container-faq">
+            <div className="flex flex-col justify-center items-start">
+              <div className="absolute top-36 ml-[190px]"><FAQIcon/></div>
+            <div className="relative w-[450px]   mt-40 max-h-[474px]  overflow-hidden overflow-y-auto scroll-container-faq">
                 
                 <ol className="flex flex-col items-center gap-3">
                   {/* Question 1 */}
                 <li className="w-96 h-12 bg-gradient-to-br from-[#887cf9ca] to-[#a49ef6bf] text-white px-3 border border-white/60 rounded-3xl flex items-center justify-between p-3 relative" style={{ fontFamily: 'Darker Grotesque', fontSize: 17, fontWeight: 500 }}>
                   1. What is the purpose of this journaling app?
-                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle1(!toggle1)} style={{zIndex: 100000000}}>
+                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle1(!toggle1)} style={{zIndex: 1000000}}>
                     <IoChevronDownCircleOutline className={`cursor-pointer transition-transform duration-300 ${toggle1 ? 'rotate-180' : ''}`} />
                   </span>
                 </li>
@@ -296,7 +449,7 @@ export default function Support() {
                 {/* Question 2 */}
                 <li className="w-96 h-12 bg-gradient-to-br from-[#887cf9ca] to-[#a49ef6bf] text-white px-3 border border-white/60 rounded-3xl flex items-center justify-between p-3 relative" style={{ fontFamily: 'Darker Grotesque', fontSize: 17, fontWeight: 500 }}>
                   2. How do I create a new journal entry?
-                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle2(!toggle2)} style={{zIndex: 100000000}}>
+                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle2(!toggle2)} style={{zIndex: 1000000}}>
                     <IoChevronDownCircleOutline className={`cursor-pointer transition-transform duration-300 ${toggle2 ? 'rotate-180' : ''}`} />
                   </span>
                 </li>
@@ -306,7 +459,7 @@ export default function Support() {
                  {/* Question 3 */}
                 <li className="w-96 h-12 bg-gradient-to-br from-[#887cf9ca] to-[#a49ef6bf] text-white px-3 border border-white/60 rounded-3xl flex items-center justify-between p-3 relative" style={{ fontFamily: 'Darker Grotesque', fontSize: 17, fontWeight: 500 }}>
                   3. Can I customize my journal entries?
-                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle3(!toggle3)} style={{zIndex: 100000000}}>
+                  <span className="pl-[60px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle3(!toggle3)} style={{zIndex: 1000000}}>
                     <IoChevronDownCircleOutline className={`cursor-pointer transition-transform duration-300 ${toggle3 ? 'rotate-180' : ''}`} />
                   </span>
                 </li>
@@ -317,7 +470,7 @@ export default function Support() {
                 {/* Question 4 */}
                 <li className="w-96 h-12 bg-gradient-to-br from-[#887cf9ca] to-[#a49ef6bf] text-white px-3 border border-white/60 rounded-3xl flex items-center justify-between p-3 relative" style={{ fontFamily: 'Darker Grotesque', fontSize: 17, fontWeight: 500 }}>
                   4. How can I search through my past entries?
-                  <span className="pl-2.5 pt-1" size={35} strokeWidth={2} onClick={() => setToggle4(!toggle4)} style={{zIndex: 100000000}}>
+                  <span className="pl-2.5 pt-1" size={35} strokeWidth={2} onClick={() => setToggle4(!toggle4)} style={{zIndex: 1000000}}>
                     <IoChevronDownCircleOutline className={`cursor-pointer transition-transform duration-300 ${toggle4 ? 'rotate-180' : ''}`} />
                   </span>
                 </li>
@@ -328,7 +481,7 @@ export default function Support() {
                 {/* Question 5 */}
                 <li className="w-96 h-12 bg-gradient-to-br from-[#887cf9ca] to-[#a49ef6bf] text-white px-3 border border-white/60 rounded-3xl flex items-center justify-between p-3 relative" style={{ fontFamily: 'Darker Grotesque', fontSize: 17, fontWeight: 500 }}>
                   5. Can I track my mood & emotions over time?
-                  <span className="pl-[16px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle5(!toggle5)} style={{zIndex: 100000000}}>
+                  <span className="pl-[16px] pt-1" size={35} strokeWidth={2} onClick={() => setToggle5(!toggle5)} style={{zIndex: 1000000}}>
                     <IoChevronDownCircleOutline className={`cursor-pointer transition-transform duration-300 ${toggle5 ? 'rotate-180' : ''}`} />
                   </span>
                 </li>
@@ -337,9 +490,41 @@ export default function Support() {
                 </div>
 
                 </ol>
-            </div>
+            </div></div>
           </div>
             )}
+
+
+          {showPopupFromNotific && (
+            
+            <div className="fixed inset-0" style={{ zIndex: 1000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
+              <div className="overlay_blur"></div>
+              <div className="popup border border-white/45 z-40 ">
+                <div className="popup-content flex flex-col justify-center items-center relative">
+                  <div className="flex w-full justify-end items-end">
+                    <button className="close-button self-end pr-2 top-5 absolute" onClick={() => handleClosePopup()}>
+                      <Close />
+                    </button>
+                  </div>
+                  <div className="flex items-center">
+                    <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
+                     <Popup
+                      noteDate={noteDate}
+                      showPopupFromNotific={showPopupFromNotific}
+                      
+                      onSave={handleEntryChange}
+                      setTitle1={setTitle1}
+                      fetchUser={fetchUser}
+                      showSmallNotesCalendar={showSmallNotesCalendar}
+                      setShowSmallNotesCalendar={setShowSmallNotesCalendar}
+                      fetchTheReminder={fetchTheReminder}
+                    />
+                  <p onClick={() => setNoteDate(addDays(noteDate, 1))} className="pl-4 cursor-pointer"><Calenright /></p>
+              </div>
+          </div>
+        </div>
+      </div>
+       )}
       </div>
     </div>
   );

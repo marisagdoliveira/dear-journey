@@ -20,7 +20,7 @@ import { useReminder } from "@/context/ReminderContext";
 
 
 
-export default function Calendar({  setShowAdditionalTitles, setUserLibrary, setReminderTitle, title1, noteContent, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate, session_email}) {
+export default function Calendar({  setShowAdditionalTitles, setUserLibrary, noteDate, setNoteDate, showSmallNotesCalendar, setShowSmallNotesCalendar, setReminderTitle,setShowPopup,showPopup, title1, noteContent, handleReminderSave, showPopupReminder, setShowPopupReminder, showPopupReminderDate, session_email}) {
 
  
   //const { data: session, status } = getSession(); // Valid usage of hook inside a component
@@ -30,13 +30,13 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, set
   const [journalEntries, setJournalEntries] = useState([]);
   const [email, setEmail] = useState('');
   const [title, setTitle] = useState('');
-  const [showPopup, setShowPopup] = useState(false);
-  const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
+  
+  
+  
   const [notifications, setNotifications] = useState([])
 
-  const [noteDate, setNoteDate] = useState("");
+  
 
-  const [aiOutput, setAiOutput] = useState(false);
 
 
   const fetchTheReminder = useReminder();
@@ -243,7 +243,7 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, set
        </div>
    
        {/* Container for calendar and overlay */}
-       <div className={`relative flex flex-wrap max-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
+       <div className={`relative flex flex-wrap  max-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
         {daysInMonth.map((day, index) => {
         const entry = getDateEntry(day);
         const isToday = isSameDay(day, today); // Check if the day is today
@@ -313,11 +313,11 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, set
               </div>
               <div className="flex items-center">
                 <p onClick={() => {setNoteDate(subDays(noteDate, 1)); 
-                  setAiOutput(false);
+                  ;
                   }} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup aiOutput={aiOutput} setAiOutput={setAiOutput} setShowAdditionalTitles={setShowAdditionalTitles} email={email} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <Popup setShowAdditionalTitles={setShowAdditionalTitles} email={email} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
                 <p onClick={() => {setNoteDate(addDays(noteDate, 1)); 
-                  setAiOutput(false);
+                  ;
                   }} className="pl-4 cursor-pointer"><Calenright /></p>
               </div>
             </div>
