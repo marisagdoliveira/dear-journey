@@ -10,6 +10,8 @@ import VisibilityHidden from "../../public/assets/VisibilityHidden.svg"
 import VisibilityOpen from "../../public/assets/VisibilityOpen.svg"
 import StatsJournaling from "../../public/assets/StatsJournaling.svg"
 import Link from "next/link";
+import { motion } from 'framer-motion';
+
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { FaRegCircleXmark } from "react-icons/fa6";
 import { FiAlertCircle } from "react-icons/fi";
@@ -106,12 +108,13 @@ export default function Profile({  }) {
   const [isOpen, setIsOpen] = useState(false);
   const [showAdditionalTitles, setShowAdditionalTitles] = useState(false); 
   const [userLibrary, setUserLibrary] = useState(null);
-  const [showPopup, setShowPopup] = useState(false);
   const [noteContent, setNoteContent] = useState("");
   const [loading, setLoading] = useState(true);
 
+
   const [filterToday, setFilterToday] = useState(true); // State to toggle between "Today" or "All"
 
+  
 
 
 
@@ -133,9 +136,6 @@ export default function Profile({  }) {
         router.replace("/");
         return; // Exit if no session
       }
-
-    
-      
         
       const res = await fetch(`/api/user?email=${session.user.email}`, { method: "GET" });
 
@@ -151,70 +151,7 @@ export default function Profile({  }) {
         console.log("AQUI AS NOTIFI!!!!", data.user.notifications)
         setUserLibrary(data.user.library);
   
-        if (data.user.notifications.length > 0) {
-          const today = new Date();
-          const isSameDay = (date1, date2) =>
-            date1.getFullYear() === date2.getFullYear() &&
-            date1.getMonth() === date2.getMonth() &&
-            date1.getDate() === date2.getDate();
-  
-          let reminderTitle = "";
-          let additionalTitles = [];
-          let popupDateSet = false;
-          const newAdditionalTitlesDates = []; // Temporary array to accumulate dates
-  
-          for (const notification of data.user.notifications) {
-            const noticeDate = new Date(notification.noticeDate);
-  
-            if (isSameDay(today, noticeDate)) {
-              const correspondingEntry = data.user.library.find(entry =>
-                isSameDay(new Date(entry.date), new Date(notification.noteDate))
-              );
-  
-              if (correspondingEntry) {
-                // Push the `noteDate` to the array for today's notifications
-                newAdditionalTitlesDates.push(notification.noteDate);
-  
-                if (!popupDateSet) {
-                  setShowPopupReminderDate(notification.noteDate);
-                  popupDateSet = true;
-                }
-  
-                if (reminderTitle === "") {
-                  reminderTitle = correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString();
-                  setReminderTitleDate(notification.noteDate)
-                  setReminderTitleToday(true);
-                } else {
-                  additionalTitles.push(correspondingEntry.title || new Date(notification.noteDate).toLocaleDateString());
-                }
-  
-                setIsOpen(true);
-              } else {
-                setReminderTitleToday(false);
-              }
-            }
-          }
-  
-          if (!reminderTitle) console.log("No notification for today.");
-  
-          const MAX_TITLE_LENGTH = 10;
-          const truncatedTitle = reminderTitle.length > MAX_TITLE_LENGTH
-            ? reminderTitle.substring(0, MAX_TITLE_LENGTH) + '...'
-            : reminderTitle;
-  
-          setReminderTitle(truncatedTitle);
-          console.log("REMINDER TITLE", reminderTitle)
-  
-          const truncatedAdditionalTitles = additionalTitles.map(title =>
-            title.length > MAX_TITLE_LENGTH ? title.substring(0, MAX_TITLE_LENGTH) + '...' : title
-          );
-  
-          setAdditionalReminderTitlesToday(truncatedAdditionalTitles);
-          setAdditionalTitlesDates(newAdditionalTitlesDates); // Set all dates at once
-  
-        } else {
-          console.log("No notifications available.");
-        }
+        
       } catch (error) {
         console.error("Error fetching user data:", error);
       } finally {
@@ -394,6 +331,20 @@ const handleSubmit = async (e) => {
     }
     if (formData.password !== formData.confirmPassword) {
       setError('Passwords do not match!');
+
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+      
+      return;
+    }
+    if (formData.password === formData.currentPassword) {
+      setError('New password must be different from the current password!');
+      
+      setTimeout(() => {
+        setError('');
+      }, 3000);
+
       return;
     }
   }
@@ -621,6 +572,8 @@ const handleSubmit = async (e) => {
       console.error('Error saving journal entry: ', error);
     }
   };
+
+
     const handleEntryChange = (date, title, mainContent, smallNotes) => {
       const existingEntry = journalEntries.find(entry => new Date(entry.date).toISOString() === date.toISOString());
       if (existingEntry) {
@@ -663,33 +616,60 @@ const handleSubmit = async (e) => {
 
 
   return (
-        <div className="flex justify-center wrapper pb-10 min-w-[100vw] min-h-screen overflow-hidden overflow-y-auto scroll-container">
-          <div className="flex items-center mt-[196px] " style={{ zIndex: 10000000 }}>
+    
+        <div className="wrapper scroll-container justify-center w-screen h-fit" style={{ maxHeight: "100vh", overflowX: "hidden", overflowY: "auto" }}>
+          
+          <div className="flex justify-center items-center mt-[40px] " style={{ zIndex: 10000000 }}>
             <div className={`${navbarIsOpen ? 'w-[280px]' : 'w-[250px]'} transition-all duration-300 ease-in-out `}>
-              <div className="absolute top-[240px] left-[0px]">
-                <Navbar setNavbarIsOpen={setNavbarIsOpen} />
-              </div>
-            <div className="absolute text-black top-[182px] left-[50px] w-[800px] " style={{ zIndex: "1000" }}>
+              <motion.div
+              
+              initial={{ x: -100, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }}
+              
+              className="fixed top-[240px] left-[0px]" style={{ zIndex: 10000000 }}>
+                <Navbar setNavbarIsOpen={setNavbarIsOpen}  />
+              </motion.div>
+            <motion.div
+            initial={{ x: -100, opacity: 0 }} 
+            animate={{ x: 0, opacity: 1 }} 
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            
+            className="absolute text-black top-[182px] left-[50px] w-[300px] " style={{ zIndex: "10000000" }}>
               <SearchBarMini setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} 
               setShowPopup={setShowPopupFromNotific} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
-              /></div>
+              /></motion.div>
             </div>
           </div>
-            <div className={`flex flex-col w-screen bg-transparent text-white align-start pt-5 gap-2 ml-10`}>
+            <div className={`flex flex-col w-screen bg-transparent text-white min-w-[1000px] ${navbarIsOpen ? 'pl-[300px]' : 'pl-[250px]'} transition-[padding-left] duration-[600ms] ease-in-out gap-2 ml-10 -mt-3`}>
               {/* Greeting */}
-              <div className="flex flex-row">
+              <motion.div 
+                initial={{ x: -100, opacity: 0 }} 
+                animate={{ x: 0, opacity: 1 }} 
+                transition={{ duration: 0.8, ease: "easeOut",  }} className="flex flex-row">
                 <h1 className="darker-grotesque-main" style={{ fontFamily: 'Darker Grotesque', fontSize: 45, fontWeight: 600 }}>
                   It's good to see you,
                 </h1>
                 <span className="w-[80px] pr-16 darker-grotesque-main" style={{ whiteSpace: "normal", fontFamily: 'Darker Grotesque', fontSize: 45, fontWeight: 550 }}>
                   &nbsp;{username}!
                 </span>
-              </div>
-              <p className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 30, fontWeight: 470 }}>
-                This is your personal space.
-              </p>
+              </motion.div>
+              <motion.p
+                initial={{ x: -100, opacity: 0 }} 
+                animate={{ x: 0, opacity: 1 }} 
+                transition={{ duration: 0.8, ease: "easeOut",  }} className="relative flex align-center darker-grotesque-main pr-6 text-lg" style={{ fontFamily: 'Darker Grotesque', fontSize: 30, fontWeight: 470 }}>
+                  This is your personal space.
+              </motion.p>
               {/* Form */}
-              <form onSubmit={handleSubmit} className="space-y-4 mt-5">
+              <motion.form
+                initial={{ y: -100, opacity: 0 }} 
+                animate={{ y: 0, opacity: 1 }} 
+                transition={{ duration: 0.8, ease: "easeOut" }}
+                
+
+                onSubmit={handleSubmit}
+                className="space-y-4 mt-5">
+                
               <p className="flex" style={{ fontFamily: 'Darker Grotesque', fontSize: 20, fontWeight: 450, marginBottom: -10 }}>
                 Edit your information</p>
                 <div className="flex items-center mb-4">
@@ -840,7 +820,7 @@ const handleSubmit = async (e) => {
                 {error && <div className='fixed top-80 left-[50vw] w-{100vw} h-{100vh} flex justify-center items-center z-50'>
                 {/* Save message container */}
                 <div className="overlay_blur"></div>
-                <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[240px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
+                <div className='absolute flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#bcb7fcb7] to-[#4e44a79e] border border-white/60 backdrop-blur-[2px] h-[150px] w-[280px] text-white text-center text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 18, zIndex: 100000 }}>
                   {/* Message */}
                   <div className='mb-4 tracking-wider' style={{ fontFamily: 'Darker Grotesque' }}>
                     {error}
@@ -907,9 +887,12 @@ const handleSubmit = async (e) => {
                   Save
                 </button>
                 </div>
-              </form>
+              </motion.form>
             {/* Journal Tracker - graph */}
-            <div className="flex justify-end items-center w-[750px] h-[180px] pr-5 bg-gradient-to-tr from-[#C6BCFF] to-[#AA9BFE] border-none rounded-[30px] shadow-[#6760bba6] mt-5 shadow-lg">
+            <motion.div
+             initial={{ y: 100, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }} className="flex justify-end items-center w-[750px] h-[180px] pr-5 bg-gradient-to-tr from-[#C6BCFF] to-[#AA9BFE] border-none rounded-[30px] shadow-[#6760bba6] mt-5 shadow-lg">
               <div className="journal-analysis p-4 text-white">
                 <h2 className="journal-analysis-title text-md mb-4 pl-10 relative" style={{ fontFamily: "Vibur", fontSize: 20 }}>
                   <ChartIcon className="absolute bottom-1 left-0" />Your Journaling Overview for {selectedYear}
@@ -1026,16 +1009,16 @@ const handleSubmit = async (e) => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
                     
                     
           </div>
           {/* User Picture and Logo */}
-          <div>
-            <div className="fixed top- right-16 w-[120px] h-[120px] z-[10000000000] mt-11" style={{  }}>
+          <div className="">
+            <div className="fixed right-16 top-0 w-[120px] h-[120px] z-[10000000000] mt-11" style={{  }}>
           <UserPic user={{ img: userPic, email: email, username: username }} onPicChange={handlePicChange} />
             </div>
-            <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>
+            <div className="fixed top-10 left-3 w-[170px] h-[100px]" style={{ zIndex: 10000000 }}>
               <div className="flex items-center ml-10">
                 <Link href="./welcome">
                   <img src="../../assets/Logo.svg" className="w-32 h-32 cursor-pointer" alt="Logo" />
@@ -1046,8 +1029,13 @@ const handleSubmit = async (e) => {
                     
           {/* Notification Center - Active Notifications */}
           <div className="active-notifications-title">
-            <p
-              className={`absolute top-52 tracking-wider border border-white/45 p-2.5 rounded-2xl bg-[#cebdf614] transition-all duration-500 ${navbarIsOpen ? 'right-[40px]' : 'right-[115px]'} ${notifications.some(notification => {
+            <motion.p
+              
+              initial={{ x: 0, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }} 
+
+              className={`absolute top-52 tracking-wider border border-white/45 p-2.5 rounded-2xl bg-[#cebdf614] transition-all duration-500 ${navbarIsOpen ? 'right-[40px]' : 'right-[90px]'} ${notifications.some(notification => {
                 const noticeDate = new Date(notification.noticeDate).setHours(0, 0, 0, 0); // Normalize to midnight
                 const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
                 return noticeDate >= today; // Check if the notification is today or later
@@ -1080,13 +1068,17 @@ const handleSubmit = async (e) => {
             </div>
           )
         }
-        </p>
+        </motion.p>
       </div>
 
 
-     <div className={`absolute top-[315px] h-fit flex justify-center items-end  pb-10 ${!navbarIsOpen ? 'right-1 pr-9' : 'right-2 pr-10'}`}>
+     <div className={`absolute top-[315px] h-fit flex justify-center items-end  pb-10  ${!navbarIsOpen ? 'right-1 pr-9' : 'right-2 pr-10'}`}>
                   
-     <div className={`notification-container  scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'}  ${notifications.some(notification => {
+     <motion.div
+        initial={{ x: 100, opacity: 0 }} 
+        animate={{ x: 0, opacity: 1 }} 
+        transition={{ duration: 0.8, ease: "easeOut" }} 
+        className={`notification-container  scroll-container ${!navbarIsOpen ? 'two-columns' : 'single-column'}  ${notifications.some(notification => {
       const noticeDate = new Date(notification.noticeDate).setHours(0, 0, 0, 0); // Normalize to midnight
       const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
       return noticeDate >= today; // Check if the notification is today or later
@@ -1097,14 +1089,24 @@ const handleSubmit = async (e) => {
         return noticeDate >= today; // Include only today or future dates
         }).length > 0 ? (
           notifications
-            .filter(notification => {
-              const noticeDate = new Date(notification.noticeDate).setHours(0, 0, 0, 0); // Normalize to midnight
-              const today = new Date().setHours(0, 0, 0, 0); // Today's date at midnight
-              return filterToday ? noticeDate === today : noticeDate >= today; // Apply the filter logic
-
-            })
+          .filter(notification => {
+            // Normalize the noticeDate to UTC date only (set to midnight UTC)
+            const noticeDate = new Date(notification.noticeDate);
+            const normalizedNoticeDate = new Date(Date.UTC(noticeDate.getUTCFullYear(), noticeDate.getUTCMonth(), noticeDate.getUTCDate()));
+        
+            // Normalize today's date to UTC date only (set to midnight UTC)
+            const today = new Date();
+            const normalizedToday = new Date(Date.UTC(today.getUTCFullYear(), today.getUTCMonth(), today.getUTCDate()));
+        
+            // Compare noticeDate to today based on filterToday flag
+            if (filterToday) {
+              return normalizedNoticeDate.getTime() === normalizedToday.getTime(); // Show only today's notifications
+            } else {
+              return normalizedNoticeDate.getTime() >= normalizedToday.getTime(); // Show today and future notifications
+            }
+          })
             .map((notification, index) => (
-              <div key={index} className="notification-item cursor-pointer ">
+              <div key={index} className="notification-item cursor-pointer">
                 <div className="icon-container relative">
                   <ActiveNotificationsIcon />
                   <p className="absolute top-4 right-20 p-1 bg-[#a19df1] h-fit w-fit rounded-lg" style={{ fontSize: 8, transform: "translateX(-65px)" }}>{new Date(notification.noteDate).toLocaleDateString()}</p>
@@ -1139,7 +1141,7 @@ const handleSubmit = async (e) => {
             </div>
             </div>
           )}
-        </div>
+        </motion.div>
           {/* Display feedback message */}
           {successFeedbackMessage && (
             <div className='fixed inset-0 flex justify-center items-center z-50'>
@@ -1183,6 +1185,7 @@ const handleSubmit = async (e) => {
                   <div className="flex items-center">
                     <p onClick={() => setNoteDate(subDays(noteDate, 1))} className="pr-4 cursor-pointer"><Calenleft /></p>
                      <Popup
+
                       noteDate={noteDate}
                       showPopupFromNotific={showPopupFromNotific}
                       

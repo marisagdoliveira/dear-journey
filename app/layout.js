@@ -4,6 +4,7 @@ import { ReminderProvider } from "../../my-app/context/ReminderContext";
 import { EmailProvider } from "../../my-app/context/EmailContext";
 import { AuthProvider } from "./Providers";
 
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata = {

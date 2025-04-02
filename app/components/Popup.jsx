@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { getSession } from "next-auth/react";
+
 
 import SmallPopupIconSmall from "../../public/assets/SmallPopupIconSmall.svg";
 import AddIconSmall from "../../public/assets/AddIconSmall.svg";
@@ -12,10 +13,13 @@ import { GoTrash } from "react-icons/go";
 import { Darker_Grotesque } from 'next/font/google';
 import { TbBell } from "react-icons/tb";
 import { FaRegCircleCheck } from "react-icons/fa6";
+import { TbMessageCircleHeart } from "react-icons/tb";
+
 import ThoughtIcon from "../../public/assets/ThoughtIcon.svg";
 import AddInsightIcon from "../../public/assets/AddInsightIcon.svg";
 import AIRobot from "../../public/assets/AIRobot.svg";
 import CloseMini from "../../public/assets/CloseMini.svg"
+import AIArchiveIcon from "../../public/assets/AIArchiveIcon.svg"
 
 
 
@@ -24,6 +28,7 @@ import CloseMini from "../../public/assets/CloseMini.svg"
 import DateTimePicker from '../components/DateTimePicker'; // Import the new component
 import { FiAlertCircle } from 'react-icons/fi';
 import { useEmail } from '@/context/EmailContext';
+import OpenAI from 'openai';
 
 
 
@@ -45,6 +50,11 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
 
 
   const [aiOutput, setAiOutput] = useState(false);
+  const [aiResponse, setAiResponse] = useState(""); // Holds the AI's response
+  console.log("AAAAAAAAAAAAAAAAAHHH", aiOutput);
+  const [savedAiResponse, setSavedAiResponse] = useState(false);
+
+
   const [title, setTitle] = useState('');
   const [mainContent, setMainContent] = useState('');
   const [smallNotes, setSmallNotes] = useState([]);
@@ -65,7 +75,15 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
 
   const [animationState, setAnimationState] = useState('paused');
 
+  const scrollRef = useRef(null);
+
  
+  useEffect(() => {
+    setAiResponse("");
+    setAiOutput(false);
+    setSavedAiResponse(false);
+  }, [noteDate]);
+
 
 
   useEffect(() => {
@@ -85,6 +103,13 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
   }, [showSmallNotesCalendar]);
   
 
+  // Close smallPopup and go back to main popup if dateTimePicker is open
+  useEffect(() => {
+
+    if (isDateTimePickerOpen) {
+      setSmallPopupOpen(false);
+    }
+  }, [isDateTimePickerOpen]);
 
   
   useEffect(() => {
@@ -128,6 +153,9 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
           }));
             setSmallNotes(updatedSmallNotes || []);
             setTitle1(entry.title || "");
+            setAiResponse(entry.lastAIResponse); // Update the AI response in state
+           
+
 
           } else {
             setTitle('');
@@ -188,6 +216,8 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
     };
   }, [showPopup]);
   
+
+
 
   const saveEntry = async () => {
     
@@ -278,9 +308,11 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
           if (!response.ok) {
               throw new Error('Failed to delete entry.');
           }
+          setDeleteMessageFail(response.error)
   
           const result = await response.json();
           console.log('Deleted entry:', result);
+          setDeleteMessageSuccess('Entry deleted successfully!');
   
           // Handle notification removal logic
           if (result.deletedNotifications) {
@@ -298,6 +330,12 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
           setSmallNotes([]);
           setTitle1("");
           fetchUser();
+
+          // Clear the delete message after 2 seconds:
+          setTimeout(() => {
+            setDeleteMessageSuccess('');
+            setDeleteMessageFail('');
+        }, 1000);
   
           // Update the state for entries to reflect the deletion
           //setEntries(prevEntries => 
@@ -342,6 +380,76 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
     
   };
 
+
+const openai = new OpenAI({
+  apiKey: process.env.NEXT_PUBLIC_OPENAI_API_KEY, // Store this securely in .env.local
+  dangerouslyAllowBrowser: true, // Only use this in the frontend
+});
+
+// The function that fetches the AI response
+const fetchAIResponse = async (mainContent) => {
+  try {
+    const response = await openai.chat.completions.create({
+      model: "gpt-4o-mini", // or use "gpt-3.5-turbo" for cheaper options
+      messages: [
+        { role: "system", content: "You are a supportive journaling assistant focused on mental health, emotional healing and self growth over time. Give brief, positive, and non-evasive thoughtful insights and advise based on what the user wrote. Your response must be concise and **must not exceed 100 words** per message. Ensure that your output fits within the 100-word limit **without cutting off sentences or leaving thoughts incomplete**. If necessary, adjust your wording or structure to ensure clarity and coherence within the word limit. Always end your response with a natural conclusion or thought. " },
+        { role: "user", content: mainContent }, // Use mainContent instead of inputText
+      ],
+      max_tokens: 150, // Limit response length
+      temperature: 0.7, // Controls randomness
+    });
+
+    return response.choices[0].message.content;
+  } catch (error) {
+    console.error("Error fetching AI response:", error);
+    return "Sorry, something went wrong. Try again later!";
+  }
+};
+
+const handleAIClick = async () => {
+  if (!mainContent) return; // Prevent empty inputs
+
+  setAiOutput(true); // Show AI response box - render the box
+  setAiResponse("Thinking..."); // Temporary loading state while waiting for the response
+
+  const response = await fetchAIResponse(mainContent); // Pass mainContent to the function
+  setAiResponse(response); // Set the AI response
+  console.log(response);
+
+    // Send the AI response to the backend
+    try {
+
+      const date = noteDate.toISOString(); // Defining date!!
+
+      const res = await fetch('/api/update-ai-response', {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email, 
+          date, 
+          aiResponse: response, // AI's generated message
+        }),
+      });
+  
+      const data = await res.json();
+      if (res.ok) {
+        console.log("AI response saved:", data.lastAIResponse);
+
+      } else {
+        console.error("Error saving AI response:", data.message);
+      }
+    } catch (error) {
+      console.error("Failed to send AI response:", error);
+    }
+
+
+};
+
+//useEffect(() => {
+//  console.log("AI RESPONSEEEEEEEEEEEEEEEEEEEEEEE", aiResponse);
+//}, [aiResponse]);
 
 
   return (
@@ -406,36 +514,48 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
                     Try writing something first!
                   </div>
                 )}
+                {aiResponse.length > 0 && (
+                 <AIArchiveIcon className='absolute bottom-7 right-[-20px] cursor-pointer transform transition-transform duration-150 hover:scale-110' size={23}
+                  
+                  onClick={() => {setSavedAiResponse(true); setAiOutput(false)}} />
+                )}
+
                 <AIRobot
-                  className={`cursor-pointer ${mainContent <= 0 ? "opacity-50" : ""}`}
+                  className={`cursor-pointer transform transition-transform duration-150 hover:scale-105 ${mainContent <= 0 ? "opacity-50" : ""}`}
                   style={{
                     zIndex: 1000000000000, // AIRobot is interactable and above the tooltip
                   }}
                   onClick={() => {
-                    if (mainContent !== "") setAiOutput(true);
+                    if (mainContent !== "") setAiOutput(true); setSavedAiResponse(false); handleAIClick();
                   }}
                 />
               </div>
             {aiOutput && (
             <div className='absolute top-[43px] right-[8px]'>
-              <div className='flex justify-end items-start h-[168px] w-[300px] border-transparent text-md shadow-lg shadow-[#26263d6c] rounded-xl p-2 bg-[#ccc4ff53] ' style={{ fontFamily: "Darker Grotesque" }}> 
+              <div className='flex justify-end items-start h-[168px] w-[300px] border-transparent text-md shadow-lg shadow-[#26263d6c] rounded-xl p-2 bg-[#ccc4ff53] ' style={{ fontFamily: "Darker Grotesque", }}> 
               
-              <CloseMini className="cursor-pointer"
+              <CloseMini className="cursor-pointer" style={{ zIndex: "100000000" }}
                 onClick={() => setAiOutput(false)} />
+              <p ref={scrollRef} className="absolute top-[20px] left-[15px] max-w-[270px] max-h-[127px] leading-[1.5] text-white text-sm text-justify pr-4 overflow-auto scroll-container-ai">{aiResponse}</p> {/* AI response text */}
+
+              </div>
+            </div>
+            )}
+            {savedAiResponse && (
+            <div className='absolute top-[43px] right-[8px]'>
+              <div className='flex justify-end items-start h-[168px] w-[300px] border-transparent text-md shadow-lg shadow-[#26263d6c] rounded-xl p-2 bg-[#ccc4ff53] ' style={{ fontFamily: "Darker Grotesque", }}> 
+              
+              <CloseMini className="cursor-pointer" style={{ zIndex: "100000000" }}
+                onClick={() => setSavedAiResponse(false)} />
+              <p ref={scrollRef} className="absolute top-[20px] left-[15px] max-w-[270px] max-h-[127px] leading-[1.5] text-white text-sm text-justify pr-4 overflow-auto scroll-container-ai"> <span className='underline underline-offset-2 font-semibold'>Last message:</span> {aiResponse}</p> {/* AI response text */}
+
               </div>
             </div>
             )}
           </div>
           </div>
          
-          {/*{smallNotes.length > 0 && (
-            <div className='flex items-center pt-4 pl-1'>
-              <ThoughtIcon className='mr-2' />  Adjust the margin as needed 
-              <p className='darker-grotesque-main' style={{ fontSize: 20 }}>
-                My latest insights:
-              </p>
-            </div>
-          )}*/}
+
           {mainContent.length > 0 && (
             <>
               <div className="flex items-center pt-4 pl-1 darker-grotesque-main" style={{ fontSize: 20 }}>
@@ -539,6 +659,19 @@ const Popup = ({  noteDate, noteContent, title1, onSave, setShowAdditionalTitles
           </div>
         </div>
       )}
+        { deleteMessageSuccess && (
+        <div className='fixed inset-0 flex justify-center items-center z-50'>
+          {/* Save message container */}
+          <div className='flex flex-col items-center justify-center gap-2 bg-gradient-to-br from-[#a49ef6bf] to-[#4e44a7e3] border border-white/60 backdrop-blur-[2px] h-[150px] w-[220px] text-white text-lg p-4 rounded-3xl shadow-lg' style={{ fontFamily: 'Darker Grotesque', fontWeight: 500, fontSize: 16 }}>
+            {/* Success Message */}
+            <div className='mb-4 tracking-wider'>
+              {deleteMessageSuccess}
+            </div>
+            {/* Check icon */}
+            <FaRegCircleCheck className='text-[rgb(172,255,226)]' size={34} />
+          </div>
+        </div>
+        )}
       {isDateTimePickerOpen && (
         <DateTimePicker
           fetchTheReminder={fetchTheReminder}

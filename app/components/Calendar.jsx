@@ -17,6 +17,7 @@ import MiniBell from "../../public/assets/MiniBell.svg"
 import CalendarContainerOriginal from "../../public/assets/CalendarContainerOriginal.svg"
 import TodayCalendarContainerPurp from "../../public/assets/TodayCalendarContainerPurp.svg"
 import { useReminder } from "@/context/ReminderContext";
+import { motion } from "framer-motion";
 
 
 
@@ -34,6 +35,9 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, not
   
   
   const [notifications, setNotifications] = useState([])
+
+    const [aiOutput, setAiOutput] = useState(false);
+  
 
   
 
@@ -235,15 +239,32 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, not
 
 
   return (
-     <div className="flex flex-col items-center w-full p-4 pt-36"> {/* <------------------ LINHA ALTERADA, ATUALIZAR NO ORIGINAL!!!!--------*/ }
-       <div className="flex justify-between w-full max-w-xl mb-7">
-         <button className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </button>
-         <h2 className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</h2>
-         <button className="text-white darker-grotesque-main" onClick={nextMonth}> <Calenright /> </button>
-       </div>
+     <div className="flex flex-col items-center w-full  p-4 pt-36"> {/* <------------------ LINHA ALTERADA, ATUALIZAR NO ORIGINAL!!!!--------*/ }
+       <motion.div
+         
+        initial={{ opacity: 0 }} 
+        animate={{ opacity: 1 }} 
+        transition={{ duration: 2, ease: "easeInOut" }}
+       
+        className="flex justify-between w-full  max-w-xl mb-7">
+         <motion.button whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 300 }} className="text-white darker-grotesque-main" onClick={prevMonth}> <Calenleft /> </motion.button>
+         <motion.h2
+          key={currentMonth}
+          initial={{ y: 0, opacity: 0 }} 
+          animate={{ y: 0, opacity: 1 }} 
+          transition={{ duration: 0.4, ease: "easeIn" }}
+          className="text-white/20 text-5xl font-semibold tracking-widest" style={{ fontFamily: 'Darker Grotesque', WebkitTextStroke: '0.9px white' }}>{format(currentMonth, 'MMMM yyyy')}</motion.h2>
+         <motion.button whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 300 }} className="text-white darker-grotesque-main" onClick={nextMonth}> <Calenright /> </motion.button>
+       </motion.div>
    
        {/* Container for calendar and overlay */}
-       <div className={`relative flex flex-wrap  max-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
+       <motion.div
+        
+        initial={{ y: 100, opacity: 1 }} 
+        animate={{ y: 0, opacity: 1 }} 
+        transition={{ duration: 0.8, ease: "easeInOut" }}
+       
+        className={`relative flex flex-wrap  max-w-[1100px] min-w-[1100px] justify-center items-center gap-2 ${showPopup ? 'blurred' : ''}`} style={{ fontFamily: 'Darker Grotesque' }}>
         {daysInMonth.map((day, index) => {
         const entry = getDateEntry(day);
         const isToday = isSameDay(day, today); // Check if the day is today
@@ -274,7 +295,7 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, not
               {entry.title}
            </div>
              : 
-             <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
+             <div className="absolute w-28 h-24 top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 max-w-[90%] text-center text-[#fefefe] overflow-hidden text-ellipsis whitespace-nowrap z-20 cursor-pointer" onClick={() => { setShowPopup(true); setNoteDate(day); setShowAdditionalTitles(false); }} style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
 
              </div>
               }
@@ -299,7 +320,7 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, not
          );
       }
     )}
-   </div>
+   </motion.div>
   
       {showPopup && (
         <div className="fixed inset-0" style={{ zIndex: 10000000 }}>  {/* zIndex em tailwind só vai até 100 - acima de 100 tem de ser no style */}
@@ -307,18 +328,20 @@ export default function Calendar({  setShowAdditionalTitles, setUserLibrary, not
           <div className="popup border border-white/45 z-40 ">
             <div className="popup-content flex flex-col justify-center items-center relative">
               <div className="flex w-full justify-end items-end">
-                <button className="close-button self-end pr-2 top-5 absolute" onClick={() => closePopup()}>
+                <motion.button whileTap={{ scale: 0.9 }}  className="close-button self-end pr-2 top-5 absolute transform transition-transform duration-150 hover:scale-105" onClick={() => closePopup()}>
                   <Close />
-                </button>
+                </motion.button>
               </div>
               <div className="flex items-center">
-                <p onClick={() => {setNoteDate(subDays(noteDate, 1)); 
-                  ;
-                  }} className="pr-4 cursor-pointer"><Calenleft /></p>
-                <Popup setShowAdditionalTitles={setShowAdditionalTitles} email={email} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
-                <p onClick={() => {setNoteDate(addDays(noteDate, 1)); 
-                  ;
-                  }} className="pl-4 cursor-pointer"><Calenright /></p>
+                <motion.p
+                  whileTap={{ scale: 0.95 }} transition={{ type: "spring", stiffness: 300 }}
+                  onClick={() => {setNoteDate(subDays(noteDate, 1)); 
+                  
+                  }} className="pr-4 cursor-pointer "><Calenleft /></motion.p>
+                <Popup aiOutput={aiOutput} setAiOutput={setAiOutput} setShowAdditionalTitles={setShowAdditionalTitles} email={email} noteContent={noteContent} title1={title1}  fetchTheReminder={fetchTheReminder} showPopup={showPopup} setShowPopup={setShowPopup} setTitle1={setTitle} getDateEntry={getDateEntry} session_email={email} noteDate={noteDate} onSave={handleEntryChange} showSmallNotesCalendar={showSmallNotesCalendar} setShowSmallNotesCalendar={setShowSmallNotesCalendar} fetchUser={fetchUserAndJournalEntries} onReminderSave={handleReminderSave} setShowPopupReminder={setShowPopupReminder} />
+                <motion.p whileTap={{ scale: 0.9 }} transition={{ type: "spring", stiffness: 300 }} onClick={() => {setNoteDate(addDays(noteDate, 1)); 
+                  
+                  }} className="pl-4 cursor-pointer "><Calenright /></motion.p>
               </div>
             </div>
           </div>

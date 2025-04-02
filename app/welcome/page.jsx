@@ -47,18 +47,15 @@ export default function Welcome() {
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [showAdditionalTitles, setShowAdditionalTitles] = useState(false); 
   const [userLibrary, setUserLibrary] = useState(null);
   const [noteContent, setNoteContent] = useState("");
 
   const [count, setCount] = useState(1);
   
-
-
+  
 
 
   const fetchTheReminder = () => {
-    
     fetchUser();
   };
 
@@ -151,6 +148,8 @@ export default function Welcome() {
       console.error('Error saving journal entry: ', error);
     }
   };
+
+
     const handleEntryChange = (date, title, mainContent, smallNotes) => {
       const existingEntry = journalEntries.find(entry => new Date(entry.date).toISOString() === date.toISOString());
       if (existingEntry) {
@@ -166,6 +165,7 @@ export default function Welcome() {
       // setReminderTitle(title);
     };
   
+
     useEffect(() => {
       fetchTheReminder()
     }, [router]);
@@ -182,9 +182,9 @@ export default function Welcome() {
 
 
   return (
-    <div className="flex flex-col wrapper pb-10 w-[100vw] pr-3 text-white no-resize">
+    <div className="flex flex-col wrapper pb-0 xs:pb-10 w-[100vw] pr-3 text-white no-resize">
       {/* ------------------------------------ Header Section -------------------------------------------------------------------- */}
-      <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>
+      <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 10000000 }}>
         <div className="flex items-center ml-10">
           {/* Logo */}
           <Link href="./welcome">
@@ -198,14 +198,17 @@ export default function Welcome() {
       </div>
   
       {/* ------------------------------------ Navbar Section ------------------------------------------------------------------------ */}
-      <div className="fixed top-[240px] w-[440px]" style={{ zIndex: 1000 }}>
+      <motion.div 
+        initial={{ x: -100, opacity: 0 }} 
+        animate={{ x: 0, opacity: 1 }} 
+        transition={{ duration: 0.8, ease: "easeOut" }} className="fixed top-[240px] w-[440px]" style={{ zIndex: 10000000 }}>
         <Navbar setNavbarIsOpen={setNavbarIsOpen} />
         <div className="absolute text-black top-[-58px] left-[50px] w-[200px]" style={{ zIndex: "1000" }}>
-            <SearchBarMini setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} 
+            <SearchBarMini setIsOpen={setIsOpen} session_email={email}  userLibrary={userLibrary} 
             setShowPopup={setShowPopupFromNotific} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
             />
         </div>
-      </div>
+      </motion.div>
   
       {/* User Picture */}
       <div className="fixed top-11 right-16 w-[120px] h-[120px] z-[10000000] sm:absolute sm:top-11 sm:right-1 sm:-translate-x-1/2">
@@ -217,7 +220,7 @@ export default function Welcome() {
   
       {/* Main Content */}
       <div className="overflow-y-auto sm:overflow-y-auto  overflow-x-hidden scroll-container">
-        <div className="flex flex-col pl-80 mt-52 sm:pl-80 sm:mt-20 md:pl-[280px] lg:pl-[280px] ">
+        <div className="flex flex-col pl-80  sm:pl-80 sm:mt-14 xs:mt-44 md:pl-[280px] lg:pl-[280px] ">
         {/* Typing Animation for h1 */}
         <motion.h1
           className="text-3xl"
@@ -246,7 +249,7 @@ export default function Welcome() {
           transition={{ duration: 1.5, delay: 2 }}
         >
           <p
-            className="w-full sm:w-[700px] text-md text-left pr-10"
+            className="w-full sm:w-[700px] text-lg text-left pr-10"
             style={{ fontFamily: "Darker Grotesque", fontWeight: "500" }}
           >
             Discover a unique journaling experience designed with your mental health in mind. Our app offers innovative features to help you effortlessly track and reflect on your thoughts and experiences over time.
@@ -261,51 +264,84 @@ export default function Welcome() {
           transition={{ duration: 1.5, delay: 1.3 }}
         >
           <p
-            className="w-full sm:w-[700px] text-md text-right pr-10"
-            style={{ fontFamily: "Darker Grotesque", fontWeight: "500" }}
+            className="w-full sm:w-[700px] text-lg text-right pr-10"
+            style={{ fontFamily: "Darker Grotesque", fontWeight: "500",  }}
           >
             With Dear Journey, you'll gain insights into your emotional well-being, make mindful observations, and enjoy a smoother, more intuitive journaling process. Start your journey towards greater self-awareness and mental clarity today!
           </p>
         </motion.div>
 
-        <div className="flex pl-14 pr-3 text-2xl w-[100%] ">
-            <p className="text-[#6464D3]" style={{ fontFamily: 'Darker Grotesque', fontWeight: '550' }}>Dear Journey offers you ...</p></div>
-            <div className="flex flex-row flex-wrap gap-7 items-end w-fit pl-20 ">
-            
-                <div className="w-[40%] h-[45vh] min-w-[350px]  border border-white/45 -ml-10 rounded-3xl flex justify-center mt-5 items-end">
-                </div>
-                <div className="w-[50%] min-w-[350px] text-lg pr-10" style={{ fontFamily: "Darker Grotesque", fontWeight: "500" }}>
-                    {[1, 2, 3, 4, 5].map((num) => (
-                      <div key={num} className="flex flex-row">
-                        <div className="w-[40px] mr-5 relative">
-                          <span
-                            className={`text-3xl absolute top-3 fadedCountWelcome ${
-                              count === num ? "fadeIn" : "fadeOut"
-                            }`}
-                            style={{ fontFamily: "Vogue", fontWeight: "700" }}
-                          >
-                            {num}.
-                          </span>
-                        </div>
-                        <p className={`mb-2 mr-5 transition-all duration-500 ${count === num ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]" : "text-[#ebebeb] opacity-90"}`}>
+        <motion.div
+          initial={{ x: -100, opacity: 0 }} // Start off-screen (left)
+          animate={{ x: 0, opacity: 1 }} // End at normal position
+          transition={{ duration: 0.8, ease: "easeOut" }} // Smooth easing
+          className="flex pl-14 pr-3 text-2xl w-[100%]"
+        >
+          <p
+            className="text-[#6464D3]"
+            style={{ fontFamily: "Darker Grotesque", fontWeight: "550" }}
+          >
+            Dear Journey offers you ...
+          </p>
+        </motion.div>
+            <motion.div
+                initial={{ y: -100, opacity: 0 }} // Start off-screen (above)
+                animate={{ y: 0, opacity: 1 }} // End at normal position
+                transition={{ duration: 1, ease: "easeOut" }} // Smooth easing
+                className="flex flex-row flex-wrap gap-7 items-end w-fit pl-20"
+              >
+                <div className="w-[40%] h-[45vh] min-w-[350px] border border-white/45 -ml-10 rounded-3xl flex justify-center mt-5 items-end"></div>
 
-                          <span className={`text-[#6464D3] ${count === num ? "opacity-100" : " opacity-90"}`} style={{ fontWeight: "600" }}>
-                            {num === 1 && "Seamless Access: "}
-                            {num === 2 && "Effortless Entries: "}
-                            {num === 3 && "Insightful Notes: "}
-                            {num === 4 && "Custom Notifications: "}
-                            {num === 5 && "AI-Driven Guidance: "}
-                          </span>
-                          {num === 1 && "register your account to access your journal from anywhere, anytime. Your reflections are always within reach."}
-                          {num === 2 && "write daily entries and edit them whenever you like. Capture your thoughts and experiences as they come."}
-                          {num === 3 && "add comments to your entries to highlight key insights and track your personal growth over time."}
-                          {num === 4 && "set up personalized notifications to remind you to revisit and revise specific topics whenever you choose."}
-                          {num === 5 && "receive thoughtful advice from our AI bot expert. Navigate your thoughts and feelings with a proactive, hands-on approach."}
-                        </p>
+                <div
+                  className="w-[50%] min-w-[350px] text-lg pr-10"
+                  style={{ fontFamily: "Darker Grotesque", fontWeight: "500" }}
+                >
+                  {[1, 2, 3, 4, 5].map((num) => (
+                    <div key={num} className="flex flex-row">
+                      <div className="w-[40px] mr-5 relative">
+                        <span
+                          className={`text-3xl absolute top-4 fadedCountWelcome ${
+                            count === num ? "fadeIn" : "fadeOut"
+                          }`}
+                          style={{ fontFamily: "Vogue", fontWeight: "700", fontSize: 40 }}
+                        >
+                          {num}.
+                        </span>
                       </div>
-                    ))}
-                  </div>
+                      <p
+                        className={`mb-2 mr-5 transition-all duration-500 ${
+                          count === num
+                            ? "text-white drop-shadow-[0_0_8px_rgba(255,255,255,0.9)]"
+                            : "text-[#ebebeb] opacity-90"
+                        }`}
+                      >
+                        <span
+                          className={`text-[#6464D3] ${
+                            count === num ? "opacity-100" : " opacity-90"
+                          }`}
+                          style={{ fontWeight: "600" }}
+                        >
+                          {num === 1 && "Seamless Access: "}
+                          {num === 2 && "Effortless Entries: "}
+                          {num === 3 && "Insightful Notes: "}
+                          {num === 4 && "Custom Notifications: "}
+                          {num === 5 && "AI-Driven Guidance: "}
+                        </span>
+                        {num === 1 &&
+                          "register your account to access your journal from anywhere, anytime. Your reflections are always within reach."}
+                        {num === 2 &&
+                          "write daily entries and edit them whenever you like. Capture your thoughts and experiences as they come."}
+                        {num === 3 &&
+                          "add comments to your entries to highlight key insights and track your personal growth over time."}
+                        {num === 4 &&
+                          "set up personalized notifications to remind you to revisit and revise specific topics whenever you choose."}
+                        {num === 5 &&
+                          "receive thoughtful advice from our AI bot expert. Navigate your thoughts and feelings with a proactive, hands-on approach."}
+                      </p>
+                    </div>
+                  ))}
                 </div>
+              </motion.div>
             </div>
 
 

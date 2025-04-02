@@ -46,8 +46,12 @@ const LibraryEntrySchema = new Schema({
     required: false,
     default: undefined
   },
+  lastAIResponse: { 
+    type: String, 
+    required: false, 
+    default: "" 
+  },
   smallNotes: [SmallNotesSchema],
-
 });
 
 // Support schema

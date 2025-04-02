@@ -59,7 +59,7 @@ const highlightMatch = (text, term, maxLength = MAX_CHARS) => {
 };
 
 
-export default function SearchBarMini({ setIsOpen, session_email, userLibrary, setShowAdditionalTitles, setShowPopup, setTitle1, setNoteDate, setShowSmallNotesCalendar, setNoteContent}) {
+export default function SearchBarMini({ setIsOpen, session_email, userLibrary, setShowPopup, setTitle1, setNoteDate, setShowSmallNotesCalendar, setNoteContent}) {
   console.log("User email:", session_email);
 
   
@@ -188,7 +188,6 @@ const handleOpenPopups = (result) => {
     setSearchTerm(""); // close research when the popup opens
 
     setShowPopup(true); // outter laywer popup + inner conntent MainPopup
-    setShowAdditionalTitles(false);
     setIsOpen(false);
 
     setNoteDate(new Date(result.parentDate));
@@ -213,7 +212,7 @@ const handleOpenPopups = (result) => {
 
   
   return (
-    <div className="text-white text-lg w-[560px]" style={{ fontFamily: "Darker Grotesque" }} ref={SearchBarMiniRef}>
+    <div className="text-white text-lg w-[190px]" style={{ fontFamily: "Darker Grotesque" }} ref={SearchBarMiniRef}>
     {/* Search Bar Container */}
     <div className="relative search-bar-container mb-3"> {/* Added a bottom margin */}
       <div className="pb-5"><SearchBox className="absolute -left-1" /></div>
@@ -224,7 +223,7 @@ const handleOpenPopups = (result) => {
         autoComplete="off"
         onChange={handleChange}
         style={{
-          width: "555px",
+          width: "190px",
           height: "38px",
           borderRadius: "60px",
           border: "1px",

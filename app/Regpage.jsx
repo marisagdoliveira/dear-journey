@@ -40,6 +40,16 @@ export default function Regpage() {
 
   const [passwordError, setPasswordError] = useState(false);
 
+  // states for reseting password:
+  // const [showForgotPassword, setShowForgotPassword] = useState(false);
+  // const [resetEmail, setResetEmail] = useState('');
+  // const [resetPassword, setResetPassword] = useState('');
+  // const [confirmResetPassword, setConfirmResetPassword] = useState('');
+  // const [resetMessage, setResetMessage] = useState('');
+  // const [passwordResetValidation, setPasswordResetValidation] = useState({});
+  // const [resetPasswordVisible, setResetPasswordVisible] = useState(false);
+  // const [confirmResetPasswordVisible, setConfirmResetPasswordVisible] = useState(false);
+
 
   
   useEffect(() => {
@@ -129,8 +139,12 @@ export default function Regpage() {
       console.log(res); // Log the response for debugging
 
 
-      if (!res.ok) {
-        throw new Error("Network response was not ok");
+      if (res.error) {
+        if (res.error.includes("CredentialsSignin")) {
+          setMessage("Incorrect email or password.");
+        } else {
+          setMessage("Login failed. Please try again.");
+        }
         return;
       }
 
@@ -141,7 +155,7 @@ export default function Regpage() {
       router.replace("homepage");
     } catch (error) {
       console.error("Error logging in:", error);
-      //setMessage("Failed to log in. Please try again later.");
+      setMessage("Failed to log in. Please try again later.");
     }
   };
 
@@ -183,7 +197,7 @@ export default function Regpage() {
             >
               <div className="flex flex-col w-72  h-fit mt-5 mb-2 justify-center items-center text-xl font-semibold text-[#5c62da]">
                 <div className="rounded-lg w-full flex justify-center items-center">
-                  <Logo className="w-32 h-32 sm:w-48 sm:h-48 md:w-48 md:h-48 lg:w-48 lg:h-48 pl-[20px] mb-[-15px]" />
+                  <Logo className="w-32 h-32 xs:w-48 xs:h-48 sm:w-48 sm:h-48 md:w-48 md:h-48 lg:w-48 lg:h-48 pl-[20px] mb-[-15px]" />
                 </div>
                 <h1 className="text-white text-3xl mb-3" style={{ fontFamily: 'Vibur, cursive' }}>Sign In</h1>
               </div>
@@ -218,16 +232,48 @@ export default function Regpage() {
 
                 
               <p className="text-s" style={{ fontFamily: 'Darker Grotesque' }}>{message}</p>
-              <div className="flex align-center justify-center"><button
+
+
+              <div className="flex align-center justify-center text-white text-md tracking-wide " style={{ fontFamily: 'Darker Grotesque', fontWeight: 450 }}
+              >
+                <span className="hover:underline underline-offset-2 cursor-pointer"
+                  onClick={() => {
+                  setShowLogin(!showLogin);
+                  setMessage('');
+                  setErrorMessage('');
+                  
+                  // Reset inputs when toggling between login and register
+                  setUsername('');
+                  setEmail('');
+                  setPassword('');
+                  setConfirmPassword('');
+                  setLoginEmail('');
+                  setLoginPassword('');
+                }}
+                >
+                  Forgot password?
+                </span>
+
+              </div>
+              <div className="flex align-center justify-center "><button
                 className="button-pop2 bg-[#8585F2]/25 border border-white/60 rounded-xl font-medium text-white w-[90px] h-[35px] mt-5 darker-grotesque-main" style={{ fontWeight: '500' }}
                 onClick={handleLogin}
               >
                 Submit
               </button></div>
+
+
              
               <div
                 className="mt-3 text-[#5c62da] text-s cursor-pointer flex align-center justify-center" style={{ fontFamily: 'Vibur, cursive' }}
-                onClick={() => {setShowLogin(false); setMessage('');}}
+                onClick={() => {
+                setShowLogin(false);
+                setMessage('');
+
+                // Reset login input fields
+                setLoginEmail('');
+                setLoginPassword('');
+              }}
               >
                 Don't have an account?{" "}
                 <span className="flex text-[#5c62da] text-s hover:underline  align-center justify-center pl-1" style={{ fontFamily: 'Vibur, cursive' }}>
@@ -246,7 +292,7 @@ export default function Regpage() {
             >
               <div className="flex flex-col w-72 h-fit mt-5 mb-2 justify-center items-center text-xl font-semibold text-[#5c62da]">
                 <div className="rounded-lg w-full flex justify-center items-center">
-                  <Logo className="w-32 h-32 !sm:w-48 !sm:h-48 md:w-48 md:h-48 lg:w-48 lg:h-48 pl-[20px] mb-[-15px] min-w-48 min-h-48 " />
+                  <Logo className="w-32 h-32 !xs:w-48 !xs:h-48 !sm:w-48 !sm:h-48 md:w-48 md:h-48 lg:w-48 lg:h-48 pl-[20px] mb-[-15px] min-w-48 min-h-48 " />
                 </div>
                 <h1 className="text-white text-3xl mb-3" style={{ fontFamily: 'Vibur, cursive' }}>Sign Up</h1>
               </div>
@@ -309,7 +355,7 @@ export default function Regpage() {
               <div className="relative">
               <input
                 className="border border-white/60 bg-transparent placeholder-white/60 rounded-xl w-[300px] h-[30px] mb-3 mt-1 py-5 pl-2 darker-grotesque-main"
-                type="password"
+                type={confirmPasswordVisible ? 'text' : 'password'}
                 placeholder="Confirm Password"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}

@@ -19,6 +19,7 @@ import Link from "next/link";
 import { getSession } from "next-auth/react";
 import SearchBarMini from "../components/SearchBarMini";
 import Popup from "../components/Popup";
+import { motion } from "framer-motion";
 
 
 export default function Support() {
@@ -51,7 +52,6 @@ export default function Support() {
   const [showSmallNotesCalendar, setShowSmallNotesCalendar] = useState(false);
 
   const [isOpen, setIsOpen] = useState(false);
-  const [showAdditionalTitles, setShowAdditionalTitles] = useState(false); 
   const [userLibrary, setUserLibrary] = useState(null);
   const [noteContent, setNoteContent] = useState("");
 
@@ -277,8 +277,8 @@ export default function Support() {
   return (
     <div className="flex flex-col wrapper pb-10 w-[100vw] text-white">
       {/* ------------------------------------ Header Section -------------------------------------------------------------------- */}
-      <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 1000 }}>
-        <div className="flex items-center ml-10">
+      <div className="fixed top-10 left-3 w-[440px] h-[100px]" style={{ zIndex: 10000000 }}>
+        <div className="flex items-center ml-10" >
           {/* Logo */}
           <Link href="./welcome">
             <img
@@ -291,14 +291,19 @@ export default function Support() {
       </div>
   
       {/* ------------------------------------ Navbar Section ------------------------------------------------------------------------ */}
-      <div className="fixed top-[240px] w-[440px]" style={{ zIndex: 1000 }}>
+      <motion.div 
+        initial={{ x: -100, opacity: 0 }} 
+        animate={{ x: 0, opacity: 1 }} 
+        transition={{ duration: 0.8, ease: "easeOut" }}
+
+        className="fixed top-[240px] w-[440px]" style={{ zIndex: 10000000 }}>
         <Navbar setNavbarIsOpen={setNavbarIsOpen} />
         <div className="absolute text-black top-[-58px] left-[50px] w-[200px]" style={{ zIndex: "1000" }}>
-            <SearchBarMini setIsOpen={setIsOpen} session_email={email} setShowAdditionalTitles={setShowAdditionalTitles} userLibrary={userLibrary} 
-            setShowPopup={setShowPopupFromNotific} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
-            />
-          </div>
-      </div>
+          <SearchBarMini setIsOpen={setIsOpen} session_email={email}  userLibrary={userLibrary} 
+          setShowPopup={setShowPopupFromNotific} setTitle1={setTitle1} setNoteDate={setNoteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} setNoteContent={setNoteContent}
+          />
+        </div>
+      </motion.div>
   
    
   
@@ -342,12 +347,23 @@ export default function Support() {
         ) : (
         <div className="pl-80 flex gap-24 justify-between">
           <div className="flex flex-col h-[350px] items-start justify-center mt-4"> {/* Support Form: --------------------------------------------------- */}
-            <h1 style={{ fontFamily: 'Darker Grotesque', fontSize: 55, fontWeight: 500 }}>
-              Welcome to Support!
-            </h1>
-            <h2 style={{ fontFamily: 'Darker Grotesque', fontSize: 40, fontWeight: 500 }}>
-              How can we help?
-            </h2>
+            <motion.div
+              initial={{ x: -100, opacity: 0 }} 
+              animate={{ x: 0, opacity: 1 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }}>
+
+              <h1 style={{ fontFamily: 'Darker Grotesque', fontSize: 55, fontWeight: 500 }}>
+                Welcome to Support!
+              </h1>
+              <h2 style={{ fontFamily: 'Darker Grotesque', fontSize: 40, fontWeight: 500 }}>
+                How can we help?
+              </h2>
+            </motion.div>
+            <motion.div 
+              initial={{ y: -100, opacity: 0 }} 
+              animate={{ y: 0, opacity: 1 }} 
+              transition={{ duration: 0.8, ease: "easeOut" }}>
+
             <p className="mb-2" style={{ fontFamily: 'Darker Grotesque', fontSize: 24, fontWeight: 400 }}>
               Please, describe the issue below:
             </p>
@@ -421,18 +437,26 @@ export default function Support() {
                 Submit
               </button>
             </form>
+            </motion.div>
             </div>
-        {/* User Picture */}
-      <div className=" w-[100px] absolute top-12 h-[100px] right-16" style={{ zIndex: 10000000 }}>
-        <UserPic className=""
-          user={{ img: userPic, email: email, username: username }} // Pass userPic instead of UserPic
-          onPicChange={handlePicChange}
-        />
-      </div>
+         {/* User Picture */}
+          <div className=" w-[100px] absolute top-12 h-[100px] right-16" style={{ zIndex: 10000000 }}>
+            <UserPic className=""
+              user={{ img: userPic, email: email, username: username }} // Pass userPic instead of UserPic
+              onPicChange={handlePicChange}
+            />
+          </div>
             
-            <div className="flex flex-col justify-center items-start">
-              <div className="absolute top-36 ml-[190px]"><FAQIcon/></div>
-            <div className="relative w-[450px]   mt-40 max-h-[474px]  overflow-hidden overflow-y-auto scroll-container-faq">
+            <motion.div
+              initial={{ opacity: 0 }} 
+              animate={{ opacity: 1 }} 
+              transition={{ duration: 2, ease: "easeOut", stiffness: 300 }}
+              className="flex flex-col justify-center items-start">
+
+              <div className="absolute top-36 ml-[190px]">
+                <FAQIcon/>
+              </div>
+              <div className="relative w-[450px]   mt-40 max-h-[474px]  overflow-hidden overflow-y-auto scroll-container-faq">
                 
                 <ol className="flex flex-col items-center gap-3">
                   {/* Question 1 */}
@@ -490,7 +514,8 @@ export default function Support() {
                 </div>
 
                 </ol>
-            </div></div>
+              </div>
+            </motion.div>
           </div>
             )}
 

@@ -33,7 +33,7 @@ const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
 
   
     return (
-        <div className={`h-[430px] ${isOpen ? 'w-[200px]' : 'w-[75px]'} px-4 flex items-center py-8 relative border ml-12 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] transition-all duration-300 ease-in-out overflow-hidden`}>
+        <div className={`h-[380px] ${isOpen ? 'w-[200px]' : 'w-[75px]'} px-4 flex items-center py-8 mb-6 relative border ml-12 rounded-[45px] border-white/60 bg-gradient-to-tl from-[rgba(100,100,211,0.4)] to-[rgba(204,196,255,0.3)] transition-all duration-300 ease-in-out overflow-hidden`}>
             <div style={{ 
                 position: 'absolute',
                 top: 0,
@@ -42,7 +42,8 @@ const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
                 height: '100%',
                 marginLeft: '20px',
                 zIndex: -1,
-            }}></div>
+            }}>
+            </div>
             <div className='relative flex-1 flex flex-col items-start justify-evenly'>
                 <div className='ml-2 py-[10px]  cursor-pointer' onClick={toggleSideBar}>
                     <Resize />
@@ -71,12 +72,7 @@ const NavBar = ({ setNavbarIsOpen, fetchTheReminder }) => {
                         Support
                     </div>
                 </Link>
-                <Link href="/profile" className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} style={{ fontFamily: 'Darker Grotesque' }}>
-                    <Notifications className="ml-2 w-8 h-8"/> 
-                    <div className={`font-medium ml-2 ${isOpen ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-[-20px] pointer-events-none'} transition-opacity transition-transform duration-300 ease-in-out text-sparkle`}>
-                        Notifications
-                    </div>
-                </Link>
+
                 <button 
                     className={`flex items-center py-[10px] text-2xl transition-transform duration-300 ease-in-out`} 
                     style={{ fontFamily: 'Darker Grotesque' }}

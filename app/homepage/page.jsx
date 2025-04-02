@@ -13,6 +13,8 @@ import { TbBell } from "react-icons/tb";
 import TbBell2 from "../../public/assets/TbBell2.svg"
 import FirstArrow from "../../public/assets/FirstArrow.svg"
 import SecondArrow from "../../public/assets/SecondArrow.svg"
+import { motion } from "framer-motion";
+
 
 
 
@@ -246,7 +248,7 @@ export default function Homepage() {
 
 
   return (
-    <div className="flex items-center justify-center wrapper pb-10">
+    <div className="flex items-center  justify-center wrapper pb-10">
   <div>
     {/* SearchBar at Top Center */}
     <div className="absolute text-black top-[41px] left-[540px] lg:left-[540px] xl:left-[1000px] " style={{ zIndex: "1000" }}>
@@ -364,11 +366,17 @@ export default function Homepage() {
   </div>
 
   {/* Navbar & Clock */}
-  <div className="flex flex-col mt-24">
+  <motion.div 
+    initial={{ x: -100, opacity: 0 }} 
+    animate={{ x: 0, opacity: 1 }} 
+    transition={{ duration: 0.8, ease: "easeOut" }}
+
+    className="flex flex-col mt-24">
+
   <div className="mt-24" style={{ zIndex: "100000000000" }}>
     <Navbar setNavbarIsOpen={setNavbarIsOpen} fetchTheReminder={fetchTheReminder} />
   </div>
-  <div className="digital-clock " style={{ zIndex: "100000000000" }}>
+  <div className="digital-clock ml-5 " style={{ zIndex: "100000000000" }}>
       <div className="time text-black">
         <div className="hour">{String(hours).padStart(2, "0")}</div>
         <div className={`dot ${showDot ? "invsi" : ""}`}>:</div>
@@ -383,9 +391,11 @@ export default function Homepage() {
         ))}
       </div>
     </div>
-  </div>
+  </motion.div>
 
   {/* Calendar */}
+  
+
   <Calendar
     className="pt-10"
     setTitle1={setTitle1} setNoteDate={setNoteDate} noteDate={noteDate} setShowSmallNotesCalendar={setShowSmallNotesCalendar} showSmallNotesCalendar={showSmallNotesCalendar} setNoteContent={setNoteContent}
@@ -400,7 +410,6 @@ export default function Homepage() {
     setShowPopupReminder={setShowPopupReminder}
     showPopupReminderDate={showPopupReminderDate}
   />
-
 
           
   </div>

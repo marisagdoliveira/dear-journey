@@ -142,7 +142,7 @@ const SmallNotesPopup = ({ smallNotes, session_email, noteDate, fetchUser, setSm
                       placeholder="Write your insight here..."
                       className="absolute text-justify left-3 w-[18vw] h-[20vh] mt-5 bg-transparent placeholder-[#ffffffb7] p-2 pl- focus:outline-none rounded-lg scroll-container text-[#dad9ff]"
                     />
-                    <p className="text-gray-200 w-[80px] absolute left-36 top-44 mt-2">
+                    <p className="text-gray-200 absolute left-36 top-44 w-[80px] mt-2">
                       {note.writtenDate ? new Date(note.writtenDate).toLocaleDateString() : 'No Date'}
                     </p>
                   </div>

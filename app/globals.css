@@ -104,6 +104,8 @@ body{
   width: 100vw;
   min-width: 100vw;
   min-height: 100vh;
+    overflow: hidden; /* Prevents black spaces */
+  background-size: cover; /* Ensures background fills the area */
 
   background-color: #8472FF;
   background-image: radial-gradient(circle farthest-corner at 50% 50%, 
@@ -113,6 +115,7 @@ body{
     position: center;
   background-size: 100% 150%;
   animation: morph 10s ease-in-out infinite;
+  /* animation-delay: 3s; */
 }
 
 
@@ -288,12 +291,17 @@ body{
 
 /* For non-webkit browsers (e.g., Firefox) */
 .scroll-container {
-  scrollbar-color: #5e5ea3cf transparent;
+  scrollbar-color: #5e5ea365 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 }
 
 .scroll-container-profile {
   scrollbar-color: #5e5ea344 transparent;
+  scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
+}
+
+.scroll-container-ai {
+  scrollbar-color: #41416d49 transparent;
   scrollbar-width: thin; /* Set the scrollbar width to 'thin' */
 }
 
@@ -837,6 +845,7 @@ function */
   display: flex;
   flex-wrap: wrap;
   justify-content: space-evenly;
+  padding-left: 40px;
 }
 
 .single-column{
@@ -1045,3 +1054,31 @@ transition: opacity 0.1s ease-in-out;
 }
 
 
+/* .layout wraps the entire page */
+.layout {
+  position: relative;
+  min-height: 100vh; /* Full viewport height */
+}
+
+/* .navbar stays fixed at the top of the screen */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 200px;
+  height: 200px; /* Adjust navbar height */
+  background-color: rgb(0, 0, 0); /* Background for the navbar */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional shadow */
+  z-index: 1000; /* Keep navbar on top of content */
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+/* .content starts below the fixed navbar */
+.content {
+   /* Adjust this to match the height of the navbar */
+  flex: 1; /* Ensure content takes the rest of the available space */
+}

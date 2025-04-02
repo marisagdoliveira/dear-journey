@@ -7,8 +7,8 @@ module.exports = {
   ],
   theme: {
     screens: {
-      xs: '220px',  // Custom breakpoint for extra small devices (mobile phones)
-      sm: '500px',
+      xs: '500px',  // Custom breakpoint for extra small devices (mobile phones)
+      sm: '510px',
       md: '768px',
       lg: '1024px',
       xl: '1920px',
